@@ -11,25 +11,22 @@
 
 \usepackage{hyperref}
 \usepackage{url}
+\usepackage{booktabs}
+\usepackage{tabularx}
 
 
-\title{Formatting Instructions for TMLR \\Journal Submissions}
-
+\title{Tool-Lab: Tracing Information Acquisition and Optimal Decision-Making in Large Language Models}
+% Opening the Black Box: Evaluating LLM Alignment through Process Tracing and Tool Use
 % Authors must not appear in the submitted version. They should be hidden
 % as long as the tmlr package is used without the [accepted] or [preprint] options.
 % Non-anonymous submissions will be rejected without review.
 
-\author{\name Kyunghyun Cho \email kyunghyun.cho@nyu.edu \\
-      \addr Department of Computer Science\\
-      University of New York
-      \AND
-      \name Raia Hadsell \email raia@google.com \\
-      \addr DeepMind
-      \AND
-      \name Hugo Larochelle \email hugolarochelle@google.com\\
-      \addr Mila, Universit\'e de Montr\'eal \\
-      Google Research\\
-      CIFAR Fellow}
+\author{\name Davood Wadi \email davood.wadi@ucanwest.ca \\
+      \addr University Canada West
+      % \AND
+      % \name Raia Hadsell \email raia@google.com \\
+      % \addr DeepMind
+      }
 
 % The \author macro works with any number of authors. Use \AND 
 % to separate the names and addresses of multiple authors.
@@ -48,360 +45,158 @@
 \maketitle
 
 \begin{abstract}
-The abstract paragraph should be indented 1/2~inch on both left and
-right-hand margins. Use 10~point type, with a vertical spacing of 11~points.
-The word \textbf{\large Abstract} must be centered, in bold, and in point size 12. Two
-line spaces precede the abstract. The abstract must be limited to one
-paragraph.
+Nothing
 \end{abstract}
 
-\section{Submission of papers to TMLR}
+\section{Introduction}
+% The Problem: LLMs are increasingly used for complex decision-making, but their internal information acquisition process remains opaque.
+% The Inspiration: Introduce Mouselab and its historical significance in tracing human cognitive processes and information search.
+% The Contribution: Introduce Tool-Lab, a novel methodology that adapts the Mouselab paradigm for LLMs by monitoring and analyzing their tool-calling behavior.
+% Paper Outline: Briefly state what the subsequent sections will cover.
 
-TMLR requires electronic submissions, processed by
-\url{https://openreview.net/}. See TMLR's website for more instructions.
+\section{Related Work}
+% Tracing Human Decision-Making: Briefly discuss Mouselab, process tracing, and information acquisition in cognitive psychology and behavioral economics.
+% LLM Decision-Making and Reasoning: Discuss current literature on LLM reasoning (e.g., Chain of Thought, ReAct) and evaluations of LLM behavior.
+% Tool Use in LLMs: Review literature on how LLMs utilize external tools, APIs, and search functions, positioning Tool-Lab as a diagnostic method rather than just a capability enhancement.
 
-If your paper is ultimately accepted, use option {\tt accepted} with the {\tt tmlr} 
-package to adjust the format to the camera ready requirements, as follows:
-\begin{center}  
-  {\tt {\textbackslash}usepackage[accepted]\{tmlr\}}. 
-\end{center}
-You also need to specify the month and year
-by defining variables {\tt month} and {\tt year}, which respectively
-should be a 2-digit and 4-digit number. To de-anonymize and remove mentions
-to TMLR (for example for posting to preprint servers), use the preprint option,
-as in {\tt {\textbackslash}usepackage[preprint]\{tmlr\}}. 
+% I need to create a table based on the research papers in mouselab directory in the repository, outlining all the research conducted so far in different disciplines.
+% Columns: subject field, inline citation, brief experiment context, what was measured, what was found
 
-Please read carefully the instructions below, and follow them
-faithfully.
-
-\subsection{Style}
-
-Papers to be submitted to TMLR must be prepared according to the
-instructions presented here.
-
-Authors are required to use the TMLR \LaTeX{} style files obtainable at the
-TMLR website. Please make sure you use the current files and
-not previous versions. Tweaking the style files may be grounds for rejection.
-
-\subsection{Retrieval of style files}
-
-The style files for TMLR and other journal information are available online on
-the TMLR website.
-The file \verb+tmlr.pdf+ contains these
-instructions and illustrates the
-various formatting requirements your TMLR paper must satisfy.
-Submissions must be made using \LaTeX{} and the style files
-\verb+tmlr.sty+ and \verb+tmlr.bst+ (to be used with \LaTeX{}2e). The file
-\verb+tmlr.tex+ may be used as a ``shell'' for writing your paper. All you
-have to do is replace the author, title, abstract, and text of the paper with
-your own.
-
-The formatting instructions contained in these style files are summarized in
-sections \ref{gen_inst}, \ref{headings}, and \ref{others} below.
-
-\section{General formatting instructions}
-\label{gen_inst}
-
-The text must be confined within a rectangle 6.5~inches wide and
-9~inches long. The left margin is 1~inch.
-Use 10~point type with a vertical spacing of 11~points. Computer Modern Bright is the
-preferred typeface throughout. Paragraphs are separated by 1/2~line space,
-with no indentation.
-
-Paper title is 17~point, in bold and left-aligned.
-All pages should start at 1~inch from the top of the page.
-
-Authors' names are
-set in boldface. Each name is placed above its corresponding
-address and has its corresponding email contact on the same line, in italic 
-and right aligned. The lead author's name is to be listed first, and
-the co-authors' names are set to follow vertically.
-
-Please pay special attention to the instructions in section \ref{others}
-regarding figures, tables, acknowledgments, and references.
-
-\section{Headings: first level}
-\label{headings}
-
-First level headings are in bold,
-flush left and in point size 12. One line space before the first level
-heading and 1/2~line space after the first level heading.
-
-\subsection{Headings: second level}
-
-Second level headings are in bold,
-flush left and in point size 10. One line space before the second level
-heading and 1/2~line space after the second level heading.
-
-\subsubsection{Headings: third level}
-
-Third level headings are in bold,
-flush left and in point size 10. One line space before the third level
-heading and 1/2~line space after the third level heading.
-
-\section{Citations, figures, tables, references}
-\label{others}
-
-These instructions apply to everyone, regardless of the formatter being used.
-
-\subsection{Citations within the text}
-
-Citations within the text should be based on the \texttt{natbib} package
-and include the authors' last names and year (with the ``et~al.'' construct
-for more than two authors). When the authors or the publication are
-included in the sentence, the citation should not be in parenthesis, using \verb|\citet{}| (as
-in ``See \citet{Hinton06} for more information.''). Otherwise, the citation
-should be in parenthesis using \verb|\citep{}| (as in ``Deep learning shows promise to make progress
-towards AI~\citep{Bengio+chapter2007}.'').
-
-The corresponding references are to be listed in alphabetical order of
-authors, in the \textbf{References} section. As to the format of the
-references themselves, any style is acceptable as long as it is used
-consistently.
-
-\subsection{Footnotes}
-
-Indicate footnotes with a number\footnote{Sample of the first footnote} in the
-text. Place the footnotes at the bottom of the page on which they appear.
-Precede the footnote with a horizontal rule of 2~inches.\footnote{Sample of the second footnote}
-
-\subsection{Figures}
-
-All artwork must be neat, clean, and legible. Lines should be dark
-enough for purposes of reproduction; art work should not be
-hand-drawn. The figure number and caption always appear after the
-figure. Place one line space before the figure caption, and one line
-space after the figure. The figure caption is lower case (except for
-first word and proper nouns); figures are numbered consecutively.
-
-Make sure the figure caption does not get separated from the figure.
-Leave sufficient space to avoid splitting the figure and figure caption.
-
-You may use color figures.
-However, it is best for the
-figure captions and the paper body to make sense if the paper is printed
-either in black/white or in color.
-\begin{figure}[h]
-\begin{center}
-%\framebox[4.0in]{$\;$}
-\fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
-\end{center}
-\caption{Sample figure caption.}
-\end{figure}
-
-\subsection{Tables}
-
-All tables must be centered, neat, clean and legible. Do not use hand-drawn
-tables. The table number and title always appear before the table. See
-Table~\ref{sample-table}. Place one line space before the table title, one line space after the table
-title, and one line space after the table. The table title must be lower case
-(except for first word and proper nouns); tables are numbered consecutively.
-
-\begin{table}[t]
-\caption{Sample table title}
-\label{sample-table}
-\begin{center}
-\begin{tabular}{ll}
-\multicolumn{1}{c}{\bf PART}  &\multicolumn{1}{c}{\bf DESCRIPTION}
-\\ \hline \\
-Dendrite         &Input terminal \\
-Axon             &Output terminal \\
-Soma             &Cell body (contains cell nucleus) \\
-\end{tabular}
-\end{center}
+\begin{table}[hbtp]
+\centering
+\caption{Summary of Mouselab research across disciplines.}
+\small
+\begin{tabularx}{\textwidth}{@{}p{2.5cm} p{2cm} X X X@{}}
+\toprule
+\textbf{Subject Field} & \textbf{Article} & \textbf{Context} & \textbf{Measures} & \textbf{Findings} \\
+\midrule
+Accounting \& Corporate Finance & \citet{hodge2004does} & Nonprofessional investors evaluated firms using searchable XBRL vs. PDF to allocate a \$10k investment. & Information acquisition and integration, investment decisions, and firm performance judgments. & XBRL technology improved nonprofessionals' acquisition and integration of disclosed information. \\
+\addlinespace
+Consumer Behavior & \citet{payne1988adaptive} & Simulated choice heuristics and human process-tracing using Mouselab evaluating risky multi-attribute options under time pressure. & Information acquisition (amount, speed, sequence, filtration) and relative choice accuracy. & Under high time pressure, users adapted by using attribute-based heuristics, processing faster, and filtering info, maintaining accuracy. \\
+\addlinespace
+Emotion \& Moral Psychology & \citet{luce1997choice} & Participants made multi-attribute choices under varying negative emotion conditions (e.g., child charity donation, job choice). & Extent and pattern of processing (time, sequence, alternative vs. attribute search), and self-reported emotion. & Higher negative emotion led to more extensive processing and a shift towards attribute-based, avoiding difficult trade-offs. \\
+\addlinespace
+Game Theory \& Behavioral Economics & \citet{johnson2002detecting} & Three-round sequential bargaining games with a shrinking pie to track information acquisition and backward induction. & Bargaining behavior (offers, rejection rates) and information search patterns (payoff box lookaheads). & Most subjects exhibited limited lookahead, failing backward induction; instruction improved both lookahead and normative offers. \\
+\addlinespace
+Healthcare Economics \& Policy & \citet{johnson2013can} \newline \citet{dellaert2024choice} & Consumers chose health insurance plans with/without aids (calculators, smart defaults); impacts of choice architecture. & Choice accuracy (cost-effectiveness), financial errors, weight on price components, and decision time. & Without decision aids, consumers made large financial errors by overweighting deductibles; smart defaults and calculators improved choices. \\
+\addlinespace
+Political Science & \citet{lau2006voters} & Voters gathered information and cast votes in a dynamic mock presidential election simulation with scrolling info. & Information search depth, comparability, sequence (candidate/attribute), and matching to decision strategies. & Voters vary in decision strategies (e.g., rational vs. heuristic); dynamic info tracking reveals heuristic use in complex races. \\
+\addlinespace
+Social Psychology \& Intergroup Bias & \citet{freeman2011looking} & Categorization of racially ambiguous faces dressed in high-status (business) vs. low-status (janitor) attire. & Categorization choice (White/Black) and real-time computer mouse hand trajectories (Area Under Curve). & High-status attire increased White categorizations, low-status increased Black; trajectories showed implicit attraction to unselected categories. \\
+\bottomrule
+\end{tabularx}
 \end{table}
 
-\section{Default Notation}
+\section{The Tool-Lab Methodology}
+% Conceptual Framework: Map the Mouselab paradigm to LLM tool use (e.g., "opening a box" in Mouselab = "calling a tool/API" in Tool-Lab).
+% Metrics and Tracking: Define the specific metrics used to evaluate the LLMs (e.g., sequence of tools called, amount of information acquired before deciding, time/tokens spent, search depth vs. breadth).
+% Experimental Setup: Explain the general setup, the array of LLMs tested (e.g., GPT-5.4, Claude 4.6, Gemini 3.1), and the standardized environment they interact with.
 
-In an attempt to encourage standardized notation, we have included the
-notation file from the textbook, \textit{Deep Learning}
-\cite{goodfellow2016deep} available at
-\url{https://github.com/goodfeli/dlbook_notation/}.  Use of this style
-is not required and can be disabled by commenting out
-\texttt{math\_commands.tex}.
+\section{Experiment 1: Political Science}
+We instantiate the first Tool-Lab task as a dynamic presidential campaign adapted from
+\citet{lau2006voters}. The original study asked human voters to navigate a mock election
+in which information arrived as a transient stream rather than as a fixed table: only a
+few candidate-attribute labels were visible at any moment, opening one item revealed its
+contents, and the rest of the stream continued to move. This design is useful for
+Tool-Lab because it turns information acquisition itself into the object of study. The
+experiment does not ask only which candidate a model selects; it asks which pieces of
+evidence the model decides are worth spending its limited access opportunities on.
 
+Our environment preserves the core structure of the political-science task. Each episode
+begins with eight unfamiliar presidential candidates, four Democrats and four Republicans,
+and proceeds through a primary stage followed by a general-election stage. Candidates are
+described through the same broad classes of cues emphasized by \citet{lau2006voters}:
+issue positions, party and ideological labels, personal background, personality cues,
+campaign strategy, endorsements, and polls. The model is assigned a party registration
+before the primary and can inspect only one currently available item at a time.
+Inspecting an item is implemented as a tool call. While the model reads that item, new
+items continue to arrive and previously visible items can disappear, creating an explicit
+opportunity cost for search. As in the original dynamic board, some cue types are
+intentionally easier to encounter than others, allowing salient signals such as party and
+poll standing to compete with more effortful issue-level evidence.
 
-\centerline{\bf Numbers and Arrays}
-\bgroup
-\def\arraystretch{1.5}
-\begin{tabular}{p{1in}p{3.25in}}
-$\displaystyle a$ & A scalar (integer or real)\\
-$\displaystyle \va$ & A vector\\
-$\displaystyle \mA$ & A matrix\\
-$\displaystyle \tA$ & A tensor\\
-$\displaystyle \mI_n$ & Identity matrix with $n$ rows and $n$ columns\\
-$\displaystyle \mI$ & Identity matrix with dimensionality implied by context\\
-$\displaystyle \ve^{(i)}$ & Standard basis vector $[0,\dots,0,1,0,\dots,0]$ with a 1 at position $i$\\
-$\displaystyle \text{diag}(\va)$ & A square, diagonal matrix with diagonal entries given by $\va$\\
-$\displaystyle \ra$ & A scalar random variable\\
-$\displaystyle \rva$ & A vector-valued random variable\\
-$\displaystyle \rmA$ & A matrix-valued random variable\\
-\end{tabular}
-\egroup
-\vspace{0.25cm}
+We log the full sequence of tool calls and evaluate the trace using three families of
+measures from the Mouselab literature. Depth of search captures how much information the
+model acquires before voting, measured from the number of unique items and distinct
+attributes inspected. Comparability of search captures how evenly the model examines the
+same attributes across the candidates in its current choice set. Sequence of search
+captures whether the model searches candidate-by-candidate or attribute-by-attribute,
+which allows us to distinguish more systematic compensatory search from shallower or
+confirmatory heuristics. These process measures are computed separately for the primary
+and general-election stages so that we can test whether narrowing the field changes the
+model's search strategy.
 
-\centerline{\bf Sets and Graphs}
-\bgroup
-\def\arraystretch{1.5}
+Decision quality is evaluated separately from search behavior. Because the campaign is
+synthetic, each candidate's attributes and the voter profile presented to the model are
+fully specified in advance, which makes it possible to define a normative correct vote as
+the candidate that best matches the fully informed preference profile. The
+political-science experiment therefore yields two outputs for each model: a final vote and
+a process trace. Comparing them lets us ask whether models that reach the correct choice
+do so by broad, comparative search or by brittle heuristic shortcuts, and whether harder
+campaign conditions, such as larger primaries or less ideologically distinctive finalists,
+push models toward the same kinds of bounded strategies observed in human voters.
 
-\begin{tabular}{p{1.25in}p{3.25in}}
-$\displaystyle \sA$ & A set\\
-$\displaystyle \R$ & The set of real numbers \\
-$\displaystyle \{0, 1\}$ & The set containing 0 and 1 \\
-$\displaystyle \{0, 1, \dots, n \}$ & The set of all integers between $0$ and $n$\\
-$\displaystyle [a, b]$ & The real interval including $a$ and $b$\\
-$\displaystyle (a, b]$ & The real interval excluding $a$ but including $b$\\
-$\displaystyle \sA \backslash \sB$ & Set subtraction, i.e., the set containing the elements of $\sA$ that are not in $\sB$\\
-$\displaystyle \gG$ & A graph\\
-$\displaystyle \parents_\gG(\ervx_i)$ & The parents of $\ervx_i$ in $\gG$
-\end{tabular}
-\vspace{0.25cm}
+\subsection{Design}
 
+At the level of experimental control, the political-science task is a synthetic
+two-stage election with known ground truth. Each episode contains four Democratic and
+four Republican candidates. Each candidate is instantiated from a common inventory of
+forty-six candidate-specific attributes spanning issue positions, ideology, background,
+personality, and campaign strategy, together with campaign-level cues such as
+endorsements and polls \citep{lau2006voters}. A voter profile is specified in advance
+and induces a fully informed ranking over candidates, but that profile is not exposed to
+the model. This separation lets us score whether a model votes correctly without
+confounding the benchmark with the model's own verbal rationale.
 
-\centerline{\bf Indexing}
-\bgroup
-\def\arraystretch{1.5}
+The model interacts with the campaign through a constrained inspection interface. During
+the primary stage, it is assigned a party registration and can inspect only one
+currently available item at a time before deciding whether to continue searching or cast
+its vote for an in-party candidate. The general-election stage then presents the two
+nominees under the same interface. To preserve the logic of the dynamic information
+board, cue availability is transient: the visible window changes over time, some cue
+types appear more frequently than others, and inspecting one item can cause other items
+to be missed. Search therefore carries an explicit opportunity cost, rather than simply
+revealing a fixed database in arbitrary order.
 
-\begin{tabular}{p{1.25in}p{3.25in}}
-$\displaystyle \eva_i$ & Element $i$ of vector $\va$, with indexing starting at 1 \\
-$\displaystyle \eva_{-i}$ & All elements of vector $\va$ except for element $i$ \\
-$\displaystyle \emA_{i,j}$ & Element $i, j$ of matrix $\mA$ \\
-$\displaystyle \mA_{i, :}$ & Row $i$ of matrix $\mA$ \\
-$\displaystyle \mA_{:, i}$ & Column $i$ of matrix $\mA$ \\
-$\displaystyle \etA_{i, j, k}$ & Element $(i, j, k)$ of a 3-D tensor $\tA$\\
-$\displaystyle \tA_{:, :, i}$ & 2-D slice of a 3-D tensor\\
-$\displaystyle \erva_i$ & Element $i$ of the random vector $\rva$ \\
-\end{tabular}
-\egroup
-\vspace{0.25cm}
+The main manipulations target decision difficulty rather than surface form. Following
+the original paradigm, we vary the effective size of the primary choice set and the
+ideological distinctiveness of the general-election matchup, producing easier and harder
+campaign conditions without changing the tool interface. All models are evaluated under
+the same task specification and are compared on both outcome and process variables:
+their primary and general-election votes, correctness relative to the fully informed
+benchmark, depth of search, comparability of search, and the sequence of inspection
+actions. The resulting design makes it possible to distinguish models that arrive at the
+same electoral choice through systematic comparative search from models that reach that
+choice through shallow or confirmatory heuristics.
 
-
-\centerline{\bf Calculus}
-\bgroup
-\def\arraystretch{1.5}
-\begin{tabular}{p{1.25in}p{3.25in}}
-% NOTE: the [2ex] on the next line adds extra height to that row of the table.
-% Without that command, the fraction on the first line is too tall and collides
-% with the fraction on the second line.
-$\displaystyle\frac{d y} {d x}$ & Derivative of $y$ with respect to $x$\\ [2ex]
-$\displaystyle \frac{\partial y} {\partial x} $ & Partial derivative of $y$ with respect to $x$ \\
-$\displaystyle \nabla_\vx y $ & Gradient of $y$ with respect to $\vx$ \\
-$\displaystyle \nabla_\mX y $ & Matrix derivatives of $y$ with respect to $\mX$ \\
-$\displaystyle \nabla_\tX y $ & Tensor containing derivatives of $y$ with respect to $\tX$ \\
-$\displaystyle \frac{\partial f}{\partial \vx} $ & Jacobian matrix $\mJ \in \R^{m\times n}$ of $f: \R^n \rightarrow \R^m$\\
-$\displaystyle \nabla_\vx^2 f(\vx)\text{ or }\mH( f)(\vx)$ & The Hessian matrix of $f$ at input point $\vx$\\
-$\displaystyle \int f(\vx) d\vx $ & Definite integral over the entire domain of $\vx$ \\
-$\displaystyle \int_\sS f(\vx) d\vx$ & Definite integral with respect to $\vx$ over the set $\sS$ \\
-\end{tabular}
-\egroup
-\vspace{0.25cm}
-
-\centerline{\bf Probability and Information Theory}
-\bgroup
-\def\arraystretch{1.5}
-\begin{tabular}{p{1.25in}p{3.25in}}
-$\displaystyle P(\ra)$ & A probability distribution over a discrete variable\\
-$\displaystyle p(\ra)$ & A probability distribution over a continuous variable, or over
-a variable whose type has not been specified\\
-$\displaystyle \ra \sim P$ & Random variable $\ra$ has distribution $P$\\% so thing on left of \sim should always be a random variable, with name beginning with \r
-$\displaystyle  \E_{\rx\sim P} [ f(x) ]\text{ or } \E f(x)$ & Expectation of $f(x)$ with respect to $P(\rx)$ \\
-$\displaystyle \Var(f(x)) $ &  Variance of $f(x)$ under $P(\rx)$ \\
-$\displaystyle \Cov(f(x),g(x)) $ & Covariance of $f(x)$ and $g(x)$ under $P(\rx)$\\
-$\displaystyle H(\rx) $ & Shannon entropy of the random variable $\rx$\\
-$\displaystyle \KL ( P \Vert Q ) $ & Kullback-Leibler divergence of P and Q \\
-$\displaystyle \mathcal{N} ( \vx ; \vmu , \mSigma)$ & Gaussian distribution %
-over $\vx$ with mean $\vmu$ and covariance $\mSigma$ \\
-\end{tabular}
-\egroup
-\vspace{0.25cm}
-
-\centerline{\bf Functions}
-\bgroup
-\def\arraystretch{1.5}
-\begin{tabular}{p{1.25in}p{3.25in}}
-$\displaystyle f: \sA \rightarrow \sB$ & The function $f$ with domain $\sA$ and range $\sB$\\
-$\displaystyle f \circ g $ & Composition of the functions $f$ and $g$ \\
-  $\displaystyle f(\vx ; \vtheta) $ & A function of $\vx$ parametrized by $\vtheta$.
-  (Sometimes we write $f(\vx)$ and omit the argument $\vtheta$ to lighten notation) \\
-$\displaystyle \log x$ & Natural logarithm of $x$ \\
-$\displaystyle \sigma(x)$ & Logistic sigmoid, $\displaystyle \frac{1} {1 + \exp(-x)}$ \\
-$\displaystyle \zeta(x)$ & Softplus, $\log(1 + \exp(x))$ \\
-$\displaystyle || \vx ||_p $ & $\normlp$ norm of $\vx$ \\
-$\displaystyle || \vx || $ & $\normltwo$ norm of $\vx$ \\
-$\displaystyle x^+$ & Positive part of $x$, i.e., $\max(0,x)$\\
-$\displaystyle \1_\mathrm{condition}$ & is 1 if the condition is true, 0 otherwise\\
-\end{tabular}
-\egroup
-\vspace{0.25cm}
+\subsection{Procedure}
 
 
 
-\section{Final instructions}
-Do not change any aspects of the formatting parameters in the style files.
-In particular, do not modify the width or length of the rectangle the text
-should fit into, and do not change font sizes (except perhaps in the
-\textbf{References} section; see below). Please note that pages should be
-numbered.
+\section{Experiment 2: Consumer Behavior}
+% The Classic Problem: Describe the consumer choice scenario (e.g., choosing a product based on price, quality, and brand).
+% Tool-Lab Adaptation: The specific tools provided (e.g., checking price, reading reviews).
+% Results & Analysis: Analyze whether LLMs use compensatory vs. non-compensatory decision strategies, similar to human consumers.
 
-\section{Preparing PostScript or PDF files}
+\section{Experiment 3: Finance}
+% The Classic Problem: Describe the financial scenario (e.g., portfolio selection, risk assessment, or evaluating corporate reports).
+% Tool-Lab Adaptation: Tools provided (e.g., checking stock history, reading earnings summaries).
+% Results & Analysis: Evaluate the risk tolerance, depth of financial search, and information overload handling of the various LLMs.
 
-Please prepare PostScript or PDF files with paper size ``US Letter'', and
-not, for example, ``A4''. The -t
-letter option on dvips will produce US Letter files.
+\section{Discussion and Insights}
+% Cross-Domain Behavioral Patterns: What commonalities and differences exist in how different LLMs (e.g., GPT-5.4 vs. Claude 4.6) search for information? 
+% LLMs vs. Humans: How does the tool-calling behavior of LLMs compare to the human behaviors documented in the original Mouselab studies?
+% Implications for LLM Alignment: What do these information acquisition patterns tell us about how well these models are aligned with human reasoning and optimal decision-making?
 
-Consider directly generating PDF files using \verb+pdflatex+
-(especially if you are a MiKTeX user).
-PDF figures must be substituted for EPS figures, however.
-
-Otherwise, please generate your PostScript and PDF files with the following commands:
-\begin{verbatim}
-dvips mypaper.dvi -t letter -Ppdf -G0 -o mypaper.ps
-ps2pdf mypaper.ps mypaper.pdf
-\end{verbatim}
-
-\subsection{Margins in LaTeX}
-
-Most of the margin problems come from figures positioned by hand using
-\verb+\special+ or other commands. We suggest using the command
-\verb+\includegraphics+
-from the graphicx package. Always specify the figure width as a multiple of
-the line width as in the example below using .eps graphics
-\begin{verbatim}
-   \usepackage[dvips]{graphicx} ...
-   \includegraphics[width=0.8\linewidth]{myfile.eps}
-\end{verbatim}
-or % Apr 2009 addition
-\begin{verbatim}
-   \usepackage[pdftex]{graphicx} ...
-   \includegraphics[width=0.8\linewidth]{myfile.pdf}
-\end{verbatim}
-for .pdf graphics.
-See section~4.4 in the graphics bundle documentation (\url{http://www.ctan.org/tex-archive/macros/latex/required/graphics/grfguide.ps})
-
-A number of width problems arise when LaTeX cannot properly hyphenate a
-line. Please give LaTeX hyphenation hints using the \verb+\-+ command.
-
-\subsubsection*{Broader Impact Statement}
-In this optional section, TMLR encourages authors to discuss possible repercussions of their work,
-notably any potential negative impact that a user of this research should be aware of. 
-Authors should consult the TMLR Ethics Guidelines available on the TMLR website
-for guidance on how to approach this subject.
-
-\subsubsection*{Author Contributions}
-If you'd like to, you may include a section for author contributions as is done
-in many journals. This is optional and at the discretion of the authors. Only add
-this information once your submission is accepted and deanonymized. 
-
-\subsubsection*{Acknowledgments}
-Use unnumbered third level headings for the acknowledgments. All
-acknowledgments, including those to funding agencies, go at the end of the paper.
-Only add this information once your submission is accepted and deanonymized. 
+\section{Conclusion and Future Work}
+% Summary of the Tool-Lab methodology and the core findings from the three experiments.
+% Limitations of the current study.
+% Future directions for using Tool-Lab in other domains or for evaluating future generations of AI models.
 
 \bibliography{main}
 \bibliographystyle{tmlr}
 
 \appendix
 \section{Appendix}
-You may include other additional sections here.
 
 \end{document}

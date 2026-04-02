@@ -1,0 +1,176 @@
+experiment:
+  name: consumer_choice_fixed_matrix
+  description: ""
+  task_prompt: >
+    Choose the insurance plan that best matches the assigned consumer profile. 
+    Open as many cells as you need, then end the task with submit_choice.
+  matrix_mode: fixed
+  replications: 1
+  budget_usd: 0.0600
+  max_turns: 30
+  default_tool_cost_usd: 0.00004
+  tool_costs:
+    view_matrix: 0.00002
+    inspect_cell: 0.00005
+    submit_choice: 0.00002
+  seed: 31
+  tools:
+    - inspect_cell
+    - submit_choice
+  model:
+    provider: mock
+    model_name: mock-v2
+    temperature: 1.0
+    max_output_tokens: 800
+    pricing:
+      input_per_million: 2.0
+      output_per_million: 10.0
+    extra:
+      mock_inspections: 6
+  participant:
+    role: insurance shopper
+    profile: >
+      You are selecting coverage for a small family with one ongoing prescription and moderate expected
+      medical use. You care about total annual cost, prescription coverage, and a broad physician network.
+      You prefer predictable expenses over the lowest headline premium.
+  options:
+    - id: bronze_plus
+      display_name: Bronze Plus
+      description: Lowest premium, highest out-of-pocket exposure.
+      base_score: -0.20
+    - id: silver_balance
+      display_name: Silver Balance
+      description: Midrange premium with stronger coverage and predictable costs.
+      base_score: 0.35
+    - id: gold_secure
+      display_name: Gold Secure
+      description: Highest premium with the lowest deductible and broad benefits.
+      base_score: 0.10
+  attributes:
+    - id: monthly_premium
+      display_name: Monthly premium
+      description: Fixed monthly payment.
+    - id: deductible
+      display_name: Deductible
+      description: Annual amount paid before coverage accelerates.
+    - id: max_oop
+      display_name: Maximum out-of-pocket
+      description: Worst-case annual spending cap.
+    - id: network
+      display_name: Network breadth
+      description: Breadth of primary and specialist network.
+    - id: prescriptions
+      display_name: Prescription coverage
+      description: How the plan handles recurring medications.
+    - id: telehealth
+      display_name: Telehealth access
+      description: Availability of virtual care and after-hours triage.
+  cues:
+    - id: bronze_plus_monthly_premium
+      option_id: bronze_plus
+      attribute_id: monthly_premium
+      label: Bronze Plus monthly premium
+      value: $340 per month.
+      normative_score: 0.70
+    - id: silver_balance_monthly_premium
+      option_id: silver_balance
+      attribute_id: monthly_premium
+      label: Silver Balance monthly premium
+      value: $435 per month.
+      normative_score: 0.35
+    - id: gold_secure_monthly_premium
+      option_id: gold_secure
+      attribute_id: monthly_premium
+      label: Gold Secure monthly premium
+      value: $560 per month.
+      normative_score: -0.35
+    - id: bronze_plus_deductible
+      option_id: bronze_plus
+      attribute_id: deductible
+      label: Bronze Plus deductible
+      value: $7,200 individual deductible.
+      normative_score: -1.20
+    - id: silver_balance_deductible
+      option_id: silver_balance
+      attribute_id: deductible
+      label: Silver Balance deductible
+      value: $2,450 individual deductible.
+      normative_score: 0.85
+    - id: gold_secure_deductible
+      option_id: gold_secure
+      attribute_id: deductible
+      label: Gold Secure deductible
+      value: $750 individual deductible.
+      normative_score: 1.10
+    - id: bronze_plus_max_oop
+      option_id: bronze_plus
+      attribute_id: max_oop
+      label: Bronze Plus maximum out-of-pocket
+      value: $9,100 annual family cap.
+      normative_score: -1.00
+    - id: silver_balance_max_oop
+      option_id: silver_balance
+      attribute_id: max_oop
+      label: Silver Balance maximum out-of-pocket
+      value: $6,200 annual family cap.
+      normative_score: 0.70
+    - id: gold_secure_max_oop
+      option_id: gold_secure
+      attribute_id: max_oop
+      label: Gold Secure maximum out-of-pocket
+      value: $4,100 annual family cap.
+      normative_score: 0.95
+    - id: bronze_plus_network
+      option_id: bronze_plus
+      attribute_id: network
+      label: Bronze Plus network breadth
+      value: Narrow HMO network with specialist referrals required.
+      normative_score: -0.80
+    - id: silver_balance_network
+      option_id: silver_balance
+      attribute_id: network
+      label: Silver Balance network breadth
+      value: Mid-sized PPO network with most regional hospital systems included.
+      normative_score: 0.80
+    - id: gold_secure_network
+      option_id: gold_secure
+      attribute_id: network
+      label: Gold Secure network breadth
+      value: Broad PPO network with national specialist access.
+      normative_score: 1.00
+    - id: bronze_plus_prescriptions
+      option_id: bronze_plus
+      attribute_id: prescriptions
+      label: Bronze Plus prescription coverage
+      value: Generic drugs are cheap but brand-name tiers remain expensive until deductible is met.
+      normative_score: -0.95
+    - id: silver_balance_prescriptions
+      option_id: silver_balance
+      attribute_id: prescriptions
+      label: Silver Balance prescription coverage
+      value: Predictable copays for common maintenance medications.
+      normative_score: 1.05
+    - id: gold_secure_prescriptions
+      option_id: gold_secure
+      attribute_id: prescriptions
+      label: Gold Secure prescription coverage
+      value: Lowest copays and mail-order discounts for maintenance medications.
+      normative_score: 0.85
+    - id: bronze_plus_telehealth
+      option_id: bronze_plus
+      attribute_id: telehealth
+      label: Bronze Plus telehealth access
+      value: Basic video visits only during weekday business hours.
+      normative_score: -0.25
+    - id: silver_balance_telehealth
+      option_id: silver_balance
+      attribute_id: telehealth
+      label: Silver Balance telehealth access
+      value: 24/7 virtual urgent care with integrated prescription renewals.
+      normative_score: 0.65
+    - id: gold_secure_telehealth
+      option_id: gold_secure
+      attribute_id: telehealth
+      label: Gold Secure telehealth access
+      value: 24/7 virtual urgent care plus specialist video consults.
+      normative_score: 0.55

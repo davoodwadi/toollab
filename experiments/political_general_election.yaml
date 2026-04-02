@@ -1,0 +1,207 @@
+experiment:
+  name: political_general_election
+  description: Lau-style scrolling presidential campaign adapted to the Tool-Lab framework.
+  task_prompt: >
+    Choose the candidate who best matches the assigned voter. Search is costly. 
+    Inspect only what you need, then record a final vote with submit_choice.
+  matrix_mode: scrolling
+  replications: 5
+  budget_usd: 0.0800
+  max_turns: 18
+  default_tool_cost_usd: 0.00005
+  tool_costs:
+    view_visible_items: 0.00002
+    inspect_item: 0.00006
+    advance_window: 0.00002
+    submit_choice: 0.00002
+  seed: 17
+  interface:
+    window_size: 6
+    auto_advance_steps: 1
+  tools:
+    - view_visible_items
+    - inspect_item
+    - advance_window
+    - submit_choice
+  model:
+    provider: mock
+    model_name: mock-v1
+    pricing:
+      input_per_million: 0.0
+      output_per_million: 0.0
+    extra:
+      mock_inspections: 5
+  participant:
+    role: undecided voter
+    profile: >
+      You are a moderately left-of-center voter who prioritizes affordable health care, climate
+      mitigation, democratic norms, labor protections, and steady international alliances. You are
+      wary of sharp tax cuts for high earners and highly value candidate competence and honesty.
+  options:
+    - id: brooks
+      display_name: Elena Brooks
+      description: Democratic nominee.
+      base_score: 0.20
+      metadata:
+        party: Democrat
+    - id: hale
+      display_name: Marcus Hale
+      description: Republican nominee.
+      base_score: -0.10
+      metadata:
+        party: Republican
+  attributes:
+    - id: party_label
+      display_name: Party label
+      description: Partisan identification and broad coalition signal.
+    - id: ideology
+      display_name: Ideological label
+      description: Overall placement from liberal to conservative.
+    - id: economic_policy
+      display_name: Economic policy
+      description: Jobs, wages, taxes, and industrial policy.
+    - id: healthcare
+      display_name: Health care policy
+      description: Insurance coverage and prescription affordability.
+    - id: climate
+      display_name: Climate policy
+      description: Energy transition and emissions regulation.
+    - id: foreign_policy
+      display_name: Foreign policy
+      description: Alliances, trade posture, and international conflict.
+    - id: personality
+      display_name: Personality cue
+      description: Honesty, steadiness, and perceived temperament.
+    - id: endorsements
+      display_name: Endorsements
+      description: Which groups and elites publicly back the candidate.
+    - id: polls
+      display_name: Poll standing
+      description: Latest campaign standing in national tracking polls.
+  cues:
+    - id: brooks_party_label
+      option_id: brooks
+      attribute_id: party_label
+      label: Brooks's party label
+      value: Registered Democrat with a center-left coalition.
+      normative_score: 1.10
+      visibility_weight: 2.50
+    - id: hale_party_label
+      option_id: hale
+      attribute_id: party_label
+      label: Hale's party label
+      value: Registered Republican with a conservative coalition.
+      normative_score: -0.85
+      visibility_weight: 2.50
+    - id: brooks_ideology
+      option_id: brooks
+      attribute_id: ideology
+      label: Brooks's ideological profile
+      value: Pragmatic progressive with moderate messaging in swing regions.
+      normative_score: 1.00
+      visibility_weight: 2.10
+    - id: hale_ideology
+      option_id: hale
+      attribute_id: ideology
+      label: Hale's ideological profile
+      value: Movement conservative with a strong deregulation agenda.
+      normative_score: -0.95
+      visibility_weight: 2.10
+    - id: brooks_economic_policy
+      option_id: brooks
+      attribute_id: economic_policy
+      label: Brooks's economic philosophy
+      value: Supports middle-income tax credits, union bargaining, and targeted industrial subsidies.
+      normative_score: 1.30
+      visibility_weight: 1.00
+    - id: hale_economic_policy
+      option_id: hale
+      attribute_id: economic_policy
+      label: Hale's economic philosophy
+      value: Supports corporate tax cuts, right-to-work expansion, and broad deregulation.
+      normative_score: -1.10
+      visibility_weight: 1.00
+    - id: brooks_healthcare
+      option_id: brooks
+      attribute_id: healthcare
+      label: Brooks's health care plan
+      value: Expands public plan competition and caps insulin and prescription costs.
+      normative_score: 1.45
+      visibility_weight: 1.00
+    - id: hale_healthcare
+      option_id: hale
+      attribute_id: healthcare
+      label: Hale's health care plan
+      value: Favors interstate insurance markets and reduced federal benefit mandates.
+      normative_score: -1.20
+      visibility_weight: 1.00
+    - id: brooks_climate
+      option_id: brooks
+      attribute_id: climate
+      label: Brooks's climate plan
+      value: Supports clean grid investment, methane rules, and electric transit expansion.
+      normative_score: 1.35
+      visibility_weight: 0.90
+    - id: hale_climate
+      option_id: hale
+      attribute_id: climate
+      label: Hale's climate plan
+      value: Prioritizes oil and gas expansion and repealing federal emissions standards.
+      normative_score: -1.30
+      visibility_weight: 0.90
+    - id: brooks_foreign_policy
+      option_id: brooks
+      attribute_id: foreign_policy
+      label: Brooks's foreign policy stance
+      value: Strongly supports NATO, allied coordination, and conditional trade enforcement.
+      normative_score: 0.90
+      visibility_weight: 0.95
+    - id: hale_foreign_policy
+      option_id: hale
+      attribute_id: foreign_policy
+      label: Hale's foreign policy stance
+      value: Prefers transactional alliances and a unilateral tariff-heavy bargaining posture.
+      normative_score: -0.70
+      visibility_weight: 0.95
+    - id: brooks_personality
+      option_id: brooks
+      attribute_id: personality
+      label: Brooks's temperament assessment
+      value: Seen as disciplined, detail-oriented, and personally steady under pressure.
+      normative_score: 0.80
+      visibility_weight: 1.20
+    - id: hale_personality
+      option_id: hale
+      attribute_id: personality
+      label: Hale's temperament assessment
+      value: Seen as energetic but impulsive and prone to confrontational messaging.
+      normative_score: -0.65
+      visibility_weight: 1.20
+    - id: brooks_endorsements
+      option_id: brooks
+      attribute_id: endorsements
+      label: Brooks's endorsements
+      value: Backed by major labor unions, environmental groups, and several retired diplomats.
+      normative_score: 0.75
+      visibility_weight: 2.20
+    - id: hale_endorsements
+      option_id: hale
+      attribute_id: endorsements
+      label: Hale's endorsements
+      value: Backed by fossil fuel groups, anti-tax organizations, and partisan media personalities.
+      normative_score: -0.55
+      visibility_weight: 2.20
+    - id: brooks_polls
+      option_id: brooks
+      attribute_id: polls
+      label: Brooks's poll standing
+      value: Holds a narrow two-point national lead in the latest tracking average.
+      normative_score: 0.25
+      visibility_weight: 2.40
+    - id: hale_polls
+      option_id: hale
+      attribute_id: polls
+      label: Hale's poll standing
+      value: Trails slightly nationally but leads in several energy-producing swing states.
+      normative_score: 0.05
+      visibility_weight: 2.40

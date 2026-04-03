@@ -1,0 +1,233 @@
+experiment:
+  name: health_insurance_choice
+  description: "Replication of Johnson et al. (2013) PLOS ONE health insurance choice experiment."
+  metadata:
+    option_count: 8
+    design: complex
+  task_prompt: >
+    Choose the most cost-effective health insurance policy for the assigned consumer profile.
+    Open as many cells as you need, then end the task with submit_choice.
+  matrix_mode: fixed
+  replications: 10
+  budget_usd: 0.0600
+  max_turns: 40
+  default_tool_cost_usd: 0.00004
+  tool_costs:
+    view_matrix: 0.00002
+    inspect_cell: 0.00005
+    submit_choice: 0.00002
+  seed: 42
+  tools:
+    - inspect_cell
+    - submit_choice
+  model:
+    provider: mock
+    model_name: mock-v2
+    temperature: 1.0
+    max_output_tokens: 800
+    pricing:
+      input_per_million: 2.0
+      output_per_million: 10.0
+    extra:
+      mock_inspections: 24
+  participant:
+    role: insurance shopper
+    profile: >
+      You are choosing health insurance for a family of three -- yourself, a partner, and one child. 
+      You anticipate making 9 doctor visits and incurring $900 in out-of-pocket health care costs 
+      over the next year. Your goal is to select the most cost-effective plan overall considering premiums, copays, and deductibles.
+  options:
+    - id: plan_a
+      display_name: Plan A
+      description: Health insurance option A.
+      base_score: 0.0
+    - id: plan_b
+      display_name: Plan B
+      description: Health insurance option B.
+      base_score: 0.0
+    - id: plan_c
+      display_name: Plan C
+      description: Health insurance option C.
+      base_score: 0.0
+    - id: plan_d
+      display_name: Plan D
+      description: Health insurance option D.
+      base_score: 0.0
+    - id: plan_e
+      display_name: Plan E
+      description: Health insurance option E.
+      base_score: 0.0
+    - id: plan_f
+      display_name: Plan F
+      description: Health insurance option F.
+      base_score: 0.0
+    - id: plan_g
+      display_name: Plan G
+      description: Health insurance option G.
+      base_score: 0.0
+    - id: plan_h
+      display_name: Plan H
+      description: Health insurance option H.
+      base_score: 0.0
+  attributes:
+    - id: monthly_premium
+      display_name: Monthly Premium
+      description: The amount you pay every month for this plan.
+    - id: doctor_visit_copay
+      display_name: Doctor Visit Copay 
+      description: The fixed amount you pay for each doctor visit.
+    - id: annual_deductible
+      display_name: Annual Deductible
+      description: The amount you pay out-of-pocket before insurance starts paying.
+  cues:
+    - id: plan_a_premium
+      option_id: plan_a
+      attribute_id: monthly_premium
+      label: Plan A Monthly Premium
+      value: $601
+      normative_score: -7.212
+    - id: plan_a_copay
+      option_id: plan_a
+      attribute_id: doctor_visit_copay
+      label: Plan A Doctor Visit Copay
+      value: $21
+      normative_score: -0.189
+    - id: plan_a_deductible
+      option_id: plan_a
+      attribute_id: annual_deductible
+      label: Plan A Annual Deductible
+      value: $800
+      normative_score: -0.800
+
+    - id: plan_b_premium
+      option_id: plan_b
+      attribute_id: monthly_premium
+      label: Plan B Monthly Premium
+      value: $408
+      normative_score: -4.896
+    - id: plan_b_copay
+      option_id: plan_b
+      attribute_id: doctor_visit_copay
+      label: Plan B Doctor Visit Copay
+      value: $24
+      normative_score: -0.216
+    - id: plan_b_deductible
+      option_id: plan_b
+      attribute_id: annual_deductible
+      label: Plan B Annual Deductible
+      value: $1400
+      normative_score: -0.900
+
+    - id: plan_c_premium
+      option_id: plan_c
+      attribute_id: monthly_premium
+      label: Plan C Monthly Premium
+      value: $583
+      normative_score: -6.996
+    - id: plan_c_copay
+      option_id: plan_c
+      attribute_id: doctor_visit_copay
+      label: Plan C Doctor Visit Copay
+      value: $32
+      normative_score: -0.288
+    - id: plan_c_deductible
+      option_id: plan_c
+      attribute_id: annual_deductible
+      label: Plan C Annual Deductible
+      value: $1400
+      normative_score: -0.900
+
+    - id: plan_d_premium
+      option_id: plan_d
+      attribute_id: monthly_premium
+      label: Plan D Monthly Premium
+      value: $593
+      normative_score: -7.116
+    - id: plan_d_copay
+      option_id: plan_d
+      attribute_id: doctor_visit_copay
+      label: Plan D Doctor Visit Copay
+      value: $27
+      normative_score: -0.243
+    - id: plan_d_deductible
+      option_id: plan_d
+      attribute_id: annual_deductible
+      label: Plan D Annual Deductible
+      value: $1600
+      normative_score: -0.900
+
+    - id: plan_e_premium
+      option_id: plan_e
+      attribute_id: monthly_premium
+      label: Plan E Monthly Premium
+      value: $578
+      normative_score: -6.936
+    - id: plan_e_copay
+      option_id: plan_e
+      attribute_id: doctor_visit_copay
+      label: Plan E Doctor Visit Copay
+      value: $19
+      normative_score: -0.171
+    - id: plan_e_deductible
+      option_id: plan_e
+      attribute_id: annual_deductible
+      label: Plan E Annual Deductible
+      value: $900
+      normative_score: -0.900
+
+    - id: plan_f_premium
+      option_id: plan_f
+      attribute_id: monthly_premium
+      label: Plan F Monthly Premium
+      value: $416
+      normative_score: -4.992
+    - id: plan_f_copay
+      option_id: plan_f
+      attribute_id: doctor_visit_copay
+      label: Plan F Doctor Visit Copay
+      value: $33
+      normative_score: -0.297
+    - id: plan_f_deductible
+      option_id: plan_f
+      attribute_id: annual_deductible
+      label: Plan F Annual Deductible
+      value: $700
+      normative_score: -0.700
+
+    - id: plan_g_premium
+      option_id: plan_g
+      attribute_id: monthly_premium
+      label: Plan G Monthly Premium
+      value: $419
+      normative_score: -5.028
+    - id: plan_g_copay
+      option_id: plan_g
+      attribute_id: doctor_visit_copay
+      label: Plan G Doctor Visit Copay
+      value: $24
+      normative_score: -0.216
+    - id: plan_g_deductible
+      option_id: plan_g
+      attribute_id: annual_deductible
+      label: Plan G Annual Deductible
+      value: $1000
+      normative_score: -0.900
+
+    - id: plan_h_premium
+      option_id: plan_h
+      attribute_id: monthly_premium
+      label: Plan H Monthly Premium
+      value: $393
+      normative_score: -4.716
+    - id: plan_h_copay
+      option_id: plan_h
+      attribute_id: doctor_visit_copay
+      label: Plan H Doctor Visit Copay
+      value: $18
+      normative_score: -0.162
+    - id: plan_h_deductible
+      option_id: plan_h
+      attribute_id: annual_deductible
+      label: Plan H Annual Deductible
+      value: $1500
+      normative_score: -0.900

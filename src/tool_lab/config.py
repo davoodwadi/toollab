@@ -10,8 +10,8 @@ import yaml
 MatrixMode = Literal["fixed", "scrolling"]
 
 DEFAULT_TOOLS_BY_MODE: dict[MatrixMode, list[str]] = {
-    "fixed": ["view_matrix", "inspect_cell", "submit_choice"],
-    "scrolling": ["view_visible_items", "inspect_item", "advance_window", "submit_choice"],
+    "fixed": ["inspect_cell", "submit_choice"],
+    "scrolling": ["inspect_item", "advance_window", "submit_choice"],
 }
 
 REQUIRED_TOOLS_BY_MODE: dict[MatrixMode, set[str]] = {
@@ -92,6 +92,7 @@ class ExperimentSpec:
     seed: int | None = None
     interface: dict[str, Any] = field(default_factory=dict)
     analysis: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if not self.tools:
@@ -214,6 +215,7 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         seed=experiment.get("seed"),
         interface=experiment.get("interface", {}),
         analysis=experiment.get("analysis", {}),
+        metadata=experiment.get("metadata", {}),
     )
 
 

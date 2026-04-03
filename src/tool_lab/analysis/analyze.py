@@ -309,14 +309,16 @@ def session_summary(df: pd.DataFrame) -> pd.DataFrame:
 
 if __name__ == '__main__':
 
-    results_dir = Path('/home/dw/github/toollab/results/consumer-choice-mock-mock-v2')
+    # results_dir = Path('/home/dw/github/toollab/results/consumer-choice-mock-mock-v2')
+    results_dir = Path('/home/dw/github/toollab/results/health-insurance-choice-mock-mock-v2')
     results_file = results_dir/'events.jsonl'
+    
     config_file = results_dir/'config.json'
 
     df_raw = load_events(results_file)
     df = df_raw.copy().sort_values(['session_name', 'step_index'])
     # print(f"{len(df)} events across {df['session_name'].nunique()} sessions")
-    print(df)
+    print(df[['option_count', 'design']])
     print(df.columns)
     print(session_summary(df)[['session_name', 'choice', 'forced_choice', 'n_inspections', 'cost_usd']].to_string())
     

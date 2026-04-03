@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1775159245.70861 "main.aux" "main.bbl" "main" 1775238183.0604 0
+["bibtex main"] 1775250468.83866 "main.aux" "main.bbl" "main" 1775250469.34913 0
   "./main.bib" 1775060810.35276 2682 cd6122a2ac3f8ce54bb5be345f852c8a ""
   "./tmlr.bst" 1688156474 26969 9c641e8d820e63bb21b670dde311bfb2 ""
-  "main.aux" 1775238182.91674 4900 71e4e4e88461a05b98118bf756515a94 "pdflatex"
+  "main.aux" 1775250469.21087 4925 6e1e68e9d5e1aa404a09eccf882d23e2 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1775238182.58043 "/home/dw/github/toollab/main.tex" "main.pdf" "main" 1775238183.06048 0
+["pdflatex"] 1775250468.88842 "/home/dw/github/toollab/main.tex" "main.pdf" "main" 1775250469.34922 0
   "/home/dw/.local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/home/dw/.local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1202520719 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
   "/home/dw/.local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -210,15 +210,15 @@
   "/home/dw/.local/texlive/2025/texmf.cnf" 1764280521.75556 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
   "/home/dw/github/toollab/main.tex" 1775238133.91842 2594 e99052f254752e2242113611150b28a2 ""
   "fancyhdr.sty" 1688156474 17086 7ed8cbc4d361ec87392817e0dd4f65ec ""
-  "main.aux" 1775238182.91674 4900 71e4e4e88461a05b98118bf756515a94 "pdflatex"
-  "main.bbl" 1775233607.11394 2785 a4b56f48e73c5117985a0356db13bd30 "bibtex main"
-  "main.out" 1775238182.91674 1665 47cf652780300e1b8afc71e23904ba6d "pdflatex"
+  "main.aux" 1775250469.21087 4925 6e1e68e9d5e1aa404a09eccf882d23e2 "pdflatex"
+  "main.bbl" 1775250468.88587 2785 a4b56f48e73c5117985a0356db13bd30 "bibtex main"
+  "main.out" 1775250469.21087 1660 472c2b306780e361ec9d122789d08a2c "pdflatex"
   "main.tex" 1775238133.91842 2594 e99052f254752e2242113611150b28a2 ""
   "math_commands.tex" 1688156474 12284 a71653715108dc62b66e3a0bde0307d8 ""
   "sections/conclusion.tex" 1775151244.73798 269 1fcb99325fbb1f607112f9452c85d71a ""
   "sections/discussion.tex" 1775151217.23826 507 dceb0d401df57297e246b98d4d5686c4 ""
-  "sections/experiment-1.tex" 1775151170.68895 13951 31be44aca818088652ca87ca2b2a6940 ""
-  "sections/experiment-2.tex" 1775151187.47615 389 0ddc97be1c7e3acc431e3dd131cae4a2 ""
+  "sections/experiment-1.tex" 1775250468.24187 1366 b8f7c7532d50883d4d6fabb87f59234d ""
+  "sections/experiment-2.tex" 1775250055.65356 13951 8c6557b41254828f209440a2ba5f1225 ""
   "sections/experiment-3.tex" 1775151195.65145 397 a1c3991988cc1df19d7e9a6182fd4e5a ""
   "sections/introduction.tex" 1775150933.21455 524 96964456c0acb7828b26292454b07ee2 ""
   "sections/methodology.tex" 1775151063.25033 2000 31735fd2ab594f3f56ef1d692f5e585e ""

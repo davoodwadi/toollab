@@ -362,12 +362,12 @@ INPUT /home/dw/.local/texlive/2025/texmf-dist/fonts/tfm/public/lm/ec-lmri7.tfm
 INPUT ./sections/experiment-1.tex
 INPUT ./sections/experiment-1.tex
 INPUT sections/experiment-1.tex
-INPUT /home/dw/.local/texlive/2025/texmf-dist/fonts/tfm/public/lm/ec-lmssbx10.tfm
-INPUT /home/dw/.local/texlive/2025/texmf-dist/fonts/tfm/public/lm/ec-lmr8.tfm
-INPUT /home/dw/.local/texlive/2025/texmf-dist/fonts/tfm/public/lm/ec-lmri10.tfm
 INPUT ./sections/experiment-2.tex
 INPUT ./sections/experiment-2.tex
 INPUT sections/experiment-2.tex
+INPUT /home/dw/.local/texlive/2025/texmf-dist/fonts/tfm/public/lm/ec-lmssbx10.tfm
+INPUT /home/dw/.local/texlive/2025/texmf-dist/fonts/tfm/public/lm/ec-lmr8.tfm
+INPUT /home/dw/.local/texlive/2025/texmf-dist/fonts/tfm/public/lm/ec-lmri10.tfm
 INPUT ./sections/experiment-3.tex
 INPUT ./sections/experiment-3.tex
 INPUT sections/experiment-3.tex

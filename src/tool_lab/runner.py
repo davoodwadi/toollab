@@ -24,6 +24,7 @@ class ExperimentRunner:
                 experiment_name=self.spec.name,
                 provider=self.spec.model.provider, 
                 model_name=self.spec.model.model_name,
+                metadata=self.spec.metadata,
             )
             if index==0:
                 writer.write_config(self.spec.to_dict())
@@ -136,6 +137,7 @@ class ExperimentRunner:
             "choice": environment.choice,
             "cumulative_cost_usd": environment.cumulative_cost_usd,
             "budget_remaining_usd": environment.budget_remaining_usd,
+            **self.spec.metadata,
             'trace': environment.trace,
             "seed": seed,
             "started_at": started_at,

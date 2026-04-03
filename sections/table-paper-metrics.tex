@@ -2,17 +2,30 @@
 
 \begin{document}
 
-\section{Measures}
+\newcommand{\measuretablebegin}[1]{%
+  \begingroup
+  \small
+  \setlength{\LTleft}{0pt}
+  \setlength{\LTright}{0pt}
+  \setlength{\tabcolsep}{4pt}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{xltabular}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
+  \caption{#1}\\*
+  \toprule
+  \textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\*
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\*
+  \midrule
+  \endhead
+  \midrule
+  \multicolumn{4}{r}{\small\itshape Continued on next page\ldots} \\
+  \endfoot
+  \endlastfoot
+}
 
-\subsection*{\citet{hodge2004does}: Search-Facilitating Technology}
-
-{\small 
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-    \toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{hodge2004does}: measures for search-facilitating technology.}
 Observed search use & Presentation manipulated as PDF versus XBRL; placement manipulated as recognition versus disclosure. Within searchable conditions, participants were split into a search group ($n = 31$) who used the XBRL tool and a nonsearch group ($n = 29 + 34$) who did not use it or never had access. & Roughly half of the participants with access to the search tool did not use it, making actual search uptake a central behavioral variable rather than a mere treatment assignment. & Whether the model has access to tools and whether it actually invokes them; proportion of runs with tool use despite identical availability. \\
 Acquisition accuracy & Percentage of participants who correctly identified whether each firm recognized or disclosed stock-option compensation. & In the mixed reporting condition, 69\% of the search group versus 43\% of the nonsearch group identified the treatments correctly; planned contrast: $\chi^2 = 14.69$, $p < 0.01$. & Proportion of runs that recover the hidden state, reporting treatment, or payoff-relevant cue after search. \\
 Integration through choice & Percentage of the \$10{,}000 investment allocated to Firm~B rather than Firm~A. & Disclosure condition: 57\% versus 67\% invested in Firm~B for search versus nonsearch groups. Recognition condition: 55\% versus 34\%. Planned contrast: $t = 4.19$, $p < 0.01$; placement main effect: $F = 8.46$, $p = 0.01$; presentation $\times$ placement: $F = 6.26$, $p = 0.01$. & Final allocation, ranking, or categorical choice scored against a fully informed benchmark, conditioned on what the model actually inspected. \\
@@ -20,18 +33,10 @@ Financial performance judgment & 11-point rating for each firm from ``very weak'
 Financial statement reliability judgment & 11-point rating for each firm from ``not reliable'' to ``very reliable.'' & Correlated with investment allocation at $r = 0.28$, $p < 0.01$; disclosure-versus-recognition disparity was larger among search users ($p = 0.02$). & Post-decision trust, reliability, or calibration judgment about sources, alternatives, or evidence quality. \\
 Manipulation check and procedural metric & Post-experiment identification questions plus completion time. & Accuracy was near ceiling when both firms disclosed (87\% search, 94\% nonsearch); average completion time was 27 minutes. & Sanity checks that the model understood the task and a resource-use summary such as elapsed time, tokens, or billed cost. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\subsection*{\citet{dellaert2024choice}: Ordering and Partitioning in Health Insurance Choice}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{dellaert2024choice}: choice-quality and architecture measures for ordering and partitioning in health insurance choice.}
 Decision quality / overpayment & Main dependent variable across the experiments: excess annual dollars paid relative to the lowest expected-cost plan for the participant's assigned health-usage profile. Lower values indicate better decisions. & Study~1: high-quality ordering greatly reduced overpayment relative to random ordering ($M_{High} = \$1{,}185.57$ vs. $M_{Rand} = \$4{,}305.08$, $F(1,1291) = 1709.82$, $p < .001$, $\eta_p^2 = .57$). & Regret or excess-cost metric comparing the chosen action with the best available action under known task parameters. \\
 Ordering quality / user-model quality & Alternatives were ordered by a user model whose correlation with the optimal ordering varied by study: high quality, random, low quality, premium-based, or predicted-spending-based. & Study~2 showed a monotonic pattern across user-model quality ($M_{High} = \$467.52$, $M_{Rand} = \$559.33$, $M_{Low} = \$743.99$, $F(2,1640) = 18.65$, $p < .001$). Study~3 showed predicted-spending ordering outperformed premium ordering ($M_{Spending} = \$998.26$ vs. $M_{Premium} = \$2{,}673.85$, $F(1,942) = 283.56$, $p < .001$). & Ranking quality of the system's recommendation policy, measured by how well surfaced options correlate with the true optimum for that episode. \\
 Partitioning size & Choice sets were either unpartitioned or initially restricted to a first page containing the top 3 or top 10 options, with clickthrough to the rest of the set. & In Study~1, partitioning interacted with ordering ($F(2,1291) = 12.54$, $p < .001$): with high-quality ordering, overpayment fell from $\$1{,}627.27$ with no partition to $\$1{,}265.62$ with a 10-option partition and $\$745.47$ with a 3-option partition; with random ordering, partitioning was unhelpful or harmful. & Initial shortlist size or staged reveal policy controlling how many options the model sees before it decides to explore further. \\
@@ -39,19 +44,10 @@ Best-option-in-partition diagnostic & Study~2 split the random-order condition i
 Real-world ordering benchmark & Study~3 compared two exchange-like orderings: premium-based ordering with 10 options on the first page versus predicted-spending ordering with either 10 or 3 options on the first page. & Predicted-spending ordering with 3-option partitioning produced the best decisions ($\$798.70$) and premium ordering with 10-option partitioning the worst ($\$2{,}697.24$). The simple effect of shrinking the partition was significant only under predicted-spending ordering ($\$798.70$ vs. $\$1{,}215.16$, $p = .007$). & Comparison between baseline interface ranking and a stronger recommendation policy paired with a tighter shortlist. \\
 Policy-savings extrapolation & Consumer-welfare interpretation based on the average overpayment differences across Study~3 conditions. & The authors estimate that moving from premium ordering with a 10-option partition to predicted-spending ordering with a 3-option partition saves about $\$1{,}850$ per consumer per year, implying very large aggregate welfare gains at marketplace scale. & Population-level benefit calculation that converts per-run performance improvement into expected aggregate savings. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\medskip
-\noindent\textbf{Process and mediation measures reported in \citet{dellaert2024choice}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{dellaert2024choice}: process and mediation measures for ordering and partitioning in health insurance choice.}
 Process-data capture & Study~1 used MouselabWEB. Each hover revealed one plan attribute, and the authors filtered acquisitions shorter than 200 ms and longer than 50{,}000 ms before analysis. & Process tracing let the authors observe how often, how long, and in what order participants inspected plan attributes rather than inferring attention from final choices alone. & Event-level logging of tool calls, attribute inspections, revisit counts, and inspection order. \\
 Attention to the best options & Share of acquisitions directed to the three lowest-cost plans: acquisitions on the best three options divided by total acquisitions. Values range from 0 to 1. & High-quality ordering sharply increased focus on the best options ($M_{High} = .55$ vs. $M_{Rand} = .03$, $F(1,1291) = 3285.12$, $p < .001$, $\eta_p^2 = .72$). Cell means show the strongest focus under high-quality ordering with 3-option partitioning (.92), then 10-option partitioning (.41), then no partition (.25). & Proportion of inspections or tool calls directed toward the truly best options in the environment. \\
 Number of options examined & Count of distinct plans for which a participant acquired any information. & Partitioning sharply reduced search breadth ($M_{3Part} = 8.10$ vs. $M_{10Part} = 14.22$, $F(2,1291) = 592.70$, $p < .001$, $\eta_p^2 = .48$). Figure values show near-full search without partitioning (32.90 and 33.66 options for the high-quality and random conditions). & Count of unique candidates inspected before submission. \\
@@ -59,23 +55,13 @@ Ordering $\times$ partitioning attention synergy & Interaction test for whether 
 Mediation via attention to best options & Hayes PROCESS Model 8 estimated whether the effect of ordering, and the ordering $\times$ partitioning interaction, operated through attention to the best options. & Indirect effects through attention were significant in all three partition conditions, including $a_1 b_1 = -1012.76$ for the 3-option partition (95\% CI $[-1607.47, -460.96]$). Indices of moderated mediation were also significant, supporting the claim that partitioning helps mainly by amplifying useful attention when the ordering is good. & Mediation analysis linking recommendation quality to final performance through measured search allocation. \\
 Mediation via reduced search breadth & Parallel mediator testing whether partitioning affects outcomes through the number of options examined. & The indirect effect through reduced search breadth was positive for overpayment, for example $a_1 b_1 = 335.79$ (95\% CI $[158.56, 534.82]$) for 3-option partitioning under one ordering contrast. The interpretation is that looking at fewer options can worsen outcomes unless high-quality ordering offsets that loss by directing attention well. & Test of whether tighter search budgets or smaller visible candidate sets help by reducing distraction or hurt by truncating exploration. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\subsection*{Johnson et al. (2013): Health Insurance Exchange Choice}
-
-\noindent\textbf{Choice-quality and intervention measures reported in \citet{johnson2013can}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{johnson2013can}: choice-quality and intervention measures for health insurance exchange choice.}
 Comprehension-gated task design & Across six framed field experiments, respondents chose one health plan from 4 or 8 options after receiving definitions of premiums, copays, and deductibles and passing a comprehension test; only those who passed were analyzed. & The authors explicitly removed uncertainty about usage and focused on whether respondents could identify the most cost-effective plan under known doctor visits and out-of-pocket expenses. This made later failures a choice and calculation problem rather than a vocabulary problem. & Standardized pre-task briefing plus a gating quiz ensuring the model understands the task mechanics before evaluation begins. \\
 Choice accuracy & Proportion of respondents selecting the most cost-effective policy. This was the main success metric across experiments. & Experiment~1: with 4 options, respondents were correct 42\% of the time; with 8 options, 21\%, which was not different from chance ($p>.05$). Experiment~4 calculator users were still correct only 47\% of the time. MBA students in Experiment~5 were correct 73\% of the time, and combined calculator+default support in Experiment~6 brought ordinary respondents to roughly that level. & Final-choice correctness against a known optimum under fixed task parameters. \\
-Dollar error & Average dollar loss relative to the cheapest plan, computed across respondents. This was the paper's main cost metric for poor choice. & Experiment~1 respondents with 4 options made average mistakes of over \$200. In Experiment~3 unaided errors averaged \$611. In Experiment~4 calculators reduced error by \$216 but users still averaged \$364. Experiment~5 MBA students averaged \$126 error. In Experiment~6, the control group averaged \$533 error whereas calculator+default users averaged \$77. & Regret or excess-cost metric: the monetary penalty of the chosen option relative to the best available option. \\
+Dollar error & Average dollar loss relative to the cheapest plan, computed across respondents. This was the paper's main cost metric for poor choice. & Experiment~1 respondents with 4 options made average mistakes of over \$200. In Experiment~3 unaided errors averaged \$611. In Experiment~4 calculators reduced error by \$216 but users still averaged \$364 error. Experiment~5 MBA students averaged \$126 error. In Experiment~6, the control group averaged \$533 error whereas calculator+default users averaged \$77. & Regret or excess-cost metric: the monetary penalty of the chosen option relative to the best available option. \\
 Option-set size & Number of available plans, manipulated at 4 versus 8 in multiple experiments. & Larger choice sets sharply worsened baseline performance; with 8 options, respondents in Experiment~1 performed near chance. The paper treats set size as part of the exchange's choice architecture rather than as a neutral design detail. & Number of alternatives shown to the model in each episode, useful for measuring scaling failures as the choice set grows. \\
 Monetary incentives & Extra financial rewards for choosing correctly, implemented in Experiment~2 and more strongly in Experiment~6. & In Experiment~2, incentives did not improve outcomes despite increasing the expected value of correct choice. In Experiment~6, incentives again did not significantly improve performance, even though respondents spent 38\% longer on the task. & Performance-contingent rewards or penalties added to the prompt or scoring rule to test whether more effort alone improves decision quality. \\
 Calculator intervention & Annual total-cost calculator shown to respondents, with later versions including explanation and comprehension checks. & Calculators were only partially effective in Experiment~4: they improved the probability of a correct choice by 10.1 percentage points and lowered errors by \$216, but calculator users still averaged only 47\% correct and \$364 error. In Experiment~6, calculators with education significantly improved outcomes. & Tool assistance that computes aggregate plan cost or expected utility from raw attributes. \\
@@ -84,19 +70,10 @@ Combined calculator + default & Joint use of a smart default and a calculator in
 Expert benchmark & Performance of Columbia MBA students on the same task as Experiment~4. & MBA students chose correctly 73\% of the time and averaged \$126 error; the 40\% who reported using Excel did even better, with 85\% correct and only \$47 error. The paper uses this as evidence that the task is solvable with the right mental model and computational support. & Skilled-human or enhanced-model benchmark for what high-quality performance looks like under the same task constraints. \\
 Policy extrapolation metric & Aggregate savings implied by better exchange design, derived from average error differences across Experiment~6 conditions. & The authors estimate that reducing average error by \$456 per decision would save about \$9.12 billion annually if 20 million people chose exchange plans. This is not a behavioral measure per se, but it links the choice metrics to policy stakes. & Aggregate welfare calculation translating per-run decision improvement into population-scale savings. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\medskip
-\noindent\textbf{Bias, effort, and metacognitive measures reported in \citet{johnson2013can}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{johnson2013can}: bias, effort, and metacognitive measures for health insurance exchange choice.}
 Component-weight bias & In Experiments~3 and~4, orthogonalized plan attributes were used so the authors could estimate the relative weight respondents placed on premiums, copays, and deductibles. Normatively, all dollar components should receive approximately equal weight because they all enter annual cost. & Respondents systematically overweighted out-of-pocket costs and deductibles relative to premiums. The calculator improved performance partly by reducing this distortion, bringing respondents closer to treating all dollars equivalently. The exact coefficient magnitudes appear only graphically, not in the text. & Estimated weight placed on different cue types in the model's revealed policy, useful for detecting distorted reliance on one cost component over another. \\
 Confidence rating & Self-reported confidence in making the correct choice, collected on a 1--9 scale in Experiments~3, 4, and 6. & Mean confidence remained high despite poor performance: 6.6, 6.75, and 7.6 in Experiments~3, 4, and the Experiment~6 control condition. Confidence was weakly related to performance, with average correlation only .09 across those studies. & Post-decision confidence or self-evaluation score used to assess metacognitive calibration. \\
 Metacognitive response to interventions & Change in confidence after incentives, calculators, and defaults. & Calculators produced only a marginal increase in confidence (+0.23 relative to control, $p<.06$); defaults did not materially change confidence (+0.14, $p>.2$); incentives increased confidence by +0.34 ($p<.03$) despite not improving performance. The paper interprets this as overconfidence plus poor appreciation of helpful choice architecture. & Whether assistance makes the model more accurately calibrated or merely more confident. \\
@@ -106,20 +83,10 @@ Quality-information control & Experiment~4 removed non-diagnostic quality inform
 Choice-modeling framework & Choices were analyzed with logistic models for discrete outcomes and ANOVA for error-cost outcomes. & The paper explicitly modeled plan choice using logistic regression with indicator variables for categorical treatments and used ANOVA for average dollar error. This underlies the claims about treatment effects and weighting distortions. & Use of classification models for correct-choice rates and continuous-loss models for regret or excess-cost metrics. \\
 Tool-Lab mapping & The paper's core claim is that poor unaided performance stems from weak mental models and calculation costs, not from lack of incentives alone. & Calculators, defaults, and just-in-time education all improved choices more than incentives did, showing that decision support changed both bias and performance. & Compare raw LLM choice, tool-assisted choice, and prompt-instruction conditions to isolate whether failures come from computation, representation, or motivation. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\subsection*{Johnson et al. (2002): Failures of Backward Induction}
-
-\noindent\textbf{Core bargaining measures reported in \citet{johnson2002detecting}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{johnson2002detecting}: core bargaining measures for failures of backward induction.}
 First-round offer & Dollar amount offered by player 1 in a three-round alternating-offer bargaining game with pie sizes \$5.00, \$2.50, and \$1.25. The subgame-perfect benchmark was approximately \$1.25 and an equal split of the opening pie was \$2.50. & Study~1 average offers were \$2.11, roughly one-third of the way from equal split to equilibrium; 88\% of offers were closer to equal split than to equilibrium. In Study~2, uninstructed offers to robots averaged \$1.84 and post-instruction offers fell to about \$1.22. In Study~3, trained and untrained players converged only partway, to about \$1.60. & Numeric final choice or initial offer in a sequential negotiation task, scored against the equilibrium or fully informed optimum. \\
 Offer distribution by rule type & Offers were analyzed as reflecting different levels of lookahead, with heuristic benchmarks around \$2.00 (level 0), \$1.50 (level 1), and \$1.25 (equilibrium reasoning). & Combined over Studies~1 and~2, trials classified as level 0, level 1, and equilibrium by search behavior produced mean offers of \$2.07, \$1.71, and \$1.44, respectively. The rank ordering matched the theory, even if the means remained above the exact decision-rule predictions. & Distribution of submitted values by inferred reasoning depth, such as myopic, one-step, and full-lookahead policies. \\
 Round-1 rejection rate & Whether player 2 rejected the initial offer. Equilibrium predicts essentially no rejections, so rejection rates diagnose mismatch between offered amounts and responders' expectations or preferences. & In Study~1, 10.8\% of first-round offers were rejected overall and offers below \$1.80 were rejected about half the time. In Study~2, uninstructed humans rejected 51\% of robot opening offers but this fell to 7\% after instruction. In Study~3, rejection rates moved from 75\% pre-instruction to 35\% after instruction and then remained elevated at roughly 28--33\% in mixed populations. & Acceptance or rejection of a model's initial answer, proposal, or plan by a simulated counterpart or evaluator. \\
@@ -129,19 +96,10 @@ Training and transfer effect & Study~2 introduced explicit backward-induction in
 Mixed-population convergence & Study~3 paired trained and untrained humans to see whether trained subjects pulled the group to equilibrium or instead adapted upward toward the untrained population. & The result was a tug-of-war: trained players offered less, untrained players rejected low offers, trained players later raised offers somewhat, and untrained players lowered them. The mixed-population average settled around \$1.60, between post-training equilibrium play and untrained human play. & Population interaction effect when models with different reasoning policies or training regimes are evaluated together in the same environment. \\
 Open-box control & Replication control in which pie values were visible continuously rather than hidden behind Mouselab boxes. & The open-box session replicated Study~1 closely: average offer \$2.10 and rejection rate 7.5\%; these did not differ significantly from the closed-box condition, suggesting the information display itself was not driving the bargaining results. & Interface-control comparison testing whether process tracing changes behavior relative to a fully visible condition. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\medskip
-\noindent\textbf{Information-search and player-type measures reported in \citet{johnson2002detecting}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{johnson2002detecting}: information-search and player-type measures for failures of backward induction.}
 Round-specific acquisitions & Number of times each hidden Mouselab box was opened before a first-round offer. The three payoff boxes corresponded to the current, next, and final bargaining rounds. & In Study~1, player 1 acquired the first-round payoff 4.38 times on average, the second-round payoff 3.80 times, and the third-round payoff 2.12 times. Subjects failed even to open the second- and third-round boxes in 19\% and 10\% of trials, respectively. & Number of inspections of current-state versus future-state cues before an answer is submitted. \\
 Round-specific looking time & Total time spent examining each payoff box prior to a first-round offer. Looking time was recorded continuously via Mouselab. & In Study~1, player 1 spent 12.91 seconds on the first-round pie, 6.67 on the second, and only 1.24 on the third. The concentration of time on the current pie was the core evidence against full backward induction. & Time or cost allocated to present-state versus future-state evidence. \\
 Transition counts & Number of transitions among boxes, especially backward-induction transitions between second- and third-round boxes. & Medium-offer subjects, interpreted as level 1 players, made more second-to-third-round transitions than high-offer subjects. After instruction in Study~2, search shifted away from the first-round box and toward repeated second/third-round inspection. & Sequence metrics over future-state inspections, such as transitions among later stages of a tree or dynamic task. \\
@@ -155,20 +113,10 @@ Search--outcome correlation & Relationship between lookahead search and closenes
 No-learning check in Study~1 & Trial-by-trial trend in search and offers within the uninstructed human-only study. & The paper reports little change over time: average offers changed little across the eight trials, and ANOVAs showed no meaningful trial differences in most process measures. & Flat or weak within-condition learning curve when no explicit training or scaffold is provided. \\
 Tool-Lab mapping & The paper treats information search as a window into the hidden ``thinking factory,'' using search omissions and transition structure to infer decision rules. & The authors argue that equilibrium social-preference theories alone cannot explain the data because they make no corresponding prediction about information search depth or search order. & Direct logging of tool calls, future-state inspections, revisits, and transition paths to classify runs into myopic, one-step, and equilibrium-like reasoning policies. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\subsection*{Luce et al. (1997): Emotionally Difficult Decisions}
-
-\noindent\textbf{Core measures reported in \citet{luce1997choice}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{luce1997choice}: core measures for emotionally difficult decisions.}
 Emotion-induction design & Three Mouselab experiments manipulated task-related negative emotion rather than generic complexity alone: Experiment~1 used vividness and consequence framing in a child-sponsorship choice; Experiment~2 used base rate of outside support (10\% vs. 90\%) and vividness; Experiment~3 used conflict and trade-off difficulty in job choice after a pre-elicitation session. & The paper consistently treats emotion condition as the explanatory variable and processing measures as the outcomes to be explained. Base rate worked reliably in Experiment~2, whereas vividness largely did not. Conflict and trade-off difficulty jointly worked in Experiment~3. & Task-induced aversiveness, conflict, or loss-threat manipulations in prompts or environments, used to test how tool search changes when decisions are emotionally costly. \\
 NEGAVG & Mean of self-reported negatively valenced adjectives rated from 1 to 5 after each decision; positive terms were included only as disguise items. & Experiment~1: 1.90 in the lower-emotion group versus 2.93 in the higher-emotion group. Experiment~2: low base rate increased NEGAVG (2.13 vs. 1.61; $F(1,76)=9.78$, $p<.003$), whereas vividness did not. Experiment~3: NEGAVG increased with conflict ($F(1,39)=51.56$, $p<.0001$), trade-off difficulty ($F(1,39)=7.82$, $p<.008$), and their interaction ($F(1,39)=5.99$, $p<.02$). & Post-decision self-report, prompted difficulty rating, or inferred aversiveness score that captures how emotionally costly the task felt to the model or evaluator. \\
 TIME & Total time spent on a choice trial. & Experiment~1 increased from 62.10 to 84.30 seconds but was not significant ($F(1,25)=2.72$, $p<.11$). Experiment~2 increased under low base rate from 63.8 to 88.6 seconds ($F(1,76)=9.28$, $p<.003$). Experiment~3 high-conflict means rose from 66.10 to 109.90 as trade-off difficulty increased. & Elapsed wall-clock time, deliberation duration, or billed inference time before a final answer. \\
@@ -179,19 +127,10 @@ Experiment~3 attribute pretests & Session~1 elicited three importance measures f
 Mediation test & Pooled analysis across Experiments~1 and~2 and the high-conflict portion of Experiment~3 tested whether NEGAVG mediated processing effects. & Emotion condition affected NEGAVG ($F(1,143)=23.4$, $p<.0001$). NEGAVG correlated with TIME ($r=.40$, $p<.0001$) and ACQUISITIONS ($r=.29$, $p<.0004$), but not reliably with PATTERN ($r=-.13$, $p<.13$). Adding NEGAVG reduced the effect of emotion on ACQUISITIONS, TIME, and PATTERN. & Mediation or path analysis testing whether induced aversiveness explains changes in search extent and search style. \\
 Decision quality note & The paper explicitly did not include a direct decision-quality or outcome-accuracy measure. Instead, it inferred likely performance implications from the combination of more extensive but more trade-off-avoiding search. & The authors argue that emotion likely harms normative quality because participants avoid explicit trade-offs, but no direct accuracy variable was recorded in the three experiments. & Final-choice correctness should be added explicitly in Tool-Lab so process shifts can be related to outcome quality rather than inferred indirectly. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\medskip
-\noindent\textbf{Time-course measures reported in \citet{luce1997choice}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{luce1997choice}: time-course measures for emotionally difficult decisions.}
 Place (beginning vs. end) & Time-course factor defined from the first 13 and last 13 acquisitions on each trial; if a trial had fewer than 26 acquisitions, the first and second halves were used. & This staging allowed the authors to separate early coping-oriented search from late verification-oriented search while controlling for total search length. & Early-versus-late trace segmentation, for example first and last $k$ tool calls or the first and last halves of a run. \\
 PATTERN by place & The same PATTERN index was reanalyzed as a function of emotion level and place. & High emotion produced more attribute-based processing overall ($F(1,286)=11.66$, $p<.001$); the beginning of search was also more attribute-based ($F(1,286)=50.17$, $p<.001$); and emotion $\times$ place interacted ($F(1,286)=7.10$, $p<.01$), indicating that the strongest emotion effect occurred early in the trace. & Stage-specific transition metrics that test whether aversive tasks change early search more than late search. \\
 ATT-TOTAL and ALT-TOTAL & Counts of attribute-based and alternative-based transitions reported in the pooled time-course table as a decomposition of PATTERN. & Used descriptively to support the claim that more emotional decisions begin with attribute-focused search and end with alternative-focused verification; the paper emphasizes the staged pattern more than separate inferential tests on the counts. & Raw transition counts by stage, useful for decomposing a signed pattern score into its components. \\
@@ -201,20 +140,10 @@ VARATT and VARALT & Variance in the proportion of time allocated across attribut
 TCHOSEN & Proportion of time spent examining the ultimately chosen alternative. & TCHOSEN rose sharply at the end of processing ($F(1,286)=81.36$, $p<.001$) but showed no main effect of emotion and no interaction, supporting a late verification phase common to both emotion conditions. & End-of-trace focus on the final answer, finalist options, or chosen hypothesis before submission. \\
 Trade-off-avoidance check & Footnote analysis examined average within-attribute sequence lengths to rule out additive-difference processing as the source of attribute-based search. & Average within-attribute sequence length was 3.6 when reacquisitions were included and 2.8 when they were excluded, too long for simple pairwise additive-difference comparisons. & Diagnostic check on whether attribute-based search reflects pairwise comparison, elimination, or broader noncompensatory screening. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\subsection*{Payne et al. (1988): Adaptive Strategy Selection}
-
-\noindent\textbf{Measures reported in \citet{payne1988adaptive}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{payne1988adaptive}: measures for adaptive strategy selection.}
 Effort (Study~1) & Total count of elementary information processes (EIPs) used by a strategy; time pressure implemented as EIP ceilings of 50, 100, 150, or no limit. & In the no-pressure simulation, WADD required 160 operations on average; EQW achieved 0.89 relative accuracy with effort 85 in one environment; EBA averaged 0.65 relative accuracy with effort 85. & Token usage, billed cost, tool-call count, or any explicit action budget that measures search effort directly. \\
 Relative accuracy (Studies~1--3) & Normalized improvement over random choice relative to the weighted-additive optimum: $({\rm WADD}_{h} - {\rm WADD}_{r})/({\rm WADD}_{a} - {\rm WADD}_{r})$. In the human studies, expected-value maximization supplied the normative benchmark. & Without time pressure, strict lexicographic search reached 0.90 relative accuracy in high-variance environments; under severe time pressure, WADD could fall to about 0.2 whereas EBA declined from 0.69 to 0.56 and became best in three of four environments. In Study~2, mean relative accuracy was 0.62 with no pressure versus 0.48 at 15 seconds ($F = 8.32$, $p < .01$). & Normalized decision quality relative to a fully informed optimum and a random-search baseline. \\
 ACQ & Total number of information boxes opened in a decision problem. & Study~2: 35.0 versus 16.7 under no pressure versus 15 seconds ($F = 378.44$, $p < .01$). Study~3: 37.3 versus 23.2 under no pressure versus 25 seconds ($F = 118.6$, $p < .01$). High-variance contexts also reduced ACQ. & Number of tool calls or number of unique cue inspections prior to submission. \\
@@ -227,20 +156,10 @@ VAR-ALTER & Variance in the proportion of time spent on each alternative. Higher
 VAR-ATTRIB & Variance in the proportion of time spent on each attribute. Higher variance implies more selective cue use and less compensatory processing. & Study~2 increased from 0.31 to 0.38 under severe time pressure ($F = 5.98$, $p < .05$) and from 0.22 to 0.49 in high-variance contexts ($F = 119.13$, $p < .01$). Study~3 increased from 0.20 to 0.34 in high-variance contexts ($F = 14.25$, $p < .01$). & Concentration of search across cue classes or attributes, useful for diagnosing filtration and heuristic selectivity. \\
 Process--accuracy linkage & Correlation between PATTERN and relative accuracy across time-pressure, context, and learning-block cells. & In Study~2, second-half correlations were 0.41 in the no-pressure/low-variance cell, 0.30 in the no-pressure/high-variance cell, 0.31 in the 15-second/low-variance cell, and $-0.20$ in the 15-second/high-variance cell, showing that attribute-based search became more accurate in the hardest environment. Study~3 correlations stayed positive, consistent with weaker strategy change under moderate pressure. & Relationship between search style and final decision quality, estimated over repeated runs or task conditions. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\subsection*{Lau and Redlawsk (2006): Voting as Dynamic Information Processing}
-
-\noindent\textbf{Process-tracing and decision-strategy measures reported in \citet{lau2006voters}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{lau2006voters}: process-tracing and decision-strategy measures for voting as dynamic information processing.}
 Depth of search & Total amount of campaign information acquired from the dynamic information board, summarized through total items accessed, unique items accessed, and unique items accessed per candidate. & The primary-election depth summary ranged from 13 to 55 items and the general-election version from 2 to 63 items; the composite scales were highly reliable ($\alpha = .92$ primary, $\alpha = .98$ general). & Total tool-use volume, unique evidence pieces inspected, and average inspections per option or candidate. \\
 Comparability of search & Percentage of all attributes examined for at least one candidate that were also examined for all candidates in the choice set, intended to separate compensatory from selective search. & Search comparability ranged from 0 to 98\% in the primary and 31 to 90\% in the general election, with means of 51.8\% and 59\%, respectively. & Coverage parity across alternatives, for example the share of cue types inspected for every option rather than only a favored subset. \\
 Sequence of search & Transition-based measures of intra-candidate versus intra-attribute search, plus a summary of ordered versus haphazard acquisition. & Intra-candidate transitions averaged 38.9\% in the primary and 76.5\% in the general election, whereas intra-attribute transitions averaged 13.6\% and 44\%. These sequence measures were central for distinguishing candidate-based from dimensional search. & Transition metrics over tool calls, such as depth-first versus attribute-wise inspection and ordered versus haphazard trace structure. \\
@@ -248,19 +167,10 @@ Content of search & Distribution of attention across person information, issue i
 Decision-strategy classification & Voters were classified using depth, comparability, and sequence measures into four broad models: rational-compensatory (Model~1), confirmatory (Model~2), fast-and-frugal (Model~3), and intuitive noncompensatory (Model~4), with candidate-based and dimensional variants when needed. & Under the revised coding, roughly 35\% of traces were classified as Model~1, 20\% as Model~2, 15\% as Model~3, and 35\% as Model~4, with a small middle band left unclassified for robustness. & Behavioral clustering of runs into compensatory, confirmatory, fast-and-frugal, and noncompensatory search profiles using trace features rather than post hoc self-report. \\
 Task-structure manipulations & The experiments varied campaign difficulty through the number of candidates, the information environment, and the dynamic presentation of campaign information over time. & More candidates reduced search per candidate but increased total search, while simpler general-election contexts produced more strongly candidate-centered search paths and greater voter control over content selection. & Controlled variation in number of options, information salience, and episode structure to test how the environment shifts search style. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\medskip
-\noindent\textbf{Memory, evaluation, and correct-voting measures reported in \citet{lau2006voters}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{lau2006voters}: memory, evaluation, and correct-voting measures for voting as dynamic information processing.}
 Unaided recall and memory accuracy & After the campaign, subjects recalled what they knew about candidates; recalled items were coded for amount, affective valence, and gist-level accuracy. & Subjects recalled about 8.3 items for the first candidate and 7.6 for the second, with about 3 of 4 coded items judged accurate. Chosen candidates enjoyed a memory advantage in both amount and net valence. & Post-task free recall or explanation quality, scored for factual accuracy and sentiment toward chosen versus rejected options. \\
 On-line evaluation counter & Running candidate evaluations were constructed from the stream of acquired information, combining issues, personality, party cues, and endorsements into a candidate-specific tally. & The book uses this counter to compare on-line and memory-based candidate evaluation and to build the normative-naive benchmark for correct voting. & Incremental latent utility or preference score reconstructed from the model's observed evidence acquisitions over time. \\
 Vote choice and partisan defection & Final vote choice was analyzed in both primary and general-election simulations, including whether voters defected from their in-party candidate. & The later chapters show that information-processing variables meaningfully shifted both candidate evaluations and the probability of defection from party-consistent voting, rather than merely restating prior partisanship. & Final option selection, including whether the model overrides a default prior or prior preference after inspecting new evidence. \\
@@ -269,20 +179,10 @@ Correct voting (historical validation) & The same correct-voting logic was porte
 Campaign-resource distortion metric & The historical analysis compared candidates' vote shares with the shares implied by correct-voting estimates and related the gap to campaign-resource asymmetries. & Disproportionate campaign spending correlated strongly with disproportionate vote gains relative to correct-voting baselines ($r_s = .73$, $t(17) = 4.43$, $p < .001$). & Measure of how interface prominence, recommendation bias, or unequal exposure shifts final selections away from the benchmark-optimal choice. \\
 Heuristic-use measures & Later chapters coded whether voters relied on shortcuts such as endorsements, familiarity, habit, viability, and other political heuristics, then related those patterns to expertise and correct voting. & The book argues that heuristic use is not uniformly harmful: some shortcuts help novices and experts differently, and their effect on correctness depends on task difficulty and decision strategy. & Detection of rule-of-thumb policies such as always following defaults, relying on a single cue, or using prior familiarity instead of broad search. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\subsection*{Freeman et al. (2011): Status Cues Shape Race Perception}
-
-\noindent\textbf{Categorization and ambiguity measures reported in \citet{freeman2011looking}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{freeman2011looking}: categorization and ambiguity measures for status cues and race perception.}
 Experimental structure & Experiment~1 used keyboard race categorization, Experiment~2 repeated the task with mouse tracking, and a final computational study simulated both experiments with a recurrent interactive-activation network. Faces lay on 13-point White--Black morph continua and were paired with either business or janitor attire. & The paper explicitly separates outright category assignment, real-time competition during response, and a mechanistic model intended to account for both. & Evaluation suite that measures final answer, within-run competition, and fitted mechanistic explanation under the same task family. \\
 Perceived race (binary categorization) & In Experiment~1, participants categorized each target as White or Black. Generalized estimating equation logistic regression modeled perceived race with coding $0 = \text{White}$ and $1 = \text{Black}$. & As morph values increased from prototypically White to prototypically Black, Black categorizations rose sharply ($B = 13.47$, $p < .0001$, $z = 19.01$). Low-status attire increased the likelihood of Black categorization relative to high-status attire, which biased responses toward White. & Binary classification outcome under ambiguous evidence, with context cues allowed to bias the final label. \\
 Racial ambiguity & Facial input varied continuously from morph $-6$ (most prototypically White) to morph $+6$ (most prototypically Black), recoded from $-0.5$ to $0.5$ for regression. The midpoint of the continuum represented maximum ambiguity. & Status-cue effects were weakest for clearer faces and strongest for ambiguous faces, so contextual pressure mattered more as bottom-up race cues weakened. & Controlled ambiguity manipulation on the primary signal, used to test how strongly context influences decisions when evidence is uncertain. \\
@@ -290,19 +190,10 @@ Status cue & Orthogonal contextual manipulation through high-status business att
 Status $\times$ ambiguity interaction & Interaction term testing whether contextual-status effects scale with facial ambiguity. & The paper reports that status-cue influence grew stronger as faces became more racially ambiguous, consistent with the claim that top-down stereotypes gain leverage when bottom-up evidence is weak. & Moderation test asking whether contextual bias expands as the model's core evidence becomes less decisive. \\
 Congruency coding & In Experiment~2, trials were coded as congruent when the final response matched the stereotype linked to the attire cue and incongruent when it did not. & This split made it possible to ask not just whether status cues changed the final answer, but whether they still distorted processing when the final answer resisted the cue. & Indicator for whether the final answer aligned with or overrode contextual pressure. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
-\medskip
-\noindent\textbf{Process and computational measures reported in \citet{freeman2011looking}.}
-
-{\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{2.7cm} p{4.4cm} p{4.3cm} X@{}}
-\toprule
-\textbf{Measure} & \textbf{Operationalization in source paper} & \textbf{Key reported results} & \textbf{Tool-Lab analogue} \\
-\midrule
+\measuretablebegin{\protect\citet{freeman2011looking}: process and computational measures for status cues and race perception.}
 Initiation and response-time controls & In Experiment~2, mouse trajectories started from a bottom-center ``Start'' button and ended at White/Black response buttons; initiation time indexed when movement began and response time indexed when the click landed. & Initiation times were early and statistically equivalent across congruent and incongruent trials (196 vs. 200 ms, $p = .22$). Response times were also equivalent (1169 vs. 1171 ms, $p = .61$), supporting the claim that trajectory effects reflected online competition rather than timing artifacts. & Latency controls confirming that process measures reflect genuine within-run dynamics rather than simple slowing or delayed starts. \\
 Area Under the Curve (AUC) & MouseTracker trajectories were rescaled, normalized to 101 time steps, and remapped so the chosen response lay at the top-right. AUC measured the area between the observed trajectory and a straight-line ideal path; larger AUC indicates stronger pull toward the nonchosen response. & AUC served as the paper's trial-level index of simultaneous partial activation of the opposite race category during response execution. & Continuous competition metric such as cursor deflection, alternative-logit mass, or intermediate policy drift toward a rejected answer. \\
 Ambiguity effect on AUC & Normal regression of AUC on racial ambiguity, congruency, and their interaction. & Greater ambiguity increased attraction toward the opposite category ($B = 0.80$, $p < .0001$, $z = 9.03$), indicating that ambiguous faces elicited stronger simultaneous consideration of the nonselected race category. & Growth in competing-answer activation as input uncertainty increases. \\
@@ -311,8 +202,8 @@ Ambiguity $\times$ congruency interaction on AUC & Interaction test for whether 
 Computational model fit & The final study used a recurrent connectionist network with stochastic interactive activation, fed by facial-cue input, attire input, and race-task-demand input. Model outputs were compared with the human categorization curves. & The network closely matched human responses ($R^2 = 0.99$, RMSE $= 0.03$) and reproduced the same pattern whereby status cues shifted final categorization more strongly for ambiguous faces. & Mechanistic model fit showing whether a structured latent-activation model can reproduce observed context-bias effects. \\
 Partial parallel activation in the model & For incongruent trials, the model tracked maximum activation of both selected and unselected race-category nodes during settling. & The status cue elevated the activation of the unselected race category associated with that cue, especially under ambiguity, mirroring the human mouse-attraction effect even when the ultimate categorization resisted the cue. & Logged activation or probability mass assigned to rejected responses during inference, rather than only the final submitted answer. \\
 \bottomrule
-\end{tabularx}
-}
+\end{xltabular}
+\endgroup
 
 \ifSubfilesClassLoaded{%
 \bibliography{../main}

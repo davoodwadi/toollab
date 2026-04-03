@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.11.27)  3 APR 2026 09:26
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.11.27)  3 APR 2026 11:16
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -330,6 +330,8 @@ Package: longtable 2025-10-13 v4.24 Multi-page Table package (DPC)
 \c@LT@tables=\count315
 \c@LT@chunks=\count316
 \LT@p@ftn=\toks23
+) (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/needspace/needspace.sty
+Package: needspace 2025/03/13 v1.3e reserve vertical space
 ) (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/ragged2e/ragged2e.sty
 Package: ragged2e 2023/06/22 v3.6 ragged2e Package
 \CenteringLeftskip=\skip74
@@ -365,7 +367,11 @@ Package: array 2025/09/25 v2.6n Tabular extension package (FMi)
 \TX@delta=\dimen184
 \TX@cols=\count317
 \TX@ftn=\toks25
-) (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty (/home/dw/.local/texlive/2025/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.tex
+) (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/xltabular/xltabular.sty
+Package: xltabular 2025/02/28 v0.2i `xltabular' package (hv,RN)
+ (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/ltablex/ltablex.sty
+Package: ltablex 2014/08/13 v1.1 Modified tabularx
+)) (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty (/home/dw/.local/texlive/2025/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.tex
 \pgfutil@everybye=\toks26
 \pgfutil@tempdima=\dimen185
 \pgfutil@tempdimb=\dimen186
@@ -570,7 +576,7 @@ File: tikzlibraryshapes.geometric.code.tex 2025-08-29 v3.1.11a (3.1.11a)
  (/home/dw/.local/texlive/2025/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshapes.geometric.code.tex
 File: pgflibraryshapes.geometric.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 ))
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 47.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 49.
  (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
@@ -579,24 +585,24 @@ File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 ) (./main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
  (/home/dw/.local/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count340
@@ -616,12 +622,12 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
  (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-Package hyperref Info: Link coloring OFF on input line 47.
+Package hyperref Info: Link coloring OFF on input line 49.
  (./main.out) (./main.out)
 \@outlinefile=\write4
 \openout4 = `main.out'.
 
-LaTeX Font Info:    Trying to load font information for T1+lmss on input line 51.
+LaTeX Font Info:    Trying to load font information for T1+lmss on input line 53.
  (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (./sections/introduction.tex) (./sections/related-works.tex) (./sections/table-mouselab.tex (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/lm/ot1lmr.fd) (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/lm/omllmm.fd) (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/lm/omslmsy.fd) (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/lm/omxlmex.fd) (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd) (/home/dw/.local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd)
@@ -1025,13 +1031,13 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 47CF652780300E1B8AFC71E23904BA6D;1665.
  ) 
 Here is how much of TeX's memory you used:
- 22920 strings out of 467538
- 424121 string characters out of 5416425
- 841213 words of memory out of 5000000
- 51332 multiletter control sequences out of 15000+600000
+ 23014 strings out of 467538
+ 426463 string characters out of 5416425
+ 842430 words of memory out of 5000000
+ 51414 multiletter control sequences out of 15000+600000
  716551 words of font info for 98 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 102i,12n,107p,716b,873s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 102i,12n,107p,1487b,873s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </home/dw/.local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></home/dw/.local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx7.pfb></home/dw/.local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx9.pfb></home/dw/.local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></home/dw/.local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr10.pfb></home/dw/.local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr7.pfb></home/dw/.local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr8.pfb></home/dw/.local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb></home/dw/.local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb></home/dw/.local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri7.pfb></home/dw/.local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb>
 Output written on main.pdf (7 pages, 310892 bytes).
 PDF statistics:

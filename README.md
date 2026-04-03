@@ -91,6 +91,13 @@ To adapt the framework, edit or add a new YAML file with:
 
 
 # TEST
+
+Data collection:
 ```
 PYTHONPATH=src python src/tool_lab/cli.py run --config experiments/consumer_choice_fixed_matrix.yaml
+```
+
+Analysis
+```
+PYTHONPATH=src python src/tool_lab/analysis/analyze.py
 ```

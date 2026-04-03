@@ -3,7 +3,6 @@ from __future__ import annotations
 from argparse import ArgumentParser
 import json
 
-from tool_lab.analysis.metrics import aggregate_run_records
 from tool_lab.config import MatrixMode, load_experiment_spec
 from tool_lab.runner import ExperimentRunner
 from tool_lab.storage import read_jsonl
@@ -48,8 +47,6 @@ def main() -> None:
 
     if args.command == "summarize":
         records = read_jsonl(args.runs)
-        summary = aggregate_run_records(records)
-        print(json.dumps(summary, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

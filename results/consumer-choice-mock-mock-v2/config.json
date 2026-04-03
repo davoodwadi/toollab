@@ -1,0 +1,283 @@
+{
+  "analysis": {},
+  "attributes": [
+    {
+      "description": "Fixed monthly payment.",
+      "display_name": "Monthly premium",
+      "id": "monthly_premium",
+      "metadata": {}
+    },
+    {
+      "description": "Annual amount paid before coverage accelerates.",
+      "display_name": "Deductible",
+      "id": "deductible",
+      "metadata": {}
+    },
+    {
+      "description": "Worst-case annual spending cap.",
+      "display_name": "Maximum out-of-pocket",
+      "id": "max_oop",
+      "metadata": {}
+    },
+    {
+      "description": "Breadth of primary and specialist network.",
+      "display_name": "Network breadth",
+      "id": "network",
+      "metadata": {}
+    },
+    {
+      "description": "How the plan handles recurring medications.",
+      "display_name": "Prescription coverage",
+      "id": "prescriptions",
+      "metadata": {}
+    },
+    {
+      "description": "Availability of virtual care and after-hours triage.",
+      "display_name": "Telehealth access",
+      "id": "telehealth",
+      "metadata": {}
+    }
+  ],
+  "budget_usd": 0.06,
+  "cues": [
+    {
+      "attribute_id": "monthly_premium",
+      "id": "bronze_plus_monthly_premium",
+      "label": "Bronze Plus monthly premium",
+      "metadata": {},
+      "normative_score": 0.7,
+      "option_id": "bronze_plus",
+      "value": "$340 per month.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "monthly_premium",
+      "id": "silver_balance_monthly_premium",
+      "label": "Silver Balance monthly premium",
+      "metadata": {},
+      "normative_score": 0.35,
+      "option_id": "silver_balance",
+      "value": "$435 per month.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "monthly_premium",
+      "id": "gold_secure_monthly_premium",
+      "label": "Gold Secure monthly premium",
+      "metadata": {},
+      "normative_score": -0.35,
+      "option_id": "gold_secure",
+      "value": "$560 per month.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "deductible",
+      "id": "bronze_plus_deductible",
+      "label": "Bronze Plus deductible",
+      "metadata": {},
+      "normative_score": -1.2,
+      "option_id": "bronze_plus",
+      "value": "$7,200 individual deductible.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "deductible",
+      "id": "silver_balance_deductible",
+      "label": "Silver Balance deductible",
+      "metadata": {},
+      "normative_score": 0.85,
+      "option_id": "silver_balance",
+      "value": "$2,450 individual deductible.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "deductible",
+      "id": "gold_secure_deductible",
+      "label": "Gold Secure deductible",
+      "metadata": {},
+      "normative_score": 1.1,
+      "option_id": "gold_secure",
+      "value": "$750 individual deductible.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "max_oop",
+      "id": "bronze_plus_max_oop",
+      "label": "Bronze Plus maximum out-of-pocket",
+      "metadata": {},
+      "normative_score": -1.0,
+      "option_id": "bronze_plus",
+      "value": "$9,100 annual family cap.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "max_oop",
+      "id": "silver_balance_max_oop",
+      "label": "Silver Balance maximum out-of-pocket",
+      "metadata": {},
+      "normative_score": 0.7,
+      "option_id": "silver_balance",
+      "value": "$6,200 annual family cap.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "max_oop",
+      "id": "gold_secure_max_oop",
+      "label": "Gold Secure maximum out-of-pocket",
+      "metadata": {},
+      "normative_score": 0.95,
+      "option_id": "gold_secure",
+      "value": "$4,100 annual family cap.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "network",
+      "id": "bronze_plus_network",
+      "label": "Bronze Plus network breadth",
+      "metadata": {},
+      "normative_score": -0.8,
+      "option_id": "bronze_plus",
+      "value": "Narrow HMO network with specialist referrals required.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "network",
+      "id": "silver_balance_network",
+      "label": "Silver Balance network breadth",
+      "metadata": {},
+      "normative_score": 0.8,
+      "option_id": "silver_balance",
+      "value": "Mid-sized PPO network with most regional hospital systems included.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "network",
+      "id": "gold_secure_network",
+      "label": "Gold Secure network breadth",
+      "metadata": {},
+      "normative_score": 1.0,
+      "option_id": "gold_secure",
+      "value": "Broad PPO network with national specialist access.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "prescriptions",
+      "id": "bronze_plus_prescriptions",
+      "label": "Bronze Plus prescription coverage",
+      "metadata": {},
+      "normative_score": -0.95,
+      "option_id": "bronze_plus",
+      "value": "Generic drugs are cheap but brand-name tiers remain expensive until deductible is met.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "prescriptions",
+      "id": "silver_balance_prescriptions",
+      "label": "Silver Balance prescription coverage",
+      "metadata": {},
+      "normative_score": 1.05,
+      "option_id": "silver_balance",
+      "value": "Predictable copays for common maintenance medications.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "prescriptions",
+      "id": "gold_secure_prescriptions",
+      "label": "Gold Secure prescription coverage",
+      "metadata": {},
+      "normative_score": 0.85,
+      "option_id": "gold_secure",
+      "value": "Lowest copays and mail-order discounts for maintenance medications.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "telehealth",
+      "id": "bronze_plus_telehealth",
+      "label": "Bronze Plus telehealth access",
+      "metadata": {},
+      "normative_score": -0.25,
+      "option_id": "bronze_plus",
+      "value": "Basic video visits only during weekday business hours.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "telehealth",
+      "id": "silver_balance_telehealth",
+      "label": "Silver Balance telehealth access",
+      "metadata": {},
+      "normative_score": 0.65,
+      "option_id": "silver_balance",
+      "value": "24/7 virtual urgent care with integrated prescription renewals.",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "telehealth",
+      "id": "gold_secure_telehealth",
+      "label": "Gold Secure telehealth access",
+      "metadata": {},
+      "normative_score": 0.55,
+      "option_id": "gold_secure",
+      "value": "24/7 virtual urgent care plus specialist video consults.",
+      "visibility_weight": 1.0
+    }
+  ],
+  "default_tool_cost_usd": 4e-05,
+  "description": "",
+  "interface": {},
+  "matrix_mode": "fixed",
+  "max_turns": 30,
+  "model": {
+    "api_key_env": null,
+    "extra": {
+      "mock_inspections": 16
+    },
+    "max_output_tokens": 800,
+    "model_name": "mock-v2",
+    "pricing": {
+      "input_per_million": 2.0,
+      "output_per_million": 10.0
+    },
+    "provider": "mock",
+    "temperature": 1.0
+  },
+  "name": "consumer_choice",
+  "options": [
+    {
+      "base_score": -0.2,
+      "description": "Lowest premium, highest out-of-pocket exposure.",
+      "display_name": "Bronze Plus",
+      "id": "bronze_plus",
+      "metadata": {}
+    },
+    {
+      "base_score": 0.35,
+      "description": "Midrange premium with stronger coverage and predictable costs.",
+      "display_name": "Silver Balance",
+      "id": "silver_balance",
+      "metadata": {}
+    },
+    {
+      "base_score": 0.1,
+      "description": "Highest premium with the lowest deductible and broad benefits.",
+      "display_name": "Gold Secure",
+      "id": "gold_secure",
+      "metadata": {}
+    }
+  ],
+  "participant": {
+    "profile": "You are selecting coverage for a small family with one ongoing prescription and moderate expected medical use. You care about total annual cost, prescription coverage, and a broad physician network. You prefer predictable expenses over the lowest headline premium.\n",
+    "role": "insurance shopper"
+  },
+  "replications": 10,
+  "seed": 31,
+  "task_prompt": "Choose the insurance plan that best matches the assigned consumer profile.  Open as many cells as you need, then end the task with submit_choice.\n",
+  "tool_costs": {
+    "inspect_cell": 5e-05,
+    "submit_choice": 2e-05,
+    "view_matrix": 2e-05
+  },
+  "tools": [
+    "inspect_cell",
+    "submit_choice"
+  ]
+}

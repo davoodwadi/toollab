@@ -17,11 +17,14 @@ class ToolInvocation:
 
 @dataclass(slots=True)
 class AssistantResponse:
-    text: str
-    tool_calls: list[ToolInvocation] = field(default_factory=list)
+    content: str
+    reasoning: str | None
     input_tokens: int = 0
     output_tokens: int = 0
-    raw: dict[str, Any] = field(default_factory=dict)
+    input_cost: float = 0.0
+    output_cost: float = 0.0
+    tool_calls: list[ToolInvocation] = field(default_factory=list)
+    finish_reason: str | None = None
 
 
 @dataclass(slots=True)

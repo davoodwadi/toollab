@@ -20,14 +20,6 @@ def _schema(model_name: str, **fields: Any) -> dict[str, Any]:
 
 
 BUILTIN_TOOL_DEFINITIONS: dict[str, ToolDefinition] = {
-    "advance_window": {
-        "name": "advance_window",
-        "description": "Advance the scrolling information window without revealing any hidden value.",
-        "input_schema": _schema(
-            "AdvanceWindowInput",
-            steps=(int, Field(default=1, ge=1, le=5)),
-        ),
-    },
     "submit_choice": {
         "name": "submit_choice",
         "description": "Record the final decision.",
@@ -54,15 +46,5 @@ BUILTIN_TOOL_DEFINITIONS: dict[str, ToolDefinition] = {
             "InspectItemInput",
             item_id=(str, ...),
         ),
-    },
-    "view_matrix": {
-        "name": "view_matrix",
-        "description": "Show the full fixed matrix of hidden cells and their labels.",
-        "input_schema": _schema("ViewMatrixInput"),
-    },
-    "view_visible_items": {
-        "name": "view_visible_items",
-        "description": "Show the labels that are currently visible in the scrolling information window.",
-        "input_schema": _schema("ViewVisibleItemsInput"),
     },
 }

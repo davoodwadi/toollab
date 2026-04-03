@@ -1,11 +1,11 @@
 experiment:
-  name: consumer_choice_fixed_matrix
+  name: consumer_choice
   description: ""
   task_prompt: >
     Choose the insurance plan that best matches the assigned consumer profile. 
     Open as many cells as you need, then end the task with submit_choice.
   matrix_mode: fixed
-  replications: 1
+  replications: 10
   budget_usd: 0.0600
   max_turns: 30
   default_tool_cost_usd: 0.00004
@@ -26,7 +26,7 @@ experiment:
       input_per_million: 2.0
       output_per_million: 10.0
     extra:
-      mock_inspections: 6
+      mock_inspections: 16
   participant:
     role: insurance shopper
     profile: >

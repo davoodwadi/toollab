@@ -1,0 +1,45 @@
+{
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.06}
+\begin{longtable}{@{}p{0.18\textwidth} p{0.43\textwidth} p{0.32\textwidth}@{}}
+\caption{Metric taxonomy for unified Tool-Lab evaluation.}\label{tab:measure-taxonomy} \\
+\toprule
+\textbf{Metric} & \textbf{How it is measured in the original literature} & \textbf{Tool-Lab equivalent} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\textit{Table~\ref{tab:measure-taxonomy} continued.}} \\
+\toprule
+\textbf{Metric} & \textbf{How it is measured in the original literature} & \textbf{Tool-Lab equivalent} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\bottomrule
+\endlastfoot
+\multicolumn{3}{@{}l}{\textbf{Outcomes and judgments}} \\
+Final decision quality / regret & Normative accuracy of the submitted decision, including informed investment or allocation accuracy \citep{hodge2004does}, relative accuracy under a normative benchmark \citep{payne1988adaptive}, equilibrium deviation in bargaining \citep{johnson2002detecting}, excess payment in insurance choice \citep{johnson2013can,dellaert2024choice}, and correct-vote rate under fuller information \citep{lau2006voters}. & Compare the final Tool-Lab action with the episode's ground-truth optimum and compute regret, excess cost, normalized accuracy, or decision-quality scores. \\
+Final categorization / scalar evaluation & End-state perceptual labels or scalar judgments, such as binary race categorization \citep{freeman2011looking}, firm-quality and source-reliability ratings \citep{hodge2004does}, or running candidate evaluations \citep{lau2006voters}. & Record the final class label or post-task scalar evaluation and compare it with benchmark labels, target properties, or evidence-grounded preference models. \\
+Confidence / calibration & Self-reported confidence in making the correct choice \citep{johnson2013can} and related post-decision reliability judgments about information sources \citep{hodge2004does}, then compared with realized performance to diagnose overconfidence or poor metacognitive calibration \citep{johnson2013can}. & Collect post-decision confidence and compute calibration metrics such as confidence--accuracy correlation, calibration error, or confidence-conditioned regret. \\
+Aggregate welfare impact & Population-level extrapolation from per-decision improvements, such as annual savings from lower insurance overpayment \citep{johnson2013can,dellaert2024choice}. & Translate per-run regret reduction into projected aggregate impact using an external traffic, population, or deployment-volume estimate. \\
+\addlinespace
+\multicolumn{3}{@{}l}{\textbf{Search process}} \\
+Search effort / extent & Total information acquired \citep{lau2006voters}, including acquisitions or box openings \citep{johnson2002detecting,luce1997choice,payne1988adaptive,dellaert2024choice}, number of options examined \citep{dellaert2024choice}, completion or deliberation time \citep{hodge2004does,johnson2013can,luce1997choice,payne1988adaptive}, and response-time controls \citep{freeman2011looking} before commitment. & Log tool-call count, unique evidence retrieved, options inspected, elapsed time, token usage, or billed compute before the final answer. \\
+Search allocation / focus & Distribution of search over alternatives, including coverage parity across candidates \citep{lau2006voters}, concentration within attributes \citep{luce1997choice,payne1988adaptive}, attention to the best options \citep{dellaert2024choice}, and lookahead allocation across current versus future states \citep{johnson2002detecting}. & Measure how tool calls are distributed across options and evidence classes, including focus on optimal items, entropy of search, and parity across alternatives. \\
+Search structure / reasoning strategy & Sequential organization of search, such as alternative-based versus attribute-based transitions \citep{luce1997choice,payne1988adaptive,lau2006voters}, lookahead depth across bargaining rounds \citep{johnson2002detecting}, and trace-based classification into compensatory, heuristic, or reasoning-depth types \citep{johnson2002detecting,payne1988adaptive,lau2006voters}. & Build transition matrices, compute candidate-wise versus attribute-wise switching indices, and cluster traces into myopic, lookahead, compensatory, or heuristic strategy types. \\
+Information recovery / memory & Correct recovery of hidden or payoff-relevant information \citep{hodge2004does}, recovery of payoff-relevant future-state information \citep{johnson2002detecting}, and later unaided recall or memory accuracy for acquired information \citep{lau2006voters}. & Score whether key hidden state was inspected and integrated correctly, then probe post-task recall or justification for factual accuracy and coverage. \\
+\addlinespace
+\multicolumn{3}{@{}l}{\textbf{Intervention response and robustness}} \\
+Architectural influence on choice & Behavioral response to defaults \citep{johnson2013can}, ranking and partition-based visibility gating \citep{dellaert2024choice}, and task-structure manipulations that shape which options receive consideration \citep{lau2006voters}. & Randomize defaults, recommendations, ranking, and visibility; then measure uptake, override, salience effects, and the dependence of accuracy on whether the best option was surfaced. \\
+Tool adoption / instruction transfer & Whether assistance is actually used when available \citep{hodge2004does}, and whether explicit reasoning instruction improves later performance and transfers to new task parameters \citep{johnson2002detecting}. & Log tool availability versus invocation and compare pre/post instruction traces to test both immediate gains and transfer to novel parameter settings. \\
+Scaling and causal diagnostics & Robustness of behavior to task size, such as larger option sets or candidate pools \citep{johnson2013can,dellaert2024choice,lau2006voters}, shifts in search under tighter effort or time constraints \citep{payne1988adaptive}, and mediation tests asking whether interventions work by changing attention to the best options, search breadth, or affect-driven processing \citep{dellaert2024choice,luce1997choice}. & Vary option-set size and estimate whether intervention effects are mediated by logged search metrics such as focus, breadth, or transition structure. \\
+\addlinespace
+\multicolumn{3}{@{}l}{\textbf{Context, affect, and interaction}} \\
+Affect / aversiveness & Subjective emotional burden, threat, or task difficulty \citep{luce1997choice}, often linked to broader search and more attribute-focused processing \citep{luce1997choice}. & Collect post-task difficulty or aversiveness ratings and relate them to search breadth, timing, and strategy shifts. \\
+Contextual bias / stereotype pressure & Bias from task-irrelevant status cues \citep{freeman2011looking} and its amplification under racial ambiguity \citep{freeman2011looking}. & Manipulate irrelevant context cues and estimate direct shifts in final choices as well as interactions with evidence ambiguity. \\
+Micro-level response competition & Continuous competition between chosen and rejected alternatives during response execution, often revealed through trajectory attraction or partial parallel activation \citep{freeman2011looking}. & Log per-step logits, cursor deflection, or other intermediate state traces to quantify pull toward rejected answers during deliberation. \\
+Interaction stability / mixed populations & Stability of multi-agent interaction, including proposal rejection and bargaining breakdown \citep{johnson2002detecting}, plus convergence or divergence in mixed populations of trained and untrained players \citep{johnson2002detecting}. & Measure refusal rates, no-agreement outcomes, and mixed-cohort behavior when models with different prompts, capabilities, or training regimes interact. \\
+\end{longtable}
+}

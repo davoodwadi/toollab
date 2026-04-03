@@ -1,0 +1,31 @@
+\section{The Tool-Lab Methodology}
+
+Tool-Lab adapts process tracing to subjects whose only interface to the world is
+linguistic and tool-mediated. Instead of watching a human participant move a
+cursor over a visual decision board, we observe an LLM interacting through a
+controlled action space: it can deliberate internally, call tools to inspect
+currently available information, and emit text outputs such as intermediate
+judgments or final choices. The experimental trace is therefore defined over
+tool-mediated acquisitions and decisions rather than over mouse movements.
+This preserves the core Mouselab idea that the order and extent of information
+acquisition are themselves behavioral data.
+
+Crucially, dynamic tasks need not be reduced to Payne-style static matrices in
+order to be implemented for LLMs. The environment can maintain a latent state
+and expose only the subset of cues that is currently available, updating that
+state after each action. In this way, Tool-Lab can preserve transient cue
+availability, missed-information costs, staged decisions, and other features of
+dynamic tasks such as election campaigns, while still logging a clean and fully
+structured action trace.
+
+Resource scarcity can also be implemented directly in monetary terms. At the
+start of an episode, the system prompt specifies a maximum budget $B$ (e.g.,
+\$0.10). As the model reasons and invokes tools, the environment debits the
+actual billed cost of model inference and tool execution under the prevailing
+pricing schedule. This cost signal can be computed from observed usage without
+recording the semantic contents of private reasoning. Each tool response then
+returns not only the requested information, but also the marginal cost of that
+action, cumulative expenditure, and the budget remaining. Monetary budget thus
+serves as a domain-general implementation of search cost for LLM subjects,
+playing the role that time pressure, effort, or access difficulty plays in
+human process-tracing paradigms.

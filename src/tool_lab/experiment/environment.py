@@ -18,7 +18,7 @@ from tool_lab.models.base import AssistantResponse
 def build_environment(spec: ExperimentSpec, seed: int) -> "ToolLabEnvironment":
     if spec.matrix_mode == "fixed":
         return FixedMatrixEnvironment(spec, seed)
-    return ScrollingMatrixEnvironment(spec, seed)
+
 
 
 class ToolLabEnvironment(ABC):
@@ -32,6 +32,7 @@ class ToolLabEnvironment(ABC):
         }
         self.cumulative_cost_usd = 0.0
         self.budget_remaining_usd = spec.budget_usd
+        self.last_turn_cost_usd: float = 0.0
 
         self.cues: dict[str, CueSpec] = {cue.id: cue for cue in spec.cues}
         self.opened_cues: set[str] = set()
@@ -45,6 +46,10 @@ class ToolLabEnvironment(ABC):
         self.forced_choice_requested = False
         self.awaiting_forced_choice = False
         self._step_index = 0
+
+        self._last_inspect: dict[str, str] | None = None  # {"option_id": ..., "attribute_id": ...}
+        self._last_is_revisit: bool = False
+        self._last_transition: str | None = None
 
     def build_system_prompt(self) -> str:
         mode_rules = self._mode_rules()
@@ -95,7 +100,7 @@ class ToolLabEnvironment(ABC):
         )
 
 
-    def get_model_cost(self, message: AssistantResponse) -> float:
+    def get_model_cost(self, message: AssistantResponse) -> dict:
         input_cost = message.input_tokens * (self.spec.model.pricing.input_per_million / 1e6)
         output_cost = message.output_tokens * (self.spec.model.pricing.output_per_million / 1e6)
         return {'input_cost':input_cost, 'output_cost':output_cost}
@@ -104,25 +109,41 @@ class ToolLabEnvironment(ABC):
         self.cumulative_cost_usd += (cost['input_cost'] + cost['output_cost'])
         self.budget_remaining_usd = self.spec.budget_usd - self.cumulative_cost_usd
 
+    def charge_model_turn(self, message: AssistantResponse) -> None:
+        cost = self.get_model_cost(message)
+        self.apply_model_cost(cost)
+        message.input_cost = cost['input_cost']
+        message.output_cost = cost['output_cost']
+        self.last_turn_cost_usd = cost['input_cost'] + cost['output_cost']
+
     def execute_tool(
         self, tool_name: str, arguments: dict[str, Any], tool_call_id: str
     ) -> dict[str, Any]:
         try:
             if tool_name == "submit_choice":
-                return self._submit_choice(arguments, tool_call_id)
-            if tool_name == "inspect_cell":
-                return self._inspect_cell(arguments, tool_call_id)
-            if tool_name == "inspect_item":
-                return self._inspect_item(arguments, tool_call_id)
-            raise ValueError(f"Unsupported tool: {tool_name}")
+                payload = self._submit_choice(arguments, tool_call_id)
+            elif tool_name == "inspect_cell":
+                payload = self._inspect_cell(arguments, tool_call_id)
+            else:
+                raise ValueError(f"Unsupported tool: {tool_name}")
         except Exception as exc:
             payload = {
-                "status": "error",
-                "message": str(exc),
+                "role": "tool",
                 "tool_call_id": tool_call_id,
+                "content": json.dumps({"status": "error", "message": str(exc)}),
             }
-            self._charge_and_record(tool_name, payload, kind="tool_error")
-            return payload
+        
+        extra = {}
+        if tool_name == "inspect_cell":
+            extra["is_revisit"] = self._last_is_revisit
+            extra["transition"] = self._last_transition
+
+        self._record_event(
+            kind="tool",
+            data={"tool_name": tool_name, "tool_call_id": tool_call_id, 
+                **json.loads(payload["content"]), **extra},
+        )
+        return payload
 
     def _submit_choice(self, arguments: dict[str, Any], tool_call_id: str) -> dict[str, Any]:
         option_id = str(arguments["option_id"])
@@ -132,9 +153,12 @@ class ToolLabEnvironment(ABC):
         self.choice = option_id
 
         payload = {
+            "role": "tool",
             "tool_call_id": tool_call_id,
-            "option_id": option_id,
-            "option_label": self.options[option_id].display_name,
+            "content": json.dumps({
+                "option_id": option_id,
+                "option_label": self.options[option_id].display_name,
+            }),
         }
         return payload
 
@@ -150,21 +174,16 @@ class ToolLabEnvironment(ABC):
             f"The visible window contains {window_size} labels and advances by {step_size} step(s) after every tool action."
         )
 
-
     def _record_event(
         self,
         *,
         kind: str,
-        tool_name: str | None,
-        cost: dict | None,
         data: dict[str, Any],
     ) -> dict[str, Any]:
         self._step_index += 1
         event = {
             "step_index": self._step_index,
             "kind": kind,
-            "tool_name": tool_name,
-            **(cost or {}),
             "cumulative_cost_usd": round(self.cumulative_cost_usd, 8),
             "budget_remaining_usd": round(self.budget_remaining_usd, 8),
             **data,
@@ -174,22 +193,38 @@ class ToolLabEnvironment(ABC):
         return event
 
     def _build_inspection_payload(self, cue: CueSpec, tool_call_id: str) -> dict[str, Any]:
-        is_revisit = cue.id in self.opened_cues
+        self._last_is_revisit = cue.id in self.opened_cues
+        self._last_transition = self._classify_transition(
+            self._last_inspect, cue.option_id, cue.attribute_id
+        )
         self.opened_cues.add(cue.id)
+        self._last_inspect = {"option_id": cue.option_id, "attribute_id": cue.attribute_id}
         payload = {
-            'role':'tool',
-            # "status": "ok",
+            'role': 'tool',
             "tool_call_id": tool_call_id,
-            # "item_id": cue.id,
-            # "option_id": cue.option_id,
-            # "option_label": self.options[cue.option_id].display_name,
-            # "attribute_id": cue.attribute_id,
-            # "attribute_label": self.attributes[cue.attribute_id].display_name,
-            # "label": cue.label,
-            cue.label: cue.value,
-            # "is_revisit": is_revisit,
+            "content": json.dumps({
+                "option_id": cue.option_id,
+                "attribute_id": cue.attribute_id,
+                "value": cue.value,
+                "turn_cost_usd": round(self.last_turn_cost_usd, 4),
+                "budget_remaining_usd": round(self.budget_remaining_usd, 4),
+            }),
         }
         return payload
+
+    @staticmethod
+    def _classify_transition(prev: dict | None, option_id: str, attribute_id: str) -> str:
+        if prev is None:
+            return "first"
+        same_option = prev["option_id"] == option_id
+        same_attribute = prev["attribute_id"] == attribute_id
+        if same_option and same_attribute:
+            return "revisit"
+        if same_option:
+            return "alternative"   # alternative-based: stay on same option, switch attribute
+        if same_attribute:
+            return "attribute"  # attribute-based: switch option, same attribute
+        return "diagonal"             # switch both
 
 class FixedMatrixEnvironment(ToolLabEnvironment):
     def _inspect_cell(self, arguments: dict[str, Any], tool_call_id: str) -> dict[str, Any]:
@@ -209,79 +244,3 @@ class FixedMatrixEnvironment(ToolLabEnvironment):
                 return cue
         raise ValueError(f"No cue exists for option {option_id} and attribute {attribute_id}")
 
-
-# class ScrollingMatrixEnvironment(ToolLabEnvironment):
-#     def __init__(self, spec: ExperimentSpec, seed: int) -> None:
-#         super().__init__(spec, seed)
-#         self.window_size = int(spec.interface.get("window_size", 6))
-#         self.auto_advance_steps = int(spec.interface.get("auto_advance_steps", 1))
-#         self._ordered_cue_ids = self._weighted_shuffle(spec.cues)
-#         self._window_start = 0
-
-#     def _view_visible_items(self, arguments: dict[str, Any], tool_call_id: str) -> dict[str, Any]:
-#         payload = {
-#             "status": "ok",
-#             "tool_call_id": tool_call_id,
-#             "mode": "scrolling",
-#             "visible_items": self._visible_items_payload(),
-#         }
-#         self._charge_and_record(tool_name="view_visible_items", payload=payload, kind="observe")
-#         return payload
-
-#     def _inspect_item(self, arguments: dict[str, Any], tool_call_id: str) -> dict[str, Any]:
-#         item_id = str(arguments["item_id"])
-#         visible_map = {item.id: item for item in self.current_accessible_cues()}
-#         if item_id not in visible_map:
-#             raise ValueError(f"Item {item_id} is not currently visible")
-#         cue = visible_map[item_id]
-#         payload = self._build_inspection_payload(cue, tool_call_id)
-#         payload["visible_items_after"] = []
-#         self._charge_and_record(tool_name="inspect_item", payload=payload, kind="inspect")
-#         self._auto_advance()
-#         payload["visible_items_after"] = self._visible_items_payload()
-#         return payload
-
-#     def _advance_window(self, arguments: dict[str, Any], tool_call_id: str) -> dict[str, Any]:
-#         steps = int(arguments.get("steps", 1))
-#         self._window_start = (self._window_start + steps) % len(self._ordered_cue_ids)
-#         payload = {
-#             "status": "ok",
-#             "tool_call_id": tool_call_id,
-#             "advanced_by": steps,
-#             "visible_items": self._visible_items_payload(),
-#         }
-#         self._charge_and_record(tool_name="advance_window", payload=payload, kind="advance")
-#         return payload
-
-#     def current_accessible_cues(self) -> list[CueSpec]:
-#         cue_ids = []
-#         for offset in range(self.window_size):
-#             index = (self._window_start + offset) % len(self._ordered_cue_ids)
-#             cue_ids.append(self._ordered_cue_ids[index])
-#         return [self.cues[cue_id] for cue_id in cue_ids]
-
-#     def _visible_items_payload(self) -> list[dict[str, Any]]:
-#         return [
-#             {
-#                 "item_id": cue.id,
-#                 "label": cue.label,
-#                 "option_id": cue.option_id,
-#                 "option_label": self.options[cue.option_id].display_name,
-#                 "attribute_id": cue.attribute_id,
-#                 "attribute_label": self.attributes[cue.attribute_id].display_name,
-#                 "is_opened": cue.id in self.opened_cues,
-#             }
-#             for cue in self.current_accessible_cues()
-#         ]
-
-#     def _auto_advance(self) -> None:
-#         self._window_start = (self._window_start + self.auto_advance_steps) % len(self._ordered_cue_ids)
-
-#     def _weighted_shuffle(self, cues: list[CueSpec]) -> list[str]:
-#         keyed = []
-#         for cue in cues:
-#             weight = max(cue.visibility_weight, 1e-6)
-#             key = -log(self.random.random()) / weight
-#             keyed.append((key, cue.id))
-#         keyed.sort()
-#         return [cue_id for _, cue_id in keyed]

@@ -1,0 +1,27 @@
+% I need to create a table based on the research papers in mouselab directory in the repository, outlining all the research conducted so far in different disciplines.
+% Columns: subject field, inline citation, brief experiment context, what was measured, what was found
+
+\begin{table}[hbtp]
+\centering
+\caption{Summary of Mouselab research across disciplines.}
+\small
+\begin{tabularx}{\textwidth}{@{}p{2.5cm} p{2cm} X X X@{}}
+\toprule
+\textbf{Subject Field} & \textbf{Article} & \textbf{Context} & \textbf{Measures} & \textbf{Findings} \\
+\midrule
+Accounting \& Corporate Finance & \citet{hodge2004does} & Nonprofessional investors evaluated firms using searchable XBRL vs. PDF to allocate a \$10k investment. & Information acquisition and integration, investment decisions, and firm performance judgments. & XBRL technology improved nonprofessionals' acquisition and integration of disclosed information. \\
+\addlinespace
+Consumer Behavior & \citet{payne1988adaptive} & Simulated choice heuristics and human process-tracing using Mouselab evaluating risky multi-attribute options under time pressure. & Information acquisition (amount, speed, sequence, filtration) and relative choice accuracy. & Under high time pressure, users adapted by using attribute-based heuristics, processing faster, and filtering info, maintaining accuracy. \\
+\addlinespace
+Emotion \& Moral Psychology & \citet{luce1997choice} & Participants made multi-attribute choices under varying negative emotion conditions (e.g., child charity donation, job choice). & Extent and pattern of processing (time, sequence, alternative vs. attribute search), and self-reported emotion. & Higher negative emotion led to more extensive processing and a shift towards attribute-based, avoiding difficult trade-offs. \\
+\addlinespace
+Game Theory \& Behavioral Economics & \citet{johnson2002detecting} & Three-round sequential bargaining games with a shrinking pie to track information acquisition and backward induction. & Bargaining behavior (offers, rejection rates) and information search patterns (payoff box lookaheads). & Most subjects exhibited limited lookahead, failing backward induction; instruction improved both lookahead and normative offers. \\
+\addlinespace
+Healthcare Economics \& Policy & \citet{johnson2013can} \newline \citet{dellaert2024choice} & Consumers chose health insurance plans with/without aids (calculators, smart defaults); impacts of choice architecture. & Choice accuracy (cost-effectiveness), financial errors, weight on price components, and decision time. & Without decision aids, consumers made large financial errors by overweighting deductibles; smart defaults and calculators improved choices. \\
+\addlinespace
+Political Science & \citet{lau2006voters} & Voters gathered information and cast votes in a dynamic mock presidential election simulation with scrolling info. & Information search depth, comparability, sequence (candidate/attribute), and matching to decision strategies. & Voters vary in decision strategies (e.g., rational vs. heuristic); dynamic info tracking reveals heuristic use in complex races. \\
+\addlinespace
+Social Psychology \& Intergroup Bias & \citet{freeman2011looking} & Categorization of racially ambiguous faces dressed in high-status (business) vs. low-status (janitor) attire. & Categorization choice (White/Black) and real-time computer mouse hand trajectories (Area Under Curve). & High-status attire increased White categorizations, low-status increased Black; trajectories showed implicit attraction to unselected categories. \\
+\bottomrule
+\end{tabularx}
+\end{table}

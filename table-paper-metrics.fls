@@ -1,0 +1,10 @@
+PWD /home/dw/github/toollab
+INPUT /home/dw/.local/texlive/2025/texmf.cnf
+INPUT /home/dw/.local/texlive/2025/texmf-dist/web2c/texmf.cnf
+INPUT /home/dw/.local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt
+INPUT sections/table-paper-metrics.tex
+OUTPUT table-paper-metrics.log
+INPUT /home/dw/.local/texlive/2025/texmf-dist/tex/latex/subfiles/subfiles.cls
+INPUT /home/dw/.local/texlive/2025/texmf-dist/tex/latex/subfiles/subfiles.cls
+INPUT /home/dw/.local/texlive/2025/texmf-dist/tex/latex/import/import.sty
+INPUT /home/dw/.local/texlive/2025/texmf-dist/tex/latex/import/import.sty

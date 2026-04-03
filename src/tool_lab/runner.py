@@ -39,17 +39,8 @@ class ExperimentRunner:
 
         # build_environment: fixed or scrolling -> ToolLabEnvironment: with methods for _inspect_cell
         environment = build_environment(self.spec, seed)
-        # print(environment.spec.keys())
-        # print(environment.spec.to_dict().keys())
-        # print('*'*50)
-        # print(environment.spec.to_dict().get('options'))
-        # print('*'*50)
-        # check config requested tools against available tool (BUILTIN_TOOL_DEFINITIONS) and return `tools` list
-        # print('BUILTIN_TOOL_DEFINITIONS', BUILTIN_TOOL_DEFINITIONS)
         tools = [value for name, value in BUILTIN_TOOL_DEFINITIONS.items() if name in environment.spec.tools]
-        # print('tools', tools[0])
 
-        # print('*'*50)
         # Based on the config, get the correct provider `session` with system_prompt, initial_user_message, and tools
         model_session = create_model_session(
             self.spec.model,
@@ -57,32 +48,26 @@ class ExperimentRunner:
             environment.build_user_prompt(),
             tools,
         )
-        # print('build_system_prompt',environment.build_system_prompt())
-        # print('build_user_prompt',environment.build_user_prompt())
         started_at = datetime.now(timezone.utc).isoformat()
-
         forced_choice = False
         for _ in range(self.spec.max_turns):
             # calls the LLM -> gets response (tool_call, content, reasoning) -> adds it to session.transcript
-            # gets: LLM's response 
-            
+            # gets: LLM's response             
             assistant_response = model_session._call_model()
-            model_session.messages.append(assistant_response.raw)
-            # add to environment.cumulative_cost_usd and .model_turns
-            cost = environment.get_model_cost(assistant_response)
-            environment.apply_model_cost(cost)
-
+            environment.charge_model_turn(assistant_response)
+            # START: record assistant_response
+            assistant_data = _to_serializable(assistant_response)
+            if assistant_response.tool_calls:
+                tc = assistant_response.tool_calls[0]
+                assistant_data["tool_name"] = tc.name
+                assistant_data["tool_arguments"] = tc.arguments
             environment._record_event(
-                kind='assistant', 
-                tool_name=None,
-                cost=cost,
-                data=_to_serializable(assistant_response)
+                kind='assistant',
+                data=assistant_data,
             )
+            # END: record assistant_response
             
             print(environment._step_index)
-            print('cumulative_cost_usd:', round(environment.cumulative_cost_usd, 3))
-            print('budget_remaining_usd:', round(environment.budget_remaining_usd, 3))
-            print('*'*50)
 
             # START: force choice
             if (not assistant_response.tool_calls):
@@ -97,12 +82,7 @@ class ExperimentRunner:
                 model_session.messages.append({'role': 'user', 'content': force_message})
                 forced_choice = True
                 # print('setting forced choice')
-                environment._record_event(
-                    kind='setting_forced_choice', 
-                    tool_name=None,
-                    cost=None,
-                    data={"force_message":force_message}
-                )
+                print('FORCING CHOICE', environment.budget_remaining_usd)
                 continue
 
             if (environment.budget_remaining_usd<=0) and (is_not_choice) and (forced_choice):
@@ -131,14 +111,20 @@ class ExperimentRunner:
                 arguments=tool_call.arguments,
                 tool_call_id=tool_call.tool_call_id,
             )
-            model_session.messages.append(tool_response)
             
+            model_session.messages.append(tool_response)
+            print(tool_call.name)
+            print(tool_response)
+            print('opened_cues', environment.opened_cues)
+            if tool_call.name == "submit_choice":
+                break
             # error the remaining tools if any
             if len(assistant_response.tool_calls)>1:
                 for tool_call in assistant_response.tool_calls[1:]:
                     # return error
-                    tool_error = model_session._get_tool_error(tool_call)
+                    tool_error = model_session._get_tool_error_one_tool_only(tool_call)
                     model_session.messages.append(tool_error)
+            print('*'*50)
 
         # session ended -> record the response
         run_record = {
@@ -146,7 +132,7 @@ class ExperimentRunner:
             "experiment_name": self.spec.name,
             "provider": self.spec.model.provider,
             "model_name": self.spec.model.model_name,
-            "matrix_mode": self.spec.matrix_mode,
+            'forced_choice': forced_choice,
             "choice": environment.choice,
             "cumulative_cost_usd": environment.cumulative_cost_usd,
             "budget_remaining_usd": environment.budget_remaining_usd,

@@ -64,7 +64,7 @@ class MockModelSession:
             self._inspection_count >= (self._max_mock_inspections+8)
             or np.random.random() < 0.15
         )
-        print('_max_mock_inspections', self._inspection_count, self._max_mock_inspections)
+        # print('_max_mock_inspections', self._inspection_count, self._max_mock_inspections)
 
         if should_submit and self._option_ids:
             option_id = self._option_ids[np.random.randint(len(self._option_ids))]

@@ -23,6 +23,7 @@ class AssistantResponse:
     output_tokens: int = 0
     input_cost: float = 0.0
     output_cost: float = 0.0
+    tool_cost: int = 0
     tool_calls: list[ToolInvocation] = field(default_factory=list)
     finish_reason: str | None = None
 

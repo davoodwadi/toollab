@@ -34,6 +34,11 @@ class ToolLabEnvironment(ABC):
         self.budget_remaining_usd = spec.budget_usd
         self.last_turn_cost_usd: float = 0.0
 
+        self.cumulative_cost_tools = 0
+        self.budget_remaining_tools = spec.budget_tools
+        self.last_turn_cost_tool: int = 0
+
+
         self.cues: dict[str, CueSpec] = {cue.id: cue for cue in spec.cues}
         self.opened_cues: set[str] = set()
         self.choice: str | None = None
@@ -53,11 +58,17 @@ class ToolLabEnvironment(ABC):
 
     def build_system_prompt(self) -> str:
         mode_rules = self._mode_rules()
+        # Check which budget type is active to format the instruction
+        if self.spec.budget_type == "tools":
+            budget_str = f"The total budget is {self.spec.budget_tools} tool calls. Each tool you use reduces the remaining budget."
+        else:
+            budget_str = f"The total budget is ${self.spec.budget_usd:.4f}. Each token you generate reduces the remaining budget."
+
         return (
             "You are a subject in a Tool-Lab decision experiment. "
-            "Use the available tools to inspect information before deciding. "
-            "Do not guess hidden information. Record the final decision only by calling submit_choice. "
-            f"The total budget is ${self.spec.budget_usd:.4f}. Each token you generate reduces the remaining budget. "
+            "You can use the available tools to inspect information before deciding. "
+            "At any point you can record your final decision by calling submit_choice. "
+            f"{budget_str} "
             f"{mode_rules}"
         )
 
@@ -70,22 +81,21 @@ class ToolLabEnvironment(ABC):
             f"- {attribute.id}: {attribute.display_name}. {attribute.description}".strip()
             for attribute in self.spec.attributes
         ]
-        return "\n".join(
-            [
-                self.spec.participant.profile,
-                "",
-                self.spec.task_prompt,
-                "",
-                "Options:",
-                *option_lines,
-                "",
-                "Attributes available in this task:",
-                *attribute_lines,
-                "",
-                f"Budget: ${self.spec.budget_usd:.4f}",
-                "Use the tools to inspect information and then call submit_choice when ready.",
-            ]
-        )
+        user_prompt = [
+            self.spec.participant.profile,
+            "",
+            self.spec.task_prompt,
+            "",
+            "Options:",
+            *option_lines,
+            "",
+            "Attributes available in this task:",
+            *attribute_lines,
+            "",
+            f"Budget: ${self.spec.budget_usd:.4f}" if self.spec.budget_type=='usd' else f"Budget: {self.spec.budget_tools} tools",
+            "Use the tools to inspect information and then call submit_choice when ready.",
+        ]
+        return "\n".join(user_prompt)
 
     def reminder_message(self) -> str:
         return (
@@ -103,18 +113,28 @@ class ToolLabEnvironment(ABC):
     def get_model_cost(self, message: AssistantResponse) -> dict:
         input_cost = message.input_tokens * (self.spec.model.pricing.input_per_million / 1e6)
         output_cost = message.output_tokens * (self.spec.model.pricing.output_per_million / 1e6)
-        return {'input_cost':input_cost, 'output_cost':output_cost}
+        cost_usd = {'input_cost':input_cost, 'output_cost':output_cost}
+        cost_tools = 0
+        if message.tool_calls and message.tool_calls[0].name == 'inspect_cell':
+            cost_tools+=1
+        return cost_usd, cost_tools
     
-    def apply_model_cost(self, cost: dict) -> None:
-        self.cumulative_cost_usd += (cost['input_cost'] + cost['output_cost'])
+    def apply_model_cost(self, cost_usd: dict, cost_tools: int) -> None:
+        self.cumulative_cost_usd += (cost_usd['input_cost'] + cost_usd['output_cost'])
         self.budget_remaining_usd = self.spec.budget_usd - self.cumulative_cost_usd
 
+        self.cumulative_cost_tools += cost_tools
+        self.budget_remaining_tools = self.spec.budget_tools - self.cumulative_cost_tools
+        # print(f'cost_tools: {cost_tools}; self.budget_remaining_tools: {self.budget_remaining_tools}')
+
     def charge_model_turn(self, message: AssistantResponse) -> None:
-        cost = self.get_model_cost(message)
-        self.apply_model_cost(cost)
-        message.input_cost = cost['input_cost']
-        message.output_cost = cost['output_cost']
-        self.last_turn_cost_usd = cost['input_cost'] + cost['output_cost']
+        cost_usd, cost_tools = self.get_model_cost(message)
+        self.apply_model_cost(cost_usd, cost_tools)
+        message.input_cost = cost_usd['input_cost']
+        message.output_cost = cost_usd['output_cost']
+        message.tool_cost = cost_tools
+        self.last_turn_cost_usd = cost_usd['input_cost'] + cost_usd['output_cost']
+        self.last_turn_cost_tool = cost_tools
 
     def execute_tool(
         self, tool_name: str, arguments: dict[str, Any], tool_call_id: str
@@ -132,12 +152,13 @@ class ToolLabEnvironment(ABC):
                 "tool_call_id": tool_call_id,
                 "content": json.dumps({"status": "error", "message": str(exc)}),
             }
-        
+
         extra = {}
         if tool_name == "inspect_cell":
             extra["is_revisit"] = self._last_is_revisit
             extra["transition"] = self._last_transition
-
+        # print('_inspect_cell payload', payload)
+        # exit()
         self._record_event(
             kind="tool",
             data={"tool_name": tool_name, "tool_call_id": tool_call_id, 
@@ -186,53 +207,46 @@ class ToolLabEnvironment(ABC):
             "kind": kind,
             "cumulative_cost_usd": round(self.cumulative_cost_usd, 8),
             "budget_remaining_usd": round(self.budget_remaining_usd, 8),
+            "cumulative_cost_tools": self.cumulative_cost_tools,
+            "budget_remaining_tools":self.budget_remaining_tools,
             **data,
         }
 
         self.trace.append(event)
         return event
 
-    def _build_inspection_payload(self, cue: CueSpec, tool_call_id: str) -> dict[str, Any]:
-        self._last_is_revisit = cue.id in self.opened_cues
-        self._last_transition = self._classify_transition(
-            self._last_inspect, cue.option_id, cue.attribute_id
-        )
-        self.opened_cues.add(cue.id)
-        self._last_inspect = {"option_id": cue.option_id, "attribute_id": cue.attribute_id}
-        payload = {
-            'role': 'tool',
-            "tool_call_id": tool_call_id,
-            "content": json.dumps({
-                "option_id": cue.option_id,
-                "attribute_id": cue.attribute_id,
-                "value": cue.value,
-                "turn_cost_usd": round(self.last_turn_cost_usd, 4),
-                "budget_remaining_usd": round(self.budget_remaining_usd, 4),
-            }),
-        }
-        return payload
-
-    @staticmethod
-    def _classify_transition(prev: dict | None, option_id: str, attribute_id: str) -> str:
-        if prev is None:
-            return "first"
-        same_option = prev["option_id"] == option_id
-        same_attribute = prev["attribute_id"] == attribute_id
-        if same_option and same_attribute:
-            return "revisit"
-        if same_option:
-            return "alternative"   # alternative-based: stay on same option, switch attribute
-        if same_attribute:
-            return "attribute"  # attribute-based: switch option, same attribute
-        return "diagonal"             # switch both
-
 class FixedMatrixEnvironment(ToolLabEnvironment):
     def _inspect_cell(self, arguments: dict[str, Any], tool_call_id: str) -> dict[str, Any]:
         option_id = str(arguments["option_id"])
         attribute_id = str(arguments["attribute_id"])
         cue = self._cue_for(option_id, attribute_id)
-        payload = self._build_inspection_payload(cue, tool_call_id)
-        # self._charge_and_record(tool_name="inspect_cell", payload=payload, kind="inspect")
+
+        self._last_is_revisit = cue.id in self.opened_cues
+        self._last_transition = classify_transition(
+            self._last_inspect, cue.option_id, cue.attribute_id
+        )
+        # print('self._last_transition'.upper(), self._last_transition)
+        self.opened_cues.add(cue.id)
+        self._last_inspect = {"option_id": cue.option_id, "attribute_id": cue.attribute_id}
+
+        content_dict = {
+                "option_id": cue.option_id,
+                "attribute_id": cue.attribute_id,
+                "value": cue.value,
+        }
+        if self.spec.budget_type=='usd':
+            content_dict['turn_cost_usd'] = round(self.last_turn_cost_usd, 4)
+            content_dict['budget_remaining_usd'] = round(self.budget_remaining_usd, 4)
+        elif self.spec.budget_type=='tools':
+            content_dict['turn_cost_tools'] = self.last_turn_cost_tool
+            content_dict['budget_remaining_tools'] = self.budget_remaining_tools
+        else: 
+            raise ValueError(f'budget_type not recognized: {self.spec.budget_type}')
+        payload = {
+            'role': 'tool',
+            "tool_call_id": tool_call_id,
+            "content": json.dumps(content_dict),
+        }
         return payload
 
     def current_accessible_cues(self) -> list[CueSpec]:
@@ -244,3 +258,16 @@ class FixedMatrixEnvironment(ToolLabEnvironment):
                 return cue
         raise ValueError(f"No cue exists for option {option_id} and attribute {attribute_id}")
 
+
+def classify_transition(prev: dict | None, option_id: str, attribute_id: str) -> str:
+    if prev is None:
+        return "first"
+    same_option = prev["option_id"] == option_id
+    same_attribute = prev["attribute_id"] == attribute_id
+    if same_option and same_attribute:
+        return "revisit"
+    if same_option:
+        return "alternative"   # alternative-based: stay on same option, switch attribute
+    if same_attribute:
+        return "attribute"  # attribute-based: switch option, same attribute
+    return "diagonal"             # switch both

@@ -84,7 +84,9 @@ class ExperimentSpec:
     model: ModelConfig
     matrix_mode: MatrixMode = "scrolling"
     replications: int = 5
-    budget_usd: float = 0.10
+    budget_type: Literal["usd", "tools"] = "usd"
+    budget_usd: float | None = None
+    budget_tools: int | None = None
     max_turns: int = 20
     tools: list[str] = field(default_factory=list)
     default_tool_cost_usd: float = 0.0
@@ -126,8 +128,10 @@ class ExperimentSpec:
 
         if self.replications < 1:
             raise ValueError("replications must be at least 1")
-        if self.budget_usd <= 0:
-            raise ValueError("budget_usd must be positive")
+        if self.budget_type=='usd' and self.budget_usd<=0:
+            raise ValueError("budget USD must be positive")
+        if self.budget_type=='tools' and self.budget_tools<=0:
+            raise ValueError("budget Tools must be positive")
         if self.max_turns < 1:
             raise ValueError("max_turns must be at least 1")
 
@@ -207,7 +211,9 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         model=model,
         matrix_mode=experiment.get("matrix_mode", "scrolling"),
         replications=experiment.get("replications", 5),
-        budget_usd=experiment.get("budget_usd", 0.10),
+        budget_type=experiment.get("budget_type"),
+        budget_usd=experiment.get("budget_usd", 0.0),
+        budget_tools=experiment.get("budget_tools", 0),
         max_turns=experiment.get("max_turns", 20),
         tools=experiment.get("tools", []),
         default_tool_cost_usd=experiment.get("default_tool_cost_usd", 0.0),

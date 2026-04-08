@@ -1,0 +1,88 @@
+experiment:
+  name: left-digit
+  description: "Left digit heuristic test."
+  metadata:
+    option_count: 2
+  task_prompt: >
+    Open the cells to get information about the product. Then submit your choice with submit_choice.
+  matrix_mode: fixed
+  replications: 1
+  budget_type: tools
+  budget_tools: 5
+  max_turns: 10
+  default_tool_cost_usd: 0.00004
+  seed: 42
+  tools:
+    - inspect_cell
+    - submit_choice
+  model:
+    provider: mock
+    model_name: mock-v1
+    pricing:
+      input_per_million: 2.0
+      output_per_million: 10.0
+    extra:
+      mock_inspections: 24
+  participant:
+    role: coffee shopper
+    profile: >
+      You are choosing ground coffee. Select the coffee with the best value.
+  options:
+    - id: coffee_a
+      display_name: Option A
+      description: Coffee brand A.
+      base_score: 0.0
+    - id: coffee_b
+      display_name: Option B
+      description: Coffee brand B.
+      base_score: 0.0
+
+  attributes:
+    - id: price_dollars
+      display_name: Price (Whole Dollars)
+      description: The whole dollar amount of the coffee's price, before cents.
+    - id: price_cents
+      display_name: Price (Cents)
+      description: The fractional cents portion of the coffee's price.
+    - id: weight_oz
+      display_name: Weight (Ounces)
+      description: The net weight of the coffee package in ounces.
+
+  cues:
+    - id: a_dollars
+      option_id: coffee_a
+      attribute_id: price_dollars
+      label: Option A Dollars
+      value: "$12"
+      normative_score: 0.0
+    - id: a_cents
+      option_id: coffee_a
+      attribute_id: price_cents
+      label: Option A Cents
+      value: ".99"
+      normative_score: 0.0
+    - id: a_weight
+      option_id: coffee_a
+      attribute_id: weight_oz
+      label: Option A Weight
+      value: "13.0 oz"
+      normative_score: 0.0
+
+    - id: b_dollars
+      option_id: coffee_b
+      attribute_id: price_dollars
+      label: Option B Dollars
+      value: "$13"
+      normative_score: 0.0
+    - id: b_cents
+      option_id: coffee_b
+      attribute_id: price_cents
+      label: Option B Cents
+      value: ".00"
+      normative_score: 0.0
+    - id: b_weight
+      option_id: coffee_b
+      attribute_id: weight_oz
+      label: Option B Weight
+      value: "13.9 oz"
+      normative_score: 0.0

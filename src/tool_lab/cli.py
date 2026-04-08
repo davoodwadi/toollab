@@ -24,6 +24,7 @@ def main() -> None:
     run_parser.add_argument("--replications", type=int, help="Override replication count")
     run_parser.add_argument("--api-key-env", help="Override the API key environment variable name")
     run_parser.add_argument("--output-root", default="results", help="Directory for result artifacts")
+    run_parser.add_argument("--mock", action="store_true", help="Run a local mock trial to verify the design")
 
     summarize_parser = subparsers.add_parser(
         "summarize", help="Recompute summary statistics from an existing runs.jsonl file"
@@ -33,14 +34,23 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.command == "run":
+        mock_overrides = {}
+        if args.mock:
+            mock_overrides = {
+                "provider": "mock",
+                "model_name": "mock-v1",
+                "replications": 1
+            }
+        
         spec = load_experiment_spec(args.config).with_runtime_overrides(
             matrix_mode=args.matrix_mode,
-            provider=args.provider,
-            model_name=args.model,
-            replications=args.replications, 
+            provider=args.provider or mock_overrides.get("provider"),
+            model_name=args.model or mock_overrides.get("model_name"),
+            replications=args.replications or mock_overrides.get("replications"), 
             api_key_env=args.api_key_env,
         )
-        runner = ExperimentRunner(spec, output_root=args.output_root)
+        # print(spec.budget_type,spec.budget_tools)
+        runner = ExperimentRunner(spec, output_root=args.output_root, verbose=args.mock)
         result = runner.run()
         # print(json.dumps(result, indent=2, sort_keys=True))
         return

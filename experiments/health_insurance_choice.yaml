@@ -2,7 +2,7 @@ experiment:
   name: health_insurance_choice
   description: "Replication of Johnson et al. (2013) PLOS ONE health insurance choice experiment."
   metadata:
-    option_count: 8
+    option_count: 4
     design: complex
   task_prompt: >
     Choose the most cost-effective health insurance policy for the assigned consumer profile.
@@ -22,9 +22,7 @@ experiment:
     - submit_choice
   model:
     provider: mock
-    model_name: mock-v2
-    temperature: 1.0
-    max_output_tokens: 800
+    model_name: mock-v1
     pricing:
       input_per_million: 2.0
       output_per_million: 10.0

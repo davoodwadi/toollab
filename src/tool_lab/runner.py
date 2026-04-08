@@ -56,6 +56,7 @@ class ExperimentRunner:
             # gets: LLM's response             
             assistant_response = model_session._call_model()
             environment.charge_model_turn(assistant_response)
+            
             # START: record assistant_response
             assistant_data = _to_serializable(assistant_response)
             if assistant_response.tool_calls:

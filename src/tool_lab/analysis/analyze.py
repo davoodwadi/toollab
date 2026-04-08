@@ -20,6 +20,12 @@ def load_events(results_file: str | Path) -> pd.DataFrame:
     df = pd.concat(frames, ignore_index=True)
     return df
 
+def load_all_events(results_files: list) -> pd.DataFrame:
+    all_dfs = []
+    for rf in results_files:
+        temp_df = load_events(rf)
+        all_dfs.append(temp_df)
+    return pd.concat(all_dfs, ignore_index=True)
 
 def assistant_events(df: pd.DataFrame) -> pd.DataFrame:
     return df[df["kind"] == "assistant"].copy()
@@ -309,18 +315,32 @@ def session_summary(df: pd.DataFrame) -> pd.DataFrame:
 
 if __name__ == '__main__':
 
-    # results_dir = Path('/home/dw/github/toollab/results/consumer-choice-mock-mock-v2')
-    results_dir = Path('/home/dw/github/toollab/results/health-insurance-choice-mock-mock-v2')
-    results_file = results_dir/'events.jsonl'
+    # results_dir = Path('/home/dw/github/toollab/results/consumer-choice')
+    results_dir = Path('/home/dw/github/toollab/results/health-insurance-choice')
     
-    config_file = results_dir/'config.json'
+    results_files = list(results_dir.glob('*-events.jsonl'))
+    config_files = list(results_dir.glob('*-config.json'))
+    
+    if not results_files:
+        print('No results file found')
+        exit()
 
-    df_raw = load_events(results_file)
+    config_file = config_files[0] if config_files else None
+    config = _load_analysis_config(config_file)
+    metadata_columns = list(config['metadata'].keys())
+    print('metadata_columns', metadata_columns)
+
+    df_raw = load_all_events(results_files)
     df = df_raw.copy().sort_values(['session_name', 'step_index'])
     # print(f"{len(df)} events across {df['session_name'].nunique()} sessions")
-    print(df[['option_count', 'design']])
+    # print(df[['option_count', 'design']])
     print(df.columns)
-    print(session_summary(df)[['session_name', 'choice', 'forced_choice', 'n_inspections', 'cost_usd']].to_string())
+    print(df.shape)
+    
+    print("\nNumber of sessions per condition:")
+    print(df.groupby(['model_name', *metadata_columns])['session_name'].nunique())
+    
+    # print(session_summary(df)[['session_name', 'choice', 'forced_choice', 'n_inspections', 'cost_usd']])
     
     revisits = df.groupby('session_name').agg(
         total_steps=('step_index', max),
@@ -331,14 +351,14 @@ if __name__ == '__main__':
     transitions = df.groupby('session_name').agg(
         transition=('transition', 'value_counts'),
     )
-    print(transitions)
+    # print(transitions)
 
     mouselab_metrics = get_mouselab_metrics(df, config=config_file)
-    print(mouselab_metrics.columns)
-    print(mouselab_metrics[['session_name', 'acquisitions', 'reacquisitions']])
-    print(mouselab_metrics[['session_name', 'n_options_examined', 'n_attributes_examined', 'unique_cells_examined']])
-    print(mouselab_metrics[['session_name', 'reacquisition_rate', 'search_depth', 'alternative_transitions', 'attribute_transitions']])
-    print(mouselab_metrics[['session_name', 'mean_within_option_run_length', 'mean_within_attribute_run_length']])
-    print(mouselab_metrics[['session_name', 'payne_index']])
-    print(mouselab_metrics[['session_name', 'choice_score', 'best_option_score', 'choice_regret']])
-    print(mouselab_metrics[['session_name', 'attention_to_best_options', 'examined_best_option', 'chose_best_option']])
+    # print(mouselab_metrics.columns)
+    # print(mouselab_metrics[['session_name', 'acquisitions', 'reacquisitions']])
+    # print(mouselab_metrics[['session_name', 'n_options_examined', 'n_attributes_examined', 'unique_cells_examined']])
+    # print(mouselab_metrics[['session_name', 'reacquisition_rate', 'search_depth', 'alternative_transitions', 'attribute_transitions']])
+    # print(mouselab_metrics[['session_name', 'mean_within_option_run_length', 'mean_within_attribute_run_length']])
+    # print(mouselab_metrics[['session_name', 'payne_index']])
+    # print(mouselab_metrics[['session_name', 'choice_score', 'best_option_score', 'choice_regret']])
+    # print(mouselab_metrics[['session_name', 'attention_to_best_options', 'examined_best_option', 'chose_best_option']])

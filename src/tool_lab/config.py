@@ -19,11 +19,18 @@ REQUIRED_TOOLS_BY_MODE: dict[MatrixMode, set[str]] = {
     "scrolling": {"inspect_item", "submit_choice"},
 }
 
-
 @dataclass(slots=True)
 class PricingConfig:
     input_per_million: float = 0.0
     output_per_million: float = 0.0
+
+
+MODEL_CONFIG = {
+    'google': {
+        'gemini-3-flash-preview':  PricingConfig(input_per_million=0.50, output_per_million=3.00),
+        'gemini-3.1-pro-preview':  PricingConfig(input_per_million=2.00, output_per_million=12.00)
+    },
+}
 
 
 @dataclass(slots=True)
@@ -185,12 +192,12 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
 
     participant = ParticipantSpec(**experiment["participant"])
     model_data = experiment["model"]
-    pricing = PricingConfig(**model_data.get("pricing", {}))
+    pricing = MODEL_CONFIG[model_data['provider']][model_data['model_name']]
     model = ModelConfig(
         provider=model_data["provider"],
         model_name=model_data["model_name"], 
-        temperature=model_data.get("temperature", 1.0),
-        max_output_tokens=model_data.get("max_output_tokens", 1024),
+        # temperature=model_data.get("temperature", 1.0),
+        # max_output_tokens=model_data.get("max_output_tokens", 1024),
         api_key_env=model_data.get("api_key_env"),
         pricing=pricing,
         extra=model_data.get("extra", {}),

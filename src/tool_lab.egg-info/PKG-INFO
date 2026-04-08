@@ -1,3 +1,18 @@
+Metadata-Version: 2.4
+Name: tool-lab
+Version: 0.1.0
+Summary: Config-driven Tool-Lab experiment runner for fixed and scrolling Mouselab-style tasks.
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: anthropic>=0.51.0
+Requires-Dist: openai>=1.75.0
+Requires-Dist: PyYAML>=6.0.2
+Requires-Dist: google-genai
+Requires-Dist: pydantic>=2.8.0
+Requires-Dist: pandas
+Dynamic: license-file
+
 # Tool-Lab
 
 This repository now contains both the paper draft and a runnable Tool-Lab experiment framework.
@@ -94,7 +109,6 @@ To adapt the framework, edit or add a new YAML file with:
 
 Data collection:
 ```
-source .venv/bin/activate
 PYTHONPATH=src python src/tool_lab/cli.py run --config experiments/health_insurance_choice.yaml
 ```
 

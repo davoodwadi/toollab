@@ -57,12 +57,6 @@ class BaseModelSession(ABC):
         self.config = config
         self.system_prompt = system_prompt
         self.tools = tools
-        self.transcript: list[TranscriptEntry] = [
-            TranscriptEntry(role="user", content=initial_user_message)
-        ]
-
-
-
 
 def _to_serializable(value: Any) -> Any:
     if isinstance(value, dict):

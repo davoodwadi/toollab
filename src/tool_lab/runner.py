@@ -63,18 +63,19 @@ class ExperimentRunner:
             print("\n" + "="*50)
             print("INITIALIZING EXPERIMENT (MOCK MODE)")
             print("="*50)
-            print(f"System Prompt:\n{environment.build_system_prompt()}\n")
-            print(f"User Prompt:\n{environment.build_user_prompt()}\n")
-            print(f"Num Options:\n{num_options}\n")
-            print(f"Num Attributes:\n{num_attributes}\n")
-            print(f"Total cells:\n{total_cells}\n")
+            print(f"System Prompt:\n{model_session.system_prompt}\n")
+            print(f"User Prompt:\n{model_session.initial_user_message}\n")
+            print(f"Num Options: {num_options}")
+            print(f"Num Attributes: {num_attributes}")
+            print(f"Total cells: {total_cells}")
             if environment.spec.budget_type=='usd':
-                print(f"Budget: ${environment.spec.budget_usd}\n")
+                print(f"Budget: ${environment.spec.budget_usd}")
             else:
-                print(f"Budget: {environment.spec.budget_tools} Tools\n")
-
+                print(f"Budget: {environment.spec.budget_tools} Tools")
             print("="*50 + "\n")
-            
+        print(model_session.tools)
+        exit()
+
         for _ in range(self.spec.max_turns):
             # calls the LLM -> gets response (tool_call, content, reasoning) -> adds it to session.transcript
             # gets: LLM's response             
@@ -139,8 +140,8 @@ class ExperimentRunner:
             
             model_session.messages.append(tool_response)
             print(tool_call.name)
-            print(tool_response)
-            print('opened_cues', environment.opened_cues)
+            print(tool_response['content'])
+            # print('opened_cues', environment.opened_cues)
             if tool_call.name == "submit_choice":
                 break
             # error the remaining tools if any

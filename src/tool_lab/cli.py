@@ -25,6 +25,7 @@ def main() -> None:
     run_parser.add_argument("--api-key-env", help="Override the API key environment variable name")
     run_parser.add_argument("--output-root", default="results", help="Directory for result artifacts")
     run_parser.add_argument("--mock", action="store_true", help="Run a local mock trial to verify the design")
+    run_parser.add_argument("--verbose", action="store_true", help="Show more logs")
 
     summarize_parser = subparsers.add_parser(
         "summarize", help="Recompute summary statistics from an existing runs.jsonl file"
@@ -50,7 +51,7 @@ def main() -> None:
             api_key_env=args.api_key_env,
         )
         # print(spec.budget_type,spec.budget_tools)
-        runner = ExperimentRunner(spec, output_root=args.output_root, verbose=args.mock)
+        runner = ExperimentRunner(spec, output_root=args.output_root, verbose=args.verbose or args.mock)
         result = runner.run()
         # print(json.dumps(result, indent=2, sort_keys=True))
         return

@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-from typing import Any
-from urllib.error import HTTPError
-from urllib.parse import quote
-from urllib.request import Request, urlopen
 import json
 import os
+from typing import Any
+from uuid import uuid4
 
 from tool_lab.config import ModelConfig
 from tool_lab.experiment.tools import ToolDefinition
 from tool_lab.models.base import AssistantResponse, BaseModelSession, ToolInvocation
 
+from google import genai
+from google.genai import types
 
-class GoogleModelSession(BaseModelSession):
+class GoogleModelSession:
     provider_name = "google"
 
     def __init__(
@@ -22,120 +22,192 @@ class GoogleModelSession(BaseModelSession):
         initial_user_message: str,
         tools: list[ToolDefinition],
     ) -> None:
-        super().__init__(config, system_prompt, initial_user_message, tools)
-        api_key_env = config.api_key_env or "GOOGLE_API_KEY"
-        api_key = os.environ.get(api_key_env) or os.environ.get("GEMINI_API_KEY")
+        api_key_env = config.api_key_env or "GEMINI_API_KEY"
+        api_key = os.environ.get(api_key_env)
         if not api_key:
-            raise RuntimeError(
-                f"Missing API key in environment variable {api_key_env} or GEMINI_API_KEY"
-            )
+            raise RuntimeError(f"Missing API key in environment variable {api_key_env}")
+        self._client = genai.Client(api_key=api_key)
 
-        api_version = str(config.extra.get("api_version", "v1beta"))
-        api_base = str(
-            config.extra.get(
-                "api_base",
-                f"https://generativelanguage.googleapis.com/{api_version}",
-            )
-        ).rstrip("/")
-        self._endpoint = (
-            f"{api_base}/models/{config.model_name}:generateContent?key={quote(api_key)}"
-        )
+        self._tool_names = {str(tool["name"]) for tool in tools}
+        self._inspection_count = 0
 
-    def _invoke_model(self) -> AssistantResponse:
-        payload = {
-            "systemInstruction": {"parts": [{"text": self.system_prompt}]},
-            "contents": self._build_contents(),
-            "tools": [{"functionDeclarations": self._build_tools()}],
-            "generationConfig": {
-                "temperature": self.config.temperature,
-                "maxOutputTokens": self.config.max_output_tokens,
-            },
-        }
-        response = self._post_json(payload)
-        candidate = (response.get("candidates") or [{}])[0]
-        content = candidate.get("content") or {}
-        parts = content.get("parts") or []
-        text_parts: list[str] = []
-        tool_calls: list[ToolInvocation] = []
-        for index, part in enumerate(parts):
-            if "text" in part:
-                text_parts.append(str(part["text"]))
-                continue
-            if "functionCall" in part:
-                function_call = part["functionCall"]
-                tool_calls.append(
-                    ToolInvocation(
-                        tool_call_id=f"google_call_{index}_{function_call.get('name', 'tool')}",
-                        name=str(function_call["name"]),
-                        arguments=function_call.get("args", {}) or {},
-                    )
-                )
-        usage = response.get("usageMetadata", {})
-        return AssistantResponse(
-            text="\n".join(part for part in text_parts if part).strip(),
-            tool_calls=tool_calls,
-            input_tokens=int(usage.get("promptTokenCount", 0) or 0),
-            output_tokens=int(usage.get("candidatesTokenCount", 0) or 0),
-            raw={"response": response},
-        )
-
-    def _build_contents(self) -> list[dict[str, Any]]:
-        contents: list[dict[str, Any]] = []
-        pending_tool_parts: list[dict[str, Any]] = []
-
-        def flush_tool_parts() -> None:
-            if pending_tool_parts:
-                contents.append({"role": "user", "parts": list(pending_tool_parts)})
-                pending_tool_parts.clear()
-
-        for entry in self.transcript:
-            if entry.role == "user":
-                flush_tool_parts()
-                contents.append({"role": "user", "parts": [{"text": str(entry.content)}]})
-                continue
-            if entry.role == "assistant":
-                flush_tool_parts()
-                parts: list[dict[str, Any]] = []
-                if entry.content:
-                    parts.append({"text": str(entry.content)})
-                parts.extend(
-                    {"functionCall": {"name": call.name, "args": call.arguments}}
-                    for call in entry.tool_calls
-                )
-                contents.append({"role": "model", "parts": parts})
-                continue
-            pending_tool_parts.append(
-                {
-                    "functionResponse": {
-                        "name": entry.tool_name,
-                        "response": entry.content,
-                    }
-                }
-            )
-
-        flush_tool_parts()
-        return contents
-
-    def _build_tools(self) -> list[dict[str, Any]]:
-        return [
-            {
-                "name": tool["name"],
-                "description": tool["description"],
-                "parameters": tool["input_schema"],
-            }
-            for tool in self.tools
+        self.messages = [
+            {'role':'system', 'content':system_prompt},
+            {'role':'user', 'content':initial_user_message},
         ]
 
-    def _post_json(self, payload: dict[str, Any]) -> dict[str, Any]:
-        request = Request(
-            self._endpoint,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
-            method="POST",
+        self.config = config
+        self.system_prompt = system_prompt
+        self.initial_user_message = initial_user_message
+        self.tools = tools
+
+
+    def _build_tools(self) -> list[Any]:
+        from google.genai import types
+        
+        declarations = []
+        for tool in self.tools:
+            declarations.append(types.FunctionDeclaration(
+                name=tool["name"],
+                description=tool["description"],
+                parameters=tool.get("input_schema")
+            ))
+        
+        if not declarations:
+            return []
+        return [types.Tool(function_declarations=declarations)]
+
+    def _build_contents(self) -> list[Any]:
+        from google.genai import types
+        contents = []
+        
+        # skip system prompt at index 0
+        current_user_parts = []
+
+        for msg in self.messages[1:]:
+            role = msg["role"]
+            if role == "user":
+                current_user_parts.append(types.Part.from_text(text=str(msg["content"])))
+            elif role == "tool":
+                tool_call_id = msg.get("tool_call_id")
+                
+                # find the name from previous assistant tool calls
+                tool_name = "unknown"
+                for prev_msg in reversed(self.messages):
+                    if prev_msg["role"] == "assistant" and prev_msg.get("tool_calls"):
+                        for tc in prev_msg["tool_calls"]:
+                            if tc["id"] == tool_call_id:
+                                tool_name = tc["function"]["name"]
+                                break
+                        if tool_name != "unknown":
+                            break
+                            
+                content_str = msg.get("content", "{}")
+                try:
+                    response_obj = json.loads(content_str)
+                except json.JSONDecodeError:
+                    response_obj = {"result": content_str}
+                    
+                current_user_parts.append(types.Part(
+                    function_response=types.FunctionResponse(
+                        name=tool_name,
+                        response=response_obj,
+                        id=tool_call_id
+                    )
+                ))
+            elif role == "assistant":
+                # flush accumulated user parts to contents
+                if current_user_parts:
+                    contents.append(types.Content(role="user", parts=current_user_parts))
+                    current_user_parts = []
+                
+                parts = []
+                if msg.get("content"):
+                    parts.append(types.Part.from_text(text=str(msg["content"])))
+                if msg.get("tool_calls"):
+                    for tc in msg["tool_calls"]:
+                        args_dict = {}
+                        try:
+                            args_dict = json.loads(tc["function"]["arguments"])
+                        except Exception:
+                            pass
+                        
+                        parts.append(types.Part(
+                            function_call=types.FunctionCall(
+                                name=tc["function"]["name"],
+                                args=args_dict,
+                                id=tc.get("id")
+                            )
+                        ))
+                if parts:
+                    contents.append(types.Content(role="model", parts=parts))
+        
+        # Add any trailing user parts
+        if current_user_parts:
+            contents.append(types.Content(role="user", parts=current_user_parts))
+            
+        return contents
+
+    def _call_model(self) -> AssistantResponse:
+
+        config = types.GenerateContentConfig(
+            system_instruction=self.system_prompt,
+            tools=self._build_tools(),
+            temperature=self.config.temperature,
+            max_output_tokens=self.config.max_output_tokens,
         )
-        try:
-            with urlopen(request) as response:
-                return json.load(response)
-        except HTTPError as exc:
-            body = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"Google API request failed: {body}") from exc
+
+        response = self._client.models.generate_content(
+            model=self.config.model_name,
+            contents=self._build_contents(),
+            config=config,
+        )
+        
+        text_parts = []
+        tool_calls = []
+        
+        if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
+            for part in response.candidates[0].content.parts:
+                if part.text:
+                    text_parts.append(part.text)
+                if part.function_call:
+                    fc = part.function_call
+                    tc_id = fc.id if fc.id else f"call_{uuid4().hex[:8]}"
+                    args_dict = {}
+                    if hasattr(fc.args, 'model_dump'):
+                        args_dict = fc.args.model_dump()
+                    elif isinstance(fc.args, dict):
+                        args_dict = fc.args
+                    elif hasattr(fc.args, 'items'):
+                        args_dict = dict(fc.args.items())
+                        
+                    tool_calls.append(ToolInvocation(
+                        tool_call_id=tc_id,
+                        name=fc.name,
+                        arguments=args_dict
+                    ))
+        
+        text = "\n".join(text_parts).strip()
+        
+        assistant_msg: dict[str, Any] = {
+            "role": "assistant",
+            "content": text or None,
+            "tool_calls": [
+                {
+                    "id": tc.tool_call_id,
+                    "type": "function",
+                    "function": {
+                        "name": tc.name,
+                        "arguments": json.dumps(tc.arguments),
+                    },
+                }
+                for tc in tool_calls
+            ] if tool_calls else None,
+        }
+        self.messages.append(assistant_msg)
+        
+        input_tokens = 0
+        output_tokens = 0
+        if hasattr(response, "usage_metadata") and response.usage_metadata:
+            input_tokens = getattr(response.usage_metadata, "prompt_token_count", 0)
+            output_tokens = getattr(response.usage_metadata, "candidates_token_count", 0)
+            
+        finish_reason = None
+        if response.candidates and hasattr(response.candidates[0].finish_reason, 'name'):
+            finish_reason = response.candidates[0].finish_reason.name
+
+        return AssistantResponse(
+            content=text,
+            reasoning=None,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            tool_calls=tool_calls,
+            finish_reason=finish_reason
+        )
+
+    def _get_tool_error_one_tool_only(self, tool_call: ToolInvocation) -> dict[str, str]:
+        return {
+            'role': 'tool',
+            'tool_call_id': tool_call.tool_call_id,
+            'content': 'Error: you are allowed to call only one tool per turn'
+        }

@@ -1,0 +1,2 @@
+[console_scripts]
+tool-lab = tool_lab.cli:main

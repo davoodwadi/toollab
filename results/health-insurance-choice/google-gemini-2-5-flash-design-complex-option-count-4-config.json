@@ -20,6 +20,8 @@
       "metadata": {}
     }
   ],
+  "budget_tools": 0,
+  "budget_type": null,
   "budget_usd": 0.06,
   "cues": [
     {
@@ -270,20 +272,20 @@
   "max_turns": 40,
   "metadata": {
     "design": "complex",
-    "option_count": 8
+    "option_count": 4
   },
   "model": {
     "api_key_env": null,
     "extra": {
       "mock_inspections": 24
     },
-    "max_output_tokens": 800,
-    "model_name": "mock-v2",
+    "max_output_tokens": 1024,
+    "model_name": "gemini-2.5-flash",
     "pricing": {
       "input_per_million": 2.0,
       "output_per_million": 10.0
     },
-    "provider": "mock",
+    "provider": "google",
     "temperature": 1.0
   },
   "name": "health_insurance_choice",

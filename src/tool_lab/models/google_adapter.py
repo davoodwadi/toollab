@@ -7,7 +7,7 @@ from uuid import uuid4
 
 from tool_lab.config import ModelConfig
 from tool_lab.experiment.tools import ToolDefinition
-from tool_lab.models.base import AssistantResponse, BaseModelSession, ToolInvocation
+from tool_lab.models.base import AssistantResponse, ToolInvocation
 
 from google import genai
 from google.genai import types
@@ -31,15 +31,23 @@ class GoogleModelSession:
         self._tool_names = {str(tool["name"]) for tool in tools}
         self._inspection_count = 0
 
-        self.messages = [
-            {'role':'system', 'content':system_prompt},
-            {'role':'user', 'content':initial_user_message},
+        self.contents = [
+            types.Content(
+                role="user", parts=[types.Part(text=initial_user_message)]
+            )
         ]
 
         self.config = config
         self.system_prompt = system_prompt
         self.initial_user_message = initial_user_message
         self.tools = tools
+        # print('tools', tools)
+        # exit()
+        self.google_tools = types.Tool(function_declarations=tools)
+        self.google_config = types.GenerateContentConfig(
+            system_instruction=system_prompt,
+            tools=[tools],
+        )
 
 
     def _build_tools(self) -> list[Any]:

@@ -46,7 +46,7 @@ class ExperimentRunner:
         # Based on the config, get the correct provider `session` with system_prompt, initial_user_message, and tools
         model_session = create_model_session(
             self.spec.model,
-            environment.build_system_prompt(),
+            environment.build_system_prompt(), 
             environment.build_user_prompt(),
             tools,
         )
@@ -73,7 +73,7 @@ class ExperimentRunner:
             else:
                 print(f"Budget: {environment.spec.budget_tools} Tools")
             print("="*50 + "\n")
-        print(model_session.tools)
+        # print('model_session.contents', model_session.contents)
         exit()
 
         for _ in range(self.spec.max_turns):

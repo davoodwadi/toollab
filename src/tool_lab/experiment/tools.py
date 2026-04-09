@@ -12,11 +12,12 @@ class _InlineToolSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-def _schema(model_name: str, **fields: Any) -> dict[str, Any]:
-    model = create_model(model_name, __base__=_InlineToolSchema, **fields)
-    schema = model.model_json_schema()
-    schema.pop("title", None)
-    return schema
+# def _schema(model_name: str, **fields: Any) -> dict[str, Any]:
+#     model = create_model(model_name, __base__=_InlineToolSchema, **fields)
+#     schema = model.model_json_schema()
+#     schema.pop("title", None)
+#     return schema
+
 
 
 BUILTIN_TOOL_DEFINITIONS: dict[str, ToolDefinition] = {

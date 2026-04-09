@@ -35,29 +35,6 @@ class ToolResultMessage:
     content: dict[str, Any]
 
 
-@dataclass(slots=True)
-class TranscriptEntry:
-    role: Literal["assistant", "tool", "user"]
-    content: Any
-    tool_call_id: str | None = None
-    tool_name: str | None = None
-    tool_calls: list[ToolInvocation] = field(default_factory=list)
-
-
-class BaseModelSession(ABC):
-    provider_name = "base"
-
-    def __init__(
-        self,
-        config: ModelConfig,
-        system_prompt: str,
-        initial_user_message: str,
-        tools: list[dict[str, Any]],
-    ) -> None:
-        self.config = config
-        self.system_prompt = system_prompt
-        self.tools = tools
-
 def _to_serializable(value: Any) -> Any:
     if isinstance(value, dict):
         return {key: _to_serializable(item) for key, item in value.items()}

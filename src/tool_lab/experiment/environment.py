@@ -157,7 +157,6 @@ class ToolLabEnvironment(ABC):
         if tool_name == "inspect_cell":
             extra["is_revisit"] = self._last_is_revisit
             extra["transition"] = self._last_transition
-        # print('_inspect_cell payload', payload)
         # exit()
         self._record_event(
             kind="tool",

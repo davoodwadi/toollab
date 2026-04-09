@@ -4,7 +4,6 @@ from typing import Any
 from uuid import uuid4
 
 from tool_lab.config import ModelConfig
-from tool_lab.experiment.tools import ToolDefinition
 from tool_lab.models.base import (
     ToolInvocation,
     AssistantResponse,
@@ -23,9 +22,7 @@ class MockModelSession:
         config: ModelConfig,
         system_prompt: str,
         initial_user_message: str, 
-        tools: list[ToolDefinition],
     ) -> None:
-        self._tool_names = {str(tool["name"]) for tool in tools}
         self._behavior = str(config.extra.get("mock_behavior", "submit_after_few_tools"))
         self._max_mock_inspections = int(config.extra.get("mock_inspections", 4))
         self._inspection_count = 0
@@ -41,7 +38,6 @@ class MockModelSession:
         self.config = config
         self.system_prompt = system_prompt
         self.initial_user_message = initial_user_message
-        self.tools = tools
 
     @staticmethod
     def _parse_section_ids(prompt: str, section_header: str) -> list[str]:
@@ -143,7 +139,9 @@ class MockModelSession:
             finish_reason=response_raw['choices'][0]['finish_reason']
         )
 
-
+    def add_tool_response(self, tool_response, tool_name):
+        print('tool_response', tool_response)
+        self.messages.append(tool_response)
 
     def _get_tool_error_one_tool_only(self, tool_call):
         return {

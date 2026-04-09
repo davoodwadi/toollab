@@ -7,9 +7,7 @@ from typing import Any
 from tool_lab.config import ExperimentSpec
 from tool_lab.experiment.environment import build_environment
 from tool_lab.models import create_model_session
-from tool_lab.models.base import ToolResultMessage
 from tool_lab.storage import ResultWriter
-from tool_lab.experiment.tools import BUILTIN_TOOL_DEFINITIONS
 from tool_lab.models.base import _to_serializable
 
 class ExperimentRunner:
@@ -41,14 +39,12 @@ class ExperimentRunner:
 
         # build_environment: fixed or scrolling -> ToolLabEnvironment: with methods for _inspect_cell
         environment = build_environment(self.spec, seed)
-        tools = [value for name, value in BUILTIN_TOOL_DEFINITIONS.items() if name in environment.spec.tools]
 
         # Based on the config, get the correct provider `session` with system_prompt, initial_user_message, and tools
         model_session = create_model_session(
             self.spec.model,
             environment.build_system_prompt(), 
             environment.build_user_prompt(),
-            tools,
         )
         # print('model_session.system_prompt', model_session.system_prompt)
         # print('model_session.initial_user_message', model_session.initial_user_message)
@@ -74,9 +70,9 @@ class ExperimentRunner:
                 print(f"Budget: {environment.spec.budget_tools} Tools")
             print("="*50 + "\n")
         # print('model_session.contents', model_session.contents)
-        exit()
+        # exit()
 
-        for _ in range(self.spec.max_turns):
+        for iteration in range(self.spec.max_turns):
             # calls the LLM -> gets response (tool_call, content, reasoning) -> adds it to session.transcript
             # gets: LLM's response             
             assistant_response = model_session._call_model()
@@ -138,7 +134,9 @@ class ExperimentRunner:
                 tool_call_id=tool_call.tool_call_id,
             )
             
-            model_session.messages.append(tool_response)
+            model_session.add_tool_response(tool_response, tool_name=tool_call.name)
+
+            
             print(tool_call.name)
             print(tool_response['content'])
             # print('opened_cues', environment.opened_cues)
@@ -149,7 +147,7 @@ class ExperimentRunner:
                 for tool_call in assistant_response.tool_calls[1:]:
                     # return error
                     tool_error = model_session._get_tool_error_one_tool_only(tool_call)
-                    model_session.messages.append(tool_error)
+                    model_session.add_tool_response(tool_error, tool_name=tool_call.name)
             print('*'*50)
 
         # session ended -> record the response

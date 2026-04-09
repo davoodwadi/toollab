@@ -27,9 +27,13 @@ class PricingConfig:
 
 MODEL_CONFIG = {
     'google': {
+        'gemini-3.1-flash-lite-preview':  PricingConfig(input_per_million=0.25, output_per_million=1.50),
         'gemini-3-flash-preview':  PricingConfig(input_per_million=0.50, output_per_million=3.00),
         'gemini-3.1-pro-preview':  PricingConfig(input_per_million=2.00, output_per_million=12.00)
     },
+    'mock': {
+        'mock-1': PricingConfig(input_per_million=1.0, output_per_million=6.0)
+    }
 }
 
 

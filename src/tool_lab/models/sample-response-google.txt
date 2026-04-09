@@ -1,0 +1,65 @@
+sdk_http_response=HttpResponse(
+  headers=<dict len=12>
+) candidates=[Candidate(
+  content=Content(
+    parts=[
+      Part(
+        text="""**My Approach to Coffee Value Analysis**
+
+Okay, here's how I'm going to approach this coffee value problem. My objective is straightforward: determine which ground coffee, `coffee_a` or `coffee_b`, offers the best value. I'm defining "value" as the price per unit weight – essentially, the cost per ounce. I have a limited budget of five tool calls to get this done. I need to be strategic.
+
+I've got three attributes to consider for each coffee: `price_dollars`, `price_cents`, and `weight_oz`.  That's six pieces of information in total, but I can only inspect five. So, I need a plan to prioritize.
+
+To directly compare the value of the two coffees, I need to compare (Price A / Weight A) against (Price B / Weight B).  Price, however, is split into dollars and cents, so I'll need to combine those.
+
+Therefore, my strategy is this: I'll start by looking at the most impactful attributes first.
+
+1.  I'll begin by inspecting `price_dollars` for `coffee_a`.
+2.  Then, I'll check `weight_oz` for `coffee_a`.
+3.  Next, I'll inspect `price_dollars` for `coffee_b`.
+4.  And, I'll then check `weight_oz` for `coffee_b`.
+
+With those four pieces of data, I should have a good sense of the comparison. My fifth and final call, I'll reserve for inspecting `price_cents` for *either* coffee, or both, if the initial comparison looks close.
+
+Here's a breakdown of the function calls, so I can ensure I get it right:
+
+1.  `inspect_cell(option_id='coffee_a', attribute_id='price_dollars')`
+2.  `inspect_cell(option_id='coffee_a', attribute_id='weight_oz')`
+3.  `inspect_cell(option_id='coffee_b', attribute_id='price_dollars')`
+4.  `inspect_cell(option_id='coffee_b', attribute_id='weight_oz')`
+5.  Reserve call for `price_cents` (if necessary).
+
+Let's begin.
+
+
+""",
+        thought=True
+      ),
+      Part(
+        function_call=FunctionCall(
+          args={
+            'attribute_id': 'price_dollars',
+            'option_id': 'coffee_a'
+          },
+          id='jxduolwb',
+          name='inspect_cell'
+        ),
+        thought_signature=b"\x12\x8c\x0c\n\x89\x0c\x01\xbe>\xf6\xfbo\xdaUe\x0f\x9d\x86E\xd6n\x04\xe4\xe2h\x80\x06\x9d\xab\x17^\xe6.~\xc5\x83J\xe6{Fi\x11?\xab#\xa6\x1e\x9d\x8c\xc2! \x18\xe3N\x0b\xa5\xfa\xb9\xcbp\x1c*h\x0c\x8a\x9e\xbe\x91\xf8\x10\x13\x83\xb2\xb3\xce:=\x92\xfd\xd3\xc5\xb3\x1d\xa1\x86\xef\x8c\x92\xa0\xf8m\xad\xf2\x93\x15'...'
+      ),
+    ],
+    role='model'
+  ),
+  finish_reason=<FinishReason.STOP: 'STOP'>,
+  index=0
+)] create_time=None model_version='gemini-3-flash-preview' prompt_feedback=None response_id='sLHXaefQAp2UmtkPuZHVsAM' usage_metadata=GenerateContentResponseUsageMetadata(
+  candidates_token_count=30,
+  prompt_token_count=438,
+  prompt_tokens_details=[
+    ModalityTokenCount(
+      modality=<MediaModality.TEXT: 'TEXT'>,
+      token_count=438
+    ),
+  ],
+  thoughts_token_count=481,
+  total_token_count=949
+) model_status=None automatic_function_calling_history=None parsed=None

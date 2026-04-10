@@ -300,7 +300,6 @@ def session_summary(df: pd.DataFrame) -> pd.DataFrame:
             model_name=("model_name", "first"),
             choice=("choice", "first"),
             forced_choice=("forced_choice", "first"),
-            seed=("seed", "first"),
             started_at=("started_at", "first"),
             finished_at=("finished_at", "first"),
             total_steps=("step_index", "max"),

@@ -1,0 +1,50 @@
+Message(
+    id='msg_01419iXvCYHL841DXiKAtBL2', 
+    container=None, 
+    content=[
+        TextBlock(
+            citations=None, 
+            text='# The Lantern and the Storm\n\nOnce, in a village at the edge', 
+            type='text')
+        ], 
+    model='claude-sonnet-4-6', 
+    role='assistant', 
+    stop_reason='max_tokens', 
+    stop_sequence=None, 
+    type='message', 
+    usage=Usage(cache_creation=CacheCreation(ephemeral_1h_input_tokens=0, ephemeral_5m_input_tokens=0), cache_creation_input_tokens=0, cache_read_input_tokens=0, inference_geo='global', input_tokens=11, output_tokens=17, server_tool_use=None, service_tier='standard'), 
+    stop_details=None
+)
+
+
+
+Message(
+    id='msg_01RbX95hMc8VsZho5U9Kt6Bz', 
+    container=None, 
+    content=[
+        TextBlock(
+            citations=None, 
+            text="I'll start by inspecting all the key attributes for both coffees simultaneously to make an efficient decision.", 
+            type='text'
+        ), 
+        ToolUseBlock(
+            id='toolu_018pWPHpxUa4VUjSH923LaDm', 
+            caller=DirectCaller(type='direct'), 
+            input={'option_id': 'coffee_a', 'attribute_id': 'price_dollars'}, 
+            name='inspect_cell', 
+            type='tool_use'
+        ), 
+        ToolUseBlock(
+            id='toolu_01VJ4yPRNAtT7vbtnDz1hq54', caller=DirectCaller(type='direct'), input={'option_id': 'coffee_a', 'attribute_id': 'price_cents'}, name='inspect_cell', type='tool_use'
+        ), 
+        ToolUseBlock(id='toolu_01Lwo3FqMCX5sbfiirYnps2p', caller=DirectCaller(type='direct'), input={'option_id': 'coffee_a', 'attribute_id': 'weight_oz'}, name='inspect_cell', type='tool_use'
+        )
+    ], 
+    model='claude-sonnet-4-6', 
+    role='assistant', 
+    stop_reason='tool_use', 
+    stop_sequence=None, 
+    type='message', 
+    usage=Usage(cache_creation=CacheCreation(ephemeral_1h_input_tokens=0, ephemeral_5m_input_tokens=0), cache_creation_input_tokens=0, cache_read_input_tokens=0, inference_geo='global', input_tokens=1007, output_tokens=222, server_tool_use=None, service_tier='standard'), 
+    stop_details=None
+)

@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import asdict
 from math import log
-from random import Random
 from typing import Any
 import json
 
@@ -15,17 +14,15 @@ from tool_lab.models.base import (
 from tool_lab.config import AttributeSpec, CueSpec, ExperimentSpec, OptionSpec
 from tool_lab.models.base import AssistantResponse
 
-def build_environment(spec: ExperimentSpec, seed: int) -> "ToolLabEnvironment":
+def build_environment(spec: ExperimentSpec) -> "ToolLabEnvironment":
     if spec.matrix_mode == "fixed":
-        return FixedMatrixEnvironment(spec, seed)
+        return FixedMatrixEnvironment(spec)
 
 
 
 class ToolLabEnvironment(ABC):
-    def __init__(self, spec: ExperimentSpec, seed: int) -> None:
+    def __init__(self, spec: ExperimentSpec) -> None:
         self.spec = spec
-        self.seed = seed
-        self.random = Random(seed)
         self.options: dict[str, OptionSpec] = {option.id: option for option in spec.options}
         self.attributes: dict[str, AttributeSpec] = {
             attribute.id: attribute for attribute in spec.attributes
@@ -37,6 +34,10 @@ class ToolLabEnvironment(ABC):
         self.cumulative_cost_tools = 0
         self.budget_remaining_tools = spec.budget_tools
         self.last_turn_cost_tool: int = 0
+
+        self.cumulative_cost_tokens = 0
+        self.budget_remaining_tokens = spec.budget_tokens
+        self.last_turn_cost_tokens: int = 0
 
 
         self.cues: dict[str, CueSpec] = {cue.id: cue for cue in spec.cues}
@@ -61,6 +62,8 @@ class ToolLabEnvironment(ABC):
         # Check which budget type is active to format the instruction
         if self.spec.budget_type == "tools":
             budget_str = f"The total budget is {self.spec.budget_tools} tool calls. Each tool you use reduces the remaining budget."
+        elif self.spec.budget_type == "tokens":
+            budget_str = f"The total budget is {self.spec.budget_tokens} tokens. Each token you consume or generate reduces your remaining budget."
         else:
             budget_str = f"The total budget is ${self.spec.budget_usd:.4f}. Each token you generate reduces the remaining budget."
 
@@ -92,7 +95,7 @@ class ToolLabEnvironment(ABC):
             "Attributes available in this task:",
             *attribute_lines,
             "",
-            f"Budget: ${self.spec.budget_usd:.4f}" if self.spec.budget_type=='usd' else f"Budget: {self.spec.budget_tools} tools",
+            f"Budget: ${self.spec.budget_usd:.4f}" if self.spec.budget_type == 'usd' else f"Budget: {self.spec.budget_tokens} tokens" if self.spec.budget_type == 'tokens' else f"Budget: {self.spec.budget_tools} tools",
             "Use the tools to inspect information and then call submit_choice when ready.",
         ]
         return "\n".join(user_prompt)
@@ -115,26 +118,30 @@ class ToolLabEnvironment(ABC):
         output_cost = message.output_tokens * (self.spec.model.pricing.output_per_million / 1e6)
         cost_usd = {'input_cost':input_cost, 'output_cost':output_cost}
         cost_tools = 0
+        cost_tokens = {'input_tokens':message.input_tokens, 'output_tokens':message.output_tokens}
         if message.tool_calls and message.tool_calls[0].name == 'inspect_cell':
             cost_tools+=1
-        return cost_usd, cost_tools
+        return cost_usd, cost_tools, cost_tokens
     
-    def apply_model_cost(self, cost_usd: dict, cost_tools: int) -> None:
+    def apply_model_cost(self, cost_usd: dict, cost_tools: int, cost_tokens: dict) -> None:
         self.cumulative_cost_usd += (cost_usd['input_cost'] + cost_usd['output_cost'])
         self.budget_remaining_usd = self.spec.budget_usd - self.cumulative_cost_usd
 
         self.cumulative_cost_tools += cost_tools
         self.budget_remaining_tools = self.spec.budget_tools - self.cumulative_cost_tools
-        # print(f'cost_tools: {cost_tools}; self.budget_remaining_tools: {self.budget_remaining_tools}')
+
+        self.cumulative_cost_tokens += (cost_tokens['input_tokens'] + cost_tokens['output_tokens'])
+        self.budget_remaining_tokens = self.spec.budget_tokens - self.cumulative_cost_tokens
 
     def charge_model_turn(self, message: AssistantResponse) -> None:
-        cost_usd, cost_tools = self.get_model_cost(message)
-        self.apply_model_cost(cost_usd, cost_tools)
+        cost_usd, cost_tools, cost_tokens = self.get_model_cost(message)
+        self.apply_model_cost(cost_usd, cost_tools, cost_tokens)
         message.input_cost = cost_usd['input_cost']
         message.output_cost = cost_usd['output_cost']
         message.tool_cost = cost_tools
         self.last_turn_cost_usd = cost_usd['input_cost'] + cost_usd['output_cost']
         self.last_turn_cost_tool = cost_tools
+        self.last_turn_cost_tokens = cost_tokens['input_tokens'] + cost_tokens['output_tokens']
 
     def execute_tool(
         self, tool_name: str, arguments: dict[str, Any], tool_call_id: str
@@ -150,7 +157,7 @@ class ToolLabEnvironment(ABC):
             payload = {
                 "role": "tool",
                 "tool_call_id": tool_call_id,
-                "content": json.dumps({"status": "error", "message": str(exc)}),
+                "error": str(exc),
             }
 
         extra = {}
@@ -160,8 +167,12 @@ class ToolLabEnvironment(ABC):
         # exit()
         self._record_event(
             kind="tool",
-            data={"tool_name": tool_name, "tool_call_id": tool_call_id, 
-                **json.loads(payload["content"]), **extra},
+            data={
+                "tool_name": tool_name, 
+                "tool_call_id": tool_call_id, 
+                **json.loads(payload["content"]), 
+                **extra
+            },
         )
         return payload
 
@@ -204,10 +215,16 @@ class ToolLabEnvironment(ABC):
         event = {
             "step_index": self._step_index,
             "kind": kind,
+
             "cumulative_cost_usd": round(self.cumulative_cost_usd, 8),
             "budget_remaining_usd": round(self.budget_remaining_usd, 8),
+            
             "cumulative_cost_tools": self.cumulative_cost_tools,
             "budget_remaining_tools":self.budget_remaining_tools,
+            
+            "cumulative_cost_tokens": self.cumulative_cost_tokens,
+            "budget_remaining_tokens":self.budget_remaining_tokens,
+            
             **data,
         }
 
@@ -239,6 +256,9 @@ class FixedMatrixEnvironment(ToolLabEnvironment):
         elif self.spec.budget_type=='tools':
             content_dict['turn_cost_tools'] = self.last_turn_cost_tool
             content_dict['budget_remaining_tools'] = self.budget_remaining_tools
+        elif self.spec.budget_type=='tokens':
+            content_dict['turn_cost_tokens'] = self.last_turn_cost_tokens
+            content_dict['budget_remaining_tokens'] = self.budget_remaining_tokens
         else: 
             raise ValueError(f'budget_type not recognized: {self.spec.budget_type}')
         payload = {

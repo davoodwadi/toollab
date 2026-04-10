@@ -35,10 +35,9 @@ class ExperimentRunner:
         }
 
     def _run_single(self, replicate_index: int, session_name: str) -> dict[str, Any]:
-        seed = (self.spec.seed or 0) + replicate_index
 
         # build_environment: fixed or scrolling -> ToolLabEnvironment: with methods for _inspect_cell
-        environment = build_environment(self.spec, seed)
+        environment = build_environment(self.spec)
 
         # Based on the config, get the correct provider `session` with system_prompt, initial_user_message, and tools
         model_session = create_model_session(
@@ -57,8 +56,9 @@ class ExperimentRunner:
             num_attributes = len(environment.attributes)
             total_cells = num_options * num_attributes
             print("\n" + "="*50)
-            print("INITIALIZING EXPERIMENT (MOCK MODE)")
+            print("INITIALIZING EXPERIMENT")
             print("="*50)
+            print(f'Model: {environment.spec.model.model_name}\n')
             print(f"System Prompt:\n{model_session.system_prompt}\n")
             print(f"User Prompt:\n{model_session.initial_user_message}\n")
             print(f"Num Options: {num_options}")
@@ -66,8 +66,10 @@ class ExperimentRunner:
             print(f"Total cells: {total_cells}")
             if environment.spec.budget_type=='usd':
                 print(f"Budget: ${environment.spec.budget_usd}")
-            else:
+            elif environment.spec.budget_type=='tools':
                 print(f"Budget: {environment.spec.budget_tools} Tools")
+            elif environment.spec.budget_type=='tokens':
+                print(f"Budget: {environment.spec.budget_tokens} Tokens")
             print("="*50 + "\n")
         # print('model_session.contents', model_session.contents)
         # exit()
@@ -77,17 +79,20 @@ class ExperimentRunner:
             # gets: LLM's response             
             assistant_response = model_session._call_model()
             environment.charge_model_turn(assistant_response)
-            # print('budget_remaining_tools', environment.budget_remaining_tools, 'budget_remaining_usd', environment.budget_remaining_usd)
             # START: record assistant_response
             assistant_data = _to_serializable(assistant_response)
+
+            environment._record_event( 
+                kind='assistant',
+                data=assistant_data,
+            )
+            # print('assistant_data', assistant_data)
+
             if assistant_response.tool_calls:
                 tc = assistant_response.tool_calls[0]
                 assistant_data["tool_name"] = tc.name
                 assistant_data["tool_arguments"] = tc.arguments
-            environment._record_event(
-                kind='assistant',
-                data=assistant_data,
-            )
+            
             # END: record assistant_response
             
             print(environment._step_index)
@@ -102,10 +107,11 @@ class ExperimentRunner:
             
             if (is_budget_exhausted(environment)) and (is_not_choice) and (not forced_choice):
                 force_message = environment.forced_vote_message()
-                model_session.messages.append({'role': 'user', 'content': force_message})
+                model_session.add_force_message(force_message)
                 forced_choice = True
+
                 # print('setting forced choice')
-                print('FORCING CHOICE', environment.budget_remaining_usd if environment.spec.budget_type=='usd' else environment.budget_remaining_tools)
+                print('FORCING CHOICE', environment.budget_remaining_usd if environment.spec.budget_type=='usd' else environment.budget_remaining_tools if environment.spec.budget_type=='tools' else environment.budget_remaining_tokens)
                 continue
 
             if (is_budget_exhausted(environment)) and (is_not_choice) and (forced_choice):
@@ -119,8 +125,8 @@ class ExperimentRunner:
             if not assistant_response.tool_calls:
                 print('model did not call any tools in this turn')
                 # model did not call any tools -> ask it to try again
-                model_session.messages.append({'role':'user','content':environment.reminder_message()})
-                print([m['role'] for m in model_session.messages])
+                model_session.add_reminder(environment.reminder_message())
+                # print([m['role'] for m in model_session.messages])
                 continue
             # END: check if model did not call any tools in this turn
 
@@ -158,13 +164,15 @@ class ExperimentRunner:
             "model_name": self.spec.model.model_name,
             'forced_choice': forced_choice,
             "choice": environment.choice,
+            'budget_type':environment.spec.budget_type,
+            'budget_max': getattr(environment.spec, f"budget_{environment.spec.budget_type}", None),
             "cumulative_cost_usd": environment.cumulative_cost_usd,
             "budget_remaining_usd": environment.budget_remaining_usd,
             "cumulative_cost_tools": environment.cumulative_cost_tools,
             "budget_remaining_tools": environment.budget_remaining_tools,
+            "budget_remaining_tokens": environment.budget_remaining_tokens,
             **self.spec.metadata,
             'trace': environment.trace,
-            "seed": seed,
             "started_at": started_at,
             "finished_at": datetime.now(timezone.utc).isoformat(),
         }
@@ -176,5 +184,7 @@ def is_budget_exhausted(environment):
         return environment.budget_remaining_usd<=0
     elif environment.spec.budget_type=='tools':
         return environment.budget_remaining_tools<0
+    elif environment.spec.budget_type=='tokens':
+        return environment.budget_remaining_tokens<0
     else: 
         return

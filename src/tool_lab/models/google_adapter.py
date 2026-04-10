@@ -55,7 +55,6 @@ class GoogleModelSession:
             raise RuntimeError(f"Missing API key in environment variable {api_key_env}")
         self._client = genai.Client(api_key=api_key)
 
-        self._inspection_count = 0
 
         self.contents = [
             types.Content(
@@ -129,7 +128,7 @@ class GoogleModelSession:
             
         finish_reason = None
         if response.candidates and hasattr(response.candidates[0].finish_reason, 'name'):
-            finish_reason = response.candidates[0].finish_reason.name
+            finish_reason = str(response.candidates[0].finish_reason)
 
         return AssistantResponse(
             content=text,
@@ -141,18 +140,41 @@ class GoogleModelSession:
         )
 
     def add_tool_response(self, tool_response, tool_name):
-        print('tool_response', tool_response)
-        function_response_part = types.Part.from_function_response(
-            name=tool_name,
-            response={"result": tool_response['content']},
-            id=tool_response['tool_call_id'],
-        )
-        self.contents.append(types.Content(role="user", parts=[function_response_part])) 
+        # print('tool_response', tool_response)
+        function_response_parts = []
+        if tool_response.get('error'):
+            function_response_parts.append(
+                types.Part.from_function_response(
+                    name=tool_name,
+                    response={"error": tool_response['error']},
+                )
+            )
+        elif tool_response.get('content'):
+            function_response_parts.append(
+                    types.Part.from_function_response(
+                    name=tool_name,
+                    response={"result": tool_response['content']},
+                )
+            )
+
+        self.contents.append(types.Content(role="tool", parts=function_response_parts)) 
 
 
     def _get_tool_error_one_tool_only(self, tool_call: ToolInvocation) -> dict[str, str]:
         return {
-            'role': 'tool',
             'tool_call_id': tool_call.tool_call_id,
-            'content': 'Error: you are allowed to call only one tool per turn'
+            'error': 'Error: You are allowed to call only one tool per turn'
         }
+
+    def add_force_message(self, force_message):
+        self.contents.append(
+            types.Content(
+                role="user", parts=[types.Part(text=force_message)]
+        ))
+
+    def add_reminder(self, reminder_message):
+        self.contents.append(
+            types.Content(
+                role="user", parts=[types.Part(text=reminder_message)]
+        ))
+

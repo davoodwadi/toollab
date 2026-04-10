@@ -31,6 +31,16 @@ MODEL_CONFIG = {
         'gemini-3-flash-preview':  PricingConfig(input_per_million=0.50, output_per_million=3.00),
         'gemini-3.1-pro-preview':  PricingConfig(input_per_million=2.00, output_per_million=12.00)
     },
+    'openai': {
+        'gpt-5.4':PricingConfig(input_per_million=2.5, output_per_million=15.),
+        'gpt-5.4-mini': PricingConfig(input_per_million=0.75, output_per_million=4.5),
+        'gpt-5.4-nano': PricingConfig(input_per_million=0.2, output_per_million=1.25),
+    },
+    'anthropic': {
+        'claude-opus-4-6':PricingConfig(input_per_million=5.0, output_per_million=25.),
+        'claude-sonnet-4-6': PricingConfig(input_per_million=3., output_per_million=15.),
+        'claude-haiku-4-5-20251001': PricingConfig(input_per_million=1., output_per_million=5.),
+    },
     'mock': {
         'mock-1': PricingConfig(input_per_million=1.0, output_per_million=6.0)
     }
@@ -95,14 +105,14 @@ class ExperimentSpec:
     model: ModelConfig
     matrix_mode: MatrixMode = "scrolling"
     replications: int = 5
-    budget_type: Literal["usd", "tools"] = "usd"
+    budget_type: Literal["usd", "tools", 'tokens'] = "usd"
     budget_usd: float | None = None
     budget_tools: int | None = None
+    budget_tokens: int | None = None
     max_turns: int = 20
     tools: list[str] = field(default_factory=list)
     default_tool_cost_usd: float = 0.0
     tool_costs: dict[str, float] = field(default_factory=dict)
-    seed: int | None = None
     interface: dict[str, Any] = field(default_factory=dict)
     analysis: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -143,6 +153,8 @@ class ExperimentSpec:
             raise ValueError("budget USD must be positive")
         if self.budget_type=='tools' and self.budget_tools<=0:
             raise ValueError("budget Tools must be positive")
+        if self.budget_type=='tokens' and self.budget_tokens<=0:
+            raise ValueError("budget Tokens must be positive")
         if self.max_turns < 1:
             raise ValueError("max_turns must be at least 1")
 
@@ -225,11 +237,11 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         budget_type=experiment.get("budget_type"),
         budget_usd=experiment.get("budget_usd", 0.0),
         budget_tools=experiment.get("budget_tools", 0),
+        budget_tokens=experiment.get("budget_tokens", 0),
         max_turns=experiment.get("max_turns", 20),
         tools=experiment.get("tools", []),
         default_tool_cost_usd=experiment.get("default_tool_cost_usd", 0.0),
         tool_costs=experiment.get("tool_costs", {}),
-        seed=experiment.get("seed"),
         interface=experiment.get("interface", {}),
         analysis=experiment.get("analysis", {}),
         metadata=experiment.get("metadata", {}),

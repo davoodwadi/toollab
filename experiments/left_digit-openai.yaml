@@ -8,15 +8,15 @@ experiment:
   matrix_mode: fixed
   replications: 1
   budget_type: tools
-  budget_tokens: 5
+  budget_tools: 5
   max_turns: 10
   seed: 42
   tools:
     - inspect_cell
     - submit_choice
   model:
-    provider: google
-    model_name: gemini-3-flash-preview
+    provider: openai
+    model_name: gpt-5.4-nano
     extra:
       mock_inspections: 24
   participant:

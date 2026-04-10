@@ -1,0 +1,31 @@
+Response(
+    id='resp_0c8188159a68d3fb0069d82f7d6e6481a18cc67e12771fe9d7', 
+    created_at=1775775613.0, 
+    error=None, 
+    incomplete_details=None, 
+    instructions=None, 
+    metadata={}, 
+    model='gpt-5.4-nano-2026-03-17', 
+    object='response', 
+    output=[
+        ResponseFunctionToolCall(arguments='{"option_id":"coffee_a","attribute_id":"price_dollars"}', call_id='call_4r0Za1BoAJSk7AMKhr22GxUT', name='inspect_cell', type='function_call', id='fc_0c8188159a68d3fb0069d82f7ebd6881a182cea94fc4de2212', namespace=None, status='completed'), 
+        ResponseFunctionToolCall(arguments='{"option_id":"coffee_a","attribute_id":"price_cents"}', call_id='call_ZfzBmLeNF4TjYtW7VyrvKVjs', name='inspect_cell', type='function_call', id='fc_0c8188159a68d3fb0069d82f7ebd7481a186748fa9f410ba9a', namespace=None, status='completed'), 
+        ResponseFunctionToolCall(arguments='{"option_id":"coffee_a","attribute_id":"weight_oz"}', call_id='call_F16brfGanW7RFUpRv4wUvA9E', name='inspect_cell', type='function_call', id='fc_0c8188159a68d3fb0069d82f7ebd7c81a18de05d06dc27c643', namespace=None, status='completed'), 
+        ResponseFunctionToolCall(arguments='{"option_id":"coffee_b","attribute_id":"price_dollars"}', call_id='call_uoGEExoisoIlZIKxK78yD5af', name='inspect_cell', type='function_call', id='fc_0c8188159a68d3fb0069d82f7ebd8081a1a47c88a6440160c0', namespace=None, status='completed'), 
+        ResponseFunctionToolCall(arguments='{"option_id":"coffee_b","attribute_id":"price_cents"}', call_id='call_vXAIkKDV1ykwOeOYbvtyYN9D', name='inspect_cell', type='function_call', id='fc_0c8188159a68d3fb0069d82f7ebd8481a184c18a64a0f36522', namespace=None, status='completed'), 
+        ResponseFunctionToolCall(arguments='{"option_id":"coffee_b","attribute_id":"weight_oz"}', call_id='call_Aiy3mIjqB9cLAOWgGaTdb4Vi', name='inspect_cell', type='function_call', id='fc_0c8188159a68d3fb0069d82f7ebd8c81a1a9821fd0e46a99f6', namespace=None, status='completed')
+        ], 
+    parallel_tool_calls=True, 
+    temperature=1.0, 
+    tool_choice='auto', 
+    tools=[FunctionTool(name='submit_choice', parameters={'properties': {'option_id': {'title': 'Option Id', 'type': 'string'}, 'confidence': {'anyOf': [{'maximum': 1, 'minimum': 0, 'type': 'number'}, {'type': 'null'}], 'title': 'Confidence'}, 'justification': {'anyOf': [{'type': 'string'}, {'type': 'null'}], 'title': 'Justification'}}, 'required': ['option_id', 'confidence', 'justification'], 'title': 'SubmitChoiceInput', 'type': 'object', 'additionalProperties': False}, strict=True, type='function', defer_loading=None, description='Record the final decision.'), FunctionTool(name='inspect_cell', parameters={'properties': {'option_id': {'title': 'Option Id', 'type': 'string'}, 'attribute_id': {'title': 'Attribute Id', 'type': 'string'}}, 'required': ['option_id', 'attribute_id'], 'title': 'InspectCellInput', 'type': 'object', 'additionalProperties': False}, strict=True, type='function', defer_loading=None, description='Reveal one hidden cell in the fixed information matrix by option and attribute.')], 
+    top_p=0.98, background=False, completed_at=1775775614.0, conversation=None, max_output_tokens=None, max_tool_calls=None, 
+    previous_response_id=None, prompt=None, prompt_cache_key=None, prompt_cache_retention=None, 
+    reasoning=Reasoning(effort='none', generate_summary=None, summary=None), 
+    safety_identifier=None, service_tier='default', status='completed', 
+    text=ResponseTextConfig(format=ResponseFormatText(type='text'), verbosity='medium'), 
+    top_logprobs=0, truncation='disabled', 
+    usage=ResponseUsage(input_tokens=278, input_tokens_details=InputTokensDetails(cached_tokens=0), output_tokens=158, output_tokens_details=OutputTokensDetails(reasoning_tokens=0), total_tokens=436), 
+    user=None, billing={'payer': 'developer'}, 
+    frequency_penalty=0.0, presence_penalty=0.0, store=True
+)

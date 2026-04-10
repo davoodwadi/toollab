@@ -149,6 +149,12 @@ class MockModelSession:
             'tool_call_id': tool_call.tool_call_id,
             'content':'Error: you are allowed to call only one tool per turn'
         }
+    
+    def add_force_message(self, force_message):
+        self.messages.append({'role': 'user', 'content': force_message})
+
+    def add_reminder(self, reminder_message):
+        self.messages.append({'role':'user','content':reminder_message})
 
 
 

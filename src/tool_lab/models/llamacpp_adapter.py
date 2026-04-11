@@ -14,8 +14,8 @@ from openai import OpenAI
 
 class SubmitChoiceInput(BaseModel):
     option_id: str
-    confidence: Optional[float] = Field(default=None, ge=0, le=1)
-    justification: Optional[str] = None
+    # confidence: Optional[float] = Field(default=None, ge=0, le=1)
+    # justification: Optional[str] = None
 
 class InspectCellInput(BaseModel):
     option_id: str
@@ -41,25 +41,26 @@ inspect_cell_tool = dict(
 tools = [submit_choice_tool, inspect_cell_tool]
  
 if __name__=='__main__':
-    api_key_env = "OPENAI_API_KEY"
-    api_key = os.environ.get(api_key_env)
-    if not api_key:
-        raise RuntimeError(f"Missing API key in environment variable {api_key_env}")
-    client = OpenAI(api_key=api_key)
-    messages = [
-        {'role':'user', 'content':'tell me a story'}
-    ]
-    response = client.responses.create(
-        model='gpt-5.4-nano',
-        # tools=tools,
-        input=messages,
-        max_output_tokens=17
+    client = OpenAI(
+        base_url='http://127.0.0.1:8080/v1',
+        api_key='none',
     )
-    print(hasattr(response.output[0], 'content'))
-    print(response)
+    messages = [
+        {'role':'user', 'content':'Call one of the tools.'}
+    ]
+    model_name = client.models.list().data[0].id
+    print(model_name)
+    response = client.responses.create(
+        model=model_name,
+        tools=tools,
+        input=messages,
+        max_output_tokens=1700
+    )
+    for output in response.output:
+        print(output)
 
-class OpenAIModelSession:
-    provider_name = "openai"
+class LlamaCPPModelSession:
+    provider_name = "llamacpp"
 
     def __init__(
         self,
@@ -67,12 +68,10 @@ class OpenAIModelSession:
         system_prompt: str,
         initial_user_message: str,
     ) -> None:
-        api_key_env = config.api_key_env or "OPENAI_API_KEY"
-        api_key = os.environ.get(api_key_env)
-        if not api_key:
-            raise RuntimeError(f"Missing API key in environment variable {api_key_env}")
-        self._client = OpenAI(api_key=api_key)
-
+        self._client = OpenAI(
+            base_url='http://127.0.0.1:8080/v1',
+            api_key='none',
+        )
         self.messages = [
             {'role':"user", "content":initial_user_message}
         ]
@@ -82,12 +81,13 @@ class OpenAIModelSession:
         self.initial_user_message = initial_user_message
         self.tools = tools
 
-
     def _call_model(self) -> AssistantResponse:
         # for tool in self.tools:
             # print(tool)
         # exit()
         meta = {}
+        assert self._client.models.list().data[0].id==self.config.model_name, f'the hosted model {self._client.models.list().data[0].id} is different {self.config.model_name}'
+        # print('self.config.model_name', self.config.model_name)
         response = self._client.responses.create(
             model=self.config.model_name,
             tools=self.tools,
@@ -98,7 +98,6 @@ class OpenAIModelSession:
         # print(response)
 
         meta["model_version"] = response.model
-        meta["reasoning_effort"] = response.reasoning.effort
 
         if response.output:
             self.messages.extend(response.output)
@@ -110,11 +109,18 @@ class OpenAIModelSession:
         tool_calls = []
     
         for item in response.output:
-            if hasattr(item, 'content'):
-                text = item.content[0].text
-                text_parts.append(text)
+            # print(item)
+            # print('*'*50)
+            if item.type == 'reasoning':
+                reasoning_parts.append(item.content[0].text)
+            elif item.type == 'output_text':
+                text_parts.append(item.content[0].text)
             if item.type == "function_call":
                 tc_id = item.call_id if item.call_id else f"call_{uuid4().hex[:8]}"
+                # print(item.arguments)
+                # print(type(item.arguments))
+                # print('*'*50)
+                
                 args_dict = json.loads(item.arguments)
 
                 tool_calls.append(ToolInvocation(

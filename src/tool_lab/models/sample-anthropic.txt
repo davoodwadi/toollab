@@ -48,3 +48,28 @@ Message(
     usage=Usage(cache_creation=CacheCreation(ephemeral_1h_input_tokens=0, ephemeral_5m_input_tokens=0), cache_creation_input_tokens=0, cache_read_input_tokens=0, inference_geo='global', input_tokens=1007, output_tokens=222, server_tool_use=None, service_tier='standard'), 
     stop_details=None
 )
+
+
+Message(
+    id='msg_01EaXAcwF9hqXysqiLFyJ6aP', 
+    container=None, 
+    content=[
+        ThinkingBlock(
+            signature='Er8DClsIDBgCKkBTrevhQI3LJXgqVBZpiBCEtkZRL6pSXWDuzxuZwZSd9zxbRdJJMeHACbGvJqkQTj6Twsqk74MovH0UW6RRj48jMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgwi6gAW7kjrlJNQEoQaDAp1keUm8BzKulyIyyIwRwTZF3lOmIiOlVWJ1NXtjKLi12MZJdvw08Prfkhf4FtR2OHgMzkaDoZTIRrfYIgXKpECcEXPZh3nwS5BcqlFx4UbODiHKbqDgI586x7+mQbqf1Kn6rh1dFJUhS3zvOtug7T9EHsiLgAk3x2ZeOlkjuHt5zY+6rnadv/aJl4P1pxqBqKSUNiL7uw56WMwxpg35GmPHnkpHDLPqFoyH1OHgSwhvcfSxB+GHQYqisn81mcGFg42reaURuFiXRYQvpJfZv1IZGQZpB/0qrm06YZVX6qmT7hYwI1JR40EgsH+3aGB0L/8vtolFMo7MNEuim6ftfFx3jCT8CI2Vp+dNXZj4szemEwYPINF9ooTVtctL4HE/7gZelNdO+a6nsGC/hRoP0tV2Q0eUBzJD7/m4EZM7tZsM7UPynGv3fRasnFMng5cmhTpGAE=', 
+            thinking='Let me inspect the cells to get information about both coffee options before making a decision. I need to find the best value, which means I should look at price and weight for both options.\n\nLet me start by checking the prices and weights for both coffees.', 
+            type='thinking'
+        ), 
+        TextBlock(
+            citations=None, 
+            text="I'll systematically gather price and weight information for both coffees to calculate the best value (price per ounce). Let me start inspecting the cells!\n\n**Step 1: Price (dollars) for Coffee A**", 
+            type='text'
+        ), 
+        ToolUseBlock(id='toolu_01L6yDunKxa9EUeHMZsUngVX', caller=DirectCaller(type='direct'), input={'option_id': 'coffee_a', 'attribute_id': 'price_dollars'}, name='inspect_cell', type='tool_use')], 
+    model='claude-sonnet-4-6', 
+    role='assistant', 
+    stop_reason='tool_use', 
+    stop_sequence=None, 
+    type='message', 
+    usage=Usage(cache_creation=CacheCreation(ephemeral_1h_input_tokens=0, ephemeral_5m_input_tokens=0), cache_creation_input_tokens=0, cache_read_input_tokens=0, inference_geo='global', input_tokens=799, output_tokens=185, server_tool_use=None, service_tier='standard'), 
+    stop_details=None
+)

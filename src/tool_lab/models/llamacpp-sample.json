@@ -1,0 +1,3 @@
+{
+    "confidence":"{\"0.8},justification\":\"Coffee A costs $12.99 for 13.0 oz (~$0.999/oz). Coffee B costs at least $13.00 for 13.9 oz (~$0.935/oz). Even if Coffee B's price is $13.88, \"it\" would still be approximately the same value as Coffee A. If Coffee B's cents are 0, \"it\" is clearly better.\",\"option_id\":\"coffee_b\"}"
+}

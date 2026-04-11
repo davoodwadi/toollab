@@ -5,6 +5,7 @@ from tool_lab.models.anthropic_adapter import AnthropicModelSession
 from tool_lab.models.google_adapter import GoogleModelSession
 from tool_lab.models.mock_adapter import MockModelSession
 from tool_lab.models.openai_adapter import OpenAIModelSession
+from tool_lab.models.llamacpp_adapter import LlamaCPPModelSession
 
 
 def create_model_session(
@@ -21,4 +22,6 @@ def create_model_session(
         return MockModelSession(config, system_prompt, initial_user_message)
     if provider == "openai":
         return OpenAIModelSession(config, system_prompt, initial_user_message)
+    if provider == "llamacpp":
+        return LlamaCPPModelSession(config, system_prompt, initial_user_message)
     raise ValueError(f"Unsupported provider: {config.provider}")

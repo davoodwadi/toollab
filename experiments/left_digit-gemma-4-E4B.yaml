@@ -4,7 +4,7 @@ experiment:
   metadata:
     option_count: 2
   task_prompt: >
-    You start with a budget of 100 points. Every time you use the inspect_cell tool, 25 points will be deducted from your score.
+    You start with a budget of 100 points. Every time you use the inspect_cell tool, 5 points will be deducted from your score.
     You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice. 
     Your final score is the value of your chosen coffee minus your search costs.
   matrix_mode: fixed
@@ -12,15 +12,15 @@ experiment:
   budget_type: points
   budget_points: 100
   tool_costs:
-    inspect_cell: 25
+    inspect_cell: 5
   max_turns: 10
   seed: 42
   tools:
     - inspect_cell
     - submit_choice
   model:
-    provider: openai
-    model_name: gpt-5.4-nano
+    provider: llamacpp
+    model_name: gemma-4-E4B-it-UD-Q4_K_XL.gguf
     extra:
       mock_inspections: 24
   participant:

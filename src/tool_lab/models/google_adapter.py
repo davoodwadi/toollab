@@ -138,26 +138,25 @@ class GoogleModelSession:
             tool_calls=tool_calls,
             finish_reason=finish_reason
         )
-
-    def add_tool_response(self, tool_response, tool_name):
-        # print('tool_response', tool_response)
-        function_response_parts = []
-        if tool_response.get('error'):
-            function_response_parts.append(
-                types.Part.from_function_response(
-                    name=tool_name,
-                    response={"error": tool_response['error']},
-                )
-            )
-        elif tool_response.get('content'):
-            function_response_parts.append(
+    
+    def add_tool_results(self, tool_results_and_name):
+        for tool_response, tool_name in tool_results_and_name:
+            if tool_response.get('error'):
+                function_response_parts = [
                     types.Part.from_function_response(
-                    name=tool_name,
-                    response={"result": tool_response['content']},
-                )
-            )
+                        name=tool_name,
+                        response={"error": tool_response['error']},
+                    )
+                ]
+            elif tool_response.get('content'):
+                function_response_parts = [
+                        types.Part.from_function_response(
+                        name=tool_name,
+                        response={"result": tool_response['content']},
+                    )
+                ]
 
-        self.contents.append(types.Content(role="tool", parts=function_response_parts)) 
+            self.contents.append(types.Content(role="tool", parts=function_response_parts)) 
 
 
     def _get_tool_error_one_tool_only(self, tool_call: ToolInvocation) -> dict[str, str]:

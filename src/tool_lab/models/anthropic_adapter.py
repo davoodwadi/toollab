@@ -85,19 +85,29 @@ class AnthropicModelSession:
     def _call_model(self) -> AssistantResponse:
         # for tool in self.tools:
         #     print(tool)
-        # exit()
+        meta = {}
+        extra = {}
+        if self.config.thinking_type:
+            extra["thinking"] = {"type": self.config.thinking_type}
+            meta["thinking"] = self.config.thinking_type
+        if self.config.effort:
+            extra['output_config'] = {"effort": self.config.effort}
+            meta["effort"] = self.config.effort
+
         response = self._client.messages.create(
             model=self.config.model_name,
             tools=self.tools,
+            tool_choice={'type':"auto", "disable_parallel_tool_use":True},
             messages=self.messages,
             system=self.system_prompt,
             max_tokens=6_000,
+            **extra
         )
         print(response)
 
-        model_version = response.model
+        meta['model_version'] = response.model
         
-        self.messages.append(response)
+        self.messages.append({"role": "assistant", "content": response.content})
 
         # exit()
 
@@ -108,15 +118,17 @@ class AnthropicModelSession:
         for item in response.content:
             if item.type=='text':
                 text_parts.append(item.text)
-            if item.type == 'tool_use':
+            elif item.type=='thinking':
+                reasoning_parts.append(item.thinking)
+            elif item.type == 'tool_use':
                 tc_id = item.id if item.id else f"call_{uuid4().hex[:8]}"
                 args_dict = item.input
-
                 tool_calls.append(ToolInvocation(
                     tool_call_id=tc_id,
                     name=item.name,
                     arguments=args_dict
                 ))
+
         
         text = "\n".join(text_parts)
         reasoning = "\n".join(reasoning_parts)
@@ -131,26 +143,34 @@ class AnthropicModelSession:
             output_tokens=output_tokens,
             tool_calls=tool_calls,
             finish_reason=response.stop_reason,
-            meta={model_version:model_version}
+            meta=meta
         )
 
-    def add_tool_response(self, tool_response, tool_name):
+    def add_tool_results(self, tool_results_and_name):
         # print('tool_response', tool_response)
-        if tool_response.get('error'):
-            function_call_output = {
-                "type": "function_call_output",
-                "call_id": tool_response['tool_call_id'],
-                "output": tool_response['error']
-            }
-        elif tool_response.get('content'):
-            function_call_output = {
-                "type": "function_call_output",
-                "call_id": tool_response['tool_call_id'],
-                "output": tool_response['content']
-            }
-
-        self.messages.append(function_call_output) 
-
+        tool_results_list = []
+        for tool_response, tool_name in tool_results_and_name:
+            if tool_response.get('error'):
+                function_call_output = {
+                    "type": "tool_result",
+                    "tool_use_id": tool_response['tool_call_id'],
+                    'content': tool_response['error'],
+                    'is_error': True
+                }
+            elif tool_response.get('content'):
+                function_call_output = {
+                    "type": "tool_result",
+                    "tool_use_id": tool_response['tool_call_id'],
+                    'content': tool_response['content'],
+                }
+            
+            tool_results_list.append(function_call_output)
+                
+        message_to_add = {
+            'role': 'user',
+            'content': tool_results_list
+        }
+        self.messages.append(message_to_add) 
 
     def _get_tool_error_one_tool_only(self, tool_call: ToolInvocation) -> dict[str, str]:
         return {
@@ -160,11 +180,11 @@ class AnthropicModelSession:
 
     def add_force_message(self, force_message):
         self.messages.append(
-            {'role':"user", 'content':force_message}
+            {'role': "user", 'content': force_message}
         )
         
     def add_reminder(self, reminder_message):
         self.messages.append(
-            {'role':"user", 'content':reminder_message}
+            {'role': "user", 'content': reminder_message}
         )
 

@@ -59,8 +59,11 @@ class ExperimentRunner:
             print("INITIALIZING EXPERIMENT")
             print("="*50)
             print(f'Model: {environment.spec.model.model_name}\n')
+            print('*'*50)
             print(f"System Prompt:\n{model_session.system_prompt}\n")
+            print('*'*50)
             print(f"User Prompt:\n{model_session.initial_user_message}\n")
+            print('*'*50)
             print(f"Num Options: {num_options}")
             print(f"Num Attributes: {num_attributes}")
             print(f"Total cells: {total_cells}")
@@ -70,6 +73,9 @@ class ExperimentRunner:
                 print(f"Budget: {environment.spec.budget_tools} Tools")
             elif environment.spec.budget_type=='tokens':
                 print(f"Budget: {environment.spec.budget_tokens} Tokens")
+            elif environment.spec.budget_type=='points':
+                print(f"Budget: {environment.spec.budget_points} Points")
+            
             print("="*50 + "\n")
         # print('model_session.contents', model_session.contents)
         # exit()
@@ -111,7 +117,7 @@ class ExperimentRunner:
                 forced_choice = True
 
                 # print('setting forced choice')
-                print('FORCING CHOICE', environment.budget_remaining_usd if environment.spec.budget_type=='usd' else environment.budget_remaining_tools if environment.spec.budget_type=='tools' else environment.budget_remaining_tokens)
+                print('FORCING CHOICE', environment.budget_remaining_usd if environment.spec.budget_type=='usd' else environment.budget_remaining_tools if environment.spec.budget_type=='tools' else environment.budget_remaining_tokens if environment.spec.budget_type=='tokens' else environment.budget_remaining_points)
                 continue
 
             if (is_budget_exhausted(environment)) and (is_not_choice) and (forced_choice):
@@ -132,30 +138,34 @@ class ExperimentRunner:
 
             # print([m for m in model_session.messages if m['role']=='assistant'])
 
-            # execute first tool
-            tool_call = assistant_response.tool_calls[0]
-            tool_response = environment.execute_tool(
-                tool_name=tool_call.name,
-                arguments=tool_call.arguments,
-                tool_call_id=tool_call.tool_call_id,
-            )
-            
-            model_session.add_tool_response(tool_response, tool_name=tool_call.name)
-
-            
-            print(tool_call.name)
-            print(tool_response['content'])
-            # print('opened_cues', environment.opened_cues)
-            if tool_call.name == "submit_choice":
-                break
-            # error the remaining tools if any
-            if len(assistant_response.tool_calls)>1:
-                for tool_call in assistant_response.tool_calls[1:]:
+            # START: execute tools
+            tool_results_and_name = []
+            for index, tc in enumerate(assistant_response.tool_calls):
+                if index==0:
+                    # execute first tool
+                    tool_response = environment.execute_tool(
+                        tool_name=tc.name,
+                        arguments=tc.arguments,
+                        tool_call_id=tc.tool_call_id,
+                    )
+                    tool_results_and_name.append((tool_response, tc.name))
+                    print(tc.name)
+                    print(tool_response['content'])
+                else:
+                    # error the remaining tools, if any
                     # return error
-                    tool_error = model_session._get_tool_error_one_tool_only(tool_call)
-                    model_session.add_tool_response(tool_error, tool_name=tool_call.name)
-            print('*'*50)
+                    tool_error = model_session._get_tool_error_one_tool_only(tc)
+                    tool_results_and_name.append((tool_error, tc.name))
+            
+            model_session.add_tool_results(tool_results_and_name)
 
+            if assistant_response.tool_calls[0].name == "submit_choice":
+                break
+            print('*'*50)
+            # END: execute tools
+        print('+'*50)
+        print(f'Total cost: ${environment.cumulative_cost_usd}')
+        print('+'*50)
         # session ended -> record the response
         run_record = {
             "session_name": session_name,
@@ -166,11 +176,19 @@ class ExperimentRunner:
             "choice": environment.choice,
             'budget_type':environment.spec.budget_type,
             'budget_max': getattr(environment.spec, f"budget_{environment.spec.budget_type}", None),
+            
             "cumulative_cost_usd": environment.cumulative_cost_usd,
             "budget_remaining_usd": environment.budget_remaining_usd,
+            
             "cumulative_cost_tools": environment.cumulative_cost_tools,
             "budget_remaining_tools": environment.budget_remaining_tools,
+            
+            "cumulative_cost_tokens": environment.cumulative_cost_tokens,
             "budget_remaining_tokens": environment.budget_remaining_tokens,
+            
+            "cumulative_cost_points": environment.cumulative_cost_points,
+            "budget_remaining_points": environment.budget_remaining_points,
+            
             **self.spec.metadata,
             'trace': environment.trace,
             "started_at": started_at,
@@ -182,9 +200,14 @@ class ExperimentRunner:
 def is_budget_exhausted(environment):
     if environment.spec.budget_type=='usd':
         return environment.budget_remaining_usd<=0
-    elif environment.spec.budget_type=='tools':
+    elif environment.spec.budget_type=='tools' and environment.spec.budget_tools>0:
         return environment.budget_remaining_tools<0
+    elif environment.spec.budget_type=='tools' and environment.spec.budget_tools<=0:
+        return False
     elif environment.spec.budget_type=='tokens':
         return environment.budget_remaining_tokens<0
+    elif environment.spec.budget_type=='points':
+        # return environment.budget_remaining_points<0
+        return False
     else: 
         return

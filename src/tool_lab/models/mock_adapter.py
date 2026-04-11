@@ -139,9 +139,11 @@ class MockModelSession:
             finish_reason=response_raw['choices'][0]['finish_reason']
         )
 
-    def add_tool_response(self, tool_response, tool_name):
-        print('tool_response', tool_response)
-        self.messages.append(tool_response)
+    def add_tool_results(self, tool_results_and_name):
+        for tool_response, tool_name in tool_results_and_name:
+            print('tool_response', tool_response)
+            self.messages.append(tool_response)
+
 
     def _get_tool_error_one_tool_only(self, tool_call):
         return {

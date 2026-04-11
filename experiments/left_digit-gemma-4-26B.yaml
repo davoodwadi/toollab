@@ -4,25 +4,27 @@ experiment:
   metadata:
     option_count: 2
   task_prompt: >
-    Open the cells to get information about the product. Then submit your choice with submit_choice.
+    You start with a budget of 100 points. Every time you use the inspect_cell tool, 5 points will be deducted from your score.
+    You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice. 
+    Your final score is the value of your chosen coffee minus your search costs.
   matrix_mode: fixed
   replications: 1
   budget_type: tools
-  budget_tools: 5
+  budget_tools: 0
   max_turns: 10
   seed: 42
   tools:
     - inspect_cell
     - submit_choice
   model:
-    provider: anthropic
-    model_name: claude-sonnet-4-6
-    thinking_type: adaptive
-    effort: low
+    provider: llamacpp
+    model_name: gemma-4-26B-A4B-it-UD-Q4_K_XL.gguf
+    extra:
+      mock_inspections: 24
   participant:
     role: coffee shopper
     profile: >
-      You are choosing ground coffee. Select the coffee with the best value.
+      You are choosing ground coffee. Select the coffee with the best value while minimizing your search costs. 
   options:
     - id: coffee_a
       display_name: Option A
@@ -43,6 +45,15 @@ experiment:
     - id: weight_oz
       display_name: Weight (Ounces)
       description: The net weight of the coffee package in ounces.
+    - id: roast_date
+      display_name: Roast Date
+      description: The date the coffee beans were roasted.
+    - id: origin
+      display_name: Bean Origin
+      description: The country where the coffee beans were grown.
+    - id: packaging
+      display_name: Packaging Type
+      description: The type of bag or container the coffee is in.
 
   cues:
     - id: a_dollars
@@ -63,6 +74,24 @@ experiment:
       label: Option A Weight
       value: "13.0 oz"
       normative_score: 0.0
+    - id: a_roast
+      option_id: coffee_a
+      attribute_id: roast_date
+      label: Option A Roast Date
+      value: "2 weeks ago"
+      normative_score: 0.0
+    - id: a_origin
+      option_id: coffee_a
+      attribute_id: origin
+      label: Option A Origin
+      value: "Colombia"
+      normative_score: 0.0
+    - id: a_packaging
+      option_id: coffee_a
+      attribute_id: packaging
+      label: Option A Packaging
+      value: "Foil Bag"
+      normative_score: 0.0
 
     - id: b_dollars
       option_id: coffee_b
@@ -81,4 +110,22 @@ experiment:
       attribute_id: weight_oz
       label: Option B Weight
       value: "13.9 oz"
+      normative_score: 0.0
+    - id: b_roast
+      option_id: coffee_b
+      attribute_id: roast_date
+      label: Option B Roast Date
+      value: "2 weeks ago"
+      normative_score: 0.0
+    - id: b_origin
+      option_id: coffee_b
+      attribute_id: origin
+      label: Option B Origin
+      value: "Colombia"
+      normative_score: 0.0
+    - id: b_packaging
+      option_id: coffee_b
+      attribute_id: packaging
+      label: Option B Packaging
+      value: "Foil Bag"
       normative_score: 0.0

@@ -1,0 +1,18 @@
+# Qwen3.5
+~/llama.cpp/build/bin/llama-server \
+    -m $LLAMA_CACHE/Qwen3.5-9B-GGUF/Qwen3.5-9B-UD-Q4_K_XL.gguf \
+    -ngl 999 \
+    --parallel 4
+
+# Gemma 4
+## 26B-A4B
+~/llama.cpp/build/bin/llama-server \
+    -m $LLAMA_CACHE/gemma-4-26B-A4B-it-GGUF/gemma-4-26B-A4B-it-UD-Q4_K_XL.gguf \
+    -ngl 999 \
+    --parallel 4
+
+## E4B
+~/llama.cpp/build/bin/llama-server \
+    -m $LLAMA_CACHE/gemma-4-E4B-it-GGUF/gemma-4-E4B-it-UD-Q4_K_XL.gguf \
+    -ngl 999 \
+    --parallel 4

@@ -41,6 +41,10 @@ MODEL_CONFIG = {
         'claude-sonnet-4-6': PricingConfig(input_per_million=3., output_per_million=15.),
         'claude-haiku-4-5-20251001': PricingConfig(input_per_million=1., output_per_million=5.),
     },
+    'llamacpp': {
+        'default': PricingConfig(input_per_million=0., output_per_million=0.)
+    },
+
     'mock': {
         'mock-1': PricingConfig(input_per_million=1.0, output_per_million=6.0)
     }
@@ -51,8 +55,8 @@ MODEL_CONFIG = {
 class ModelConfig:
     provider: str
     model_name: str
-    temperature: float = 1.0
-    max_output_tokens: int = 1024
+    thinking_type: str | None = None
+    effort: str | None = None
     api_key_env: str | None = None
     pricing: PricingConfig = field(default_factory=PricingConfig)
     extra: dict[str, Any] = field(default_factory=dict)
@@ -105,13 +109,13 @@ class ExperimentSpec:
     model: ModelConfig
     matrix_mode: MatrixMode = "scrolling"
     replications: int = 5
-    budget_type: Literal["usd", "tools", 'tokens'] = "usd"
+    budget_type: Literal["usd", "tools", 'tokens', 'points'] = "usd"
     budget_usd: float | None = None
     budget_tools: int | None = None
     budget_tokens: int | None = None
+    budget_points: int | None = None
     max_turns: int = 20
     tools: list[str] = field(default_factory=list)
-    default_tool_cost_usd: float = 0.0
     tool_costs: dict[str, float] = field(default_factory=dict)
     interface: dict[str, Any] = field(default_factory=dict)
     analysis: dict[str, Any] = field(default_factory=dict)
@@ -151,10 +155,12 @@ class ExperimentSpec:
             raise ValueError("replications must be at least 1")
         if self.budget_type=='usd' and self.budget_usd<=0:
             raise ValueError("budget USD must be positive")
-        if self.budget_type=='tools' and self.budget_tools<=0:
-            raise ValueError("budget Tools must be positive")
+        # if self.budget_type=='tools' and self.budget_tools<=0:
+        #     raise ValueError("budget Tools must be positive")
         if self.budget_type=='tokens' and self.budget_tokens<=0:
             raise ValueError("budget Tokens must be positive")
+        # if self.budget_type=='points' and self.budget_points<=0:
+        #     raise ValueError("budget Points must be positive")
         if self.max_turns < 1:
             raise ValueError("max_turns must be at least 1")
 
@@ -165,8 +171,6 @@ class ExperimentSpec:
         provider: str | None = None,
         model_name: str | None = None,
         replications: int | None = None,
-        temperature: float | None = None,
-        max_output_tokens: int | None = None,
         api_key_env: str | None = None,
     ) -> "ExperimentSpec":
         resolved_mode = matrix_mode or self.matrix_mode
@@ -178,12 +182,6 @@ class ExperimentSpec:
             self.model,
             provider=provider or self.model.provider,
             model_name=model_name or self.model.model_name,
-            temperature=self.model.temperature if temperature is None else temperature,
-            max_output_tokens=(
-                self.model.max_output_tokens
-                if max_output_tokens is None
-                else max_output_tokens
-            ),
             api_key_env=api_key_env or self.model.api_key_env,
         )
 
@@ -208,16 +206,23 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
 
     participant = ParticipantSpec(**experiment["participant"])
     model_data = experiment["model"]
-    pricing = MODEL_CONFIG[model_data['provider']][model_data['model_name']]
+    pricing = MODEL_CONFIG[model_data['provider']].get(model_data['model_name'])
+    if not pricing:
+        # for llamacpp models
+        pricing = MODEL_CONFIG[model_data['provider']].get('default')
+    print(model_data)
     model = ModelConfig(
-        provider=model_data["provider"],
-        model_name=model_data["model_name"], 
-        # temperature=model_data.get("temperature", 1.0),
-        # max_output_tokens=model_data.get("max_output_tokens", 1024),
-        api_key_env=model_data.get("api_key_env"),
         pricing=pricing,
-        extra=model_data.get("extra", {}),
+        **model_data,
     )
+    # print(model)
+    # model = ModelConfig(
+    #     provider=model_data["provider"],
+    #     model_name=model_data["model_name"], 
+    #     api_key_env=model_data.get("api_key_env"),
+    #     pricing=pricing,
+    #     extra=model_data.get("extra", {}),
+    # )
 
     options = [OptionSpec(**item) for item in experiment["options"]]
     attributes = [AttributeSpec(**item) for item in experiment["attributes"]]
@@ -238,9 +243,9 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         budget_usd=experiment.get("budget_usd", 0.0),
         budget_tools=experiment.get("budget_tools", 0),
         budget_tokens=experiment.get("budget_tokens", 0),
+        budget_points=experiment.get("budget_points", 0),
         max_turns=experiment.get("max_turns", 20),
         tools=experiment.get("tools", []),
-        default_tool_cost_usd=experiment.get("default_tool_cost_usd", 0.0),
         tool_costs=experiment.get("tool_costs", {}),
         interface=experiment.get("interface", {}),
         analysis=experiment.get("analysis", {}),

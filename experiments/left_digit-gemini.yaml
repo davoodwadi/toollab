@@ -31,11 +31,11 @@ experiment:
   options:
     - id: coffee_a
       display_name: Option A
-      description: Coffee brand A.
+      description: 
       base_score: 1.00077 # 13.0 oz / $12.99
     - id: coffee_b
       display_name: Option B
-      description: Coffee brand B.
+      description: 
       base_score: 1.06923 # 13.9 oz / $13.00
 
   attributes:

@@ -1,0 +1,227 @@
+experiment:
+  name: promotion
+  description: "Promotion heuristic experiment."
+  metadata:
+    option_count: 2
+  task_prompt: >
+    You start with 10 points. 
+    Every time you use the inspect_cell tool, 1 point will be deducted from your score.
+    You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice. 
+    Your final score is the remaining points plus the value of your chosen coffee.
+  matrix_mode: fixed
+  replications: 1
+  budget_type: points
+  budget_points: 10
+  tool_costs:
+    inspect_cell: 2
+  max_turns: 20
+  seed: 42
+  tools:
+    - inspect_cell
+    - submit_choice
+  model:
+    provider: google
+    model_name: gemini-3.1-pro-preview
+    extra:
+      mock_inspections: 24
+  participant:
+    role: coffee shopper
+    profile: >
+      You are a deal hunter. You are looking for the best deal on coffee. Select the best deal while minimizing your search costs. 
+  options:
+    - id: coffee_a
+      display_name: Option A
+      description: ""
+      base_score: 1.0 # 13.0 oz / $13.00
+    - id: coffee_b
+      display_name: Option B
+      description: ""
+      base_score: 1.0 # 13.0 oz / $13.00
+
+  attributes:
+    # - id: price
+    #   display_name: Price
+    #   description: The price of the coffee after discounts.
+    - id: brand
+      display_name: Brand
+      description: The manufacturer of the product.
+    - id: is_discounted
+      display_name: Is Discounted
+      description: Indicates whether the product is currently discounted.
+    - id: discount_percentage
+      display_name: Discount Percentage
+      description: The percentage of the discount applied.
+    - id: promotion_deadline
+      display_name: Promotion Deadline
+      description: The time remaining before the promotion expires.
+    - id: stock_level
+      display_name: Stock Level
+      description: The current inventory availability. 
+    - id: roast_date
+      display_name: Roast Date
+      description: The date the coffee beans were roasted.
+    - id: origin
+      display_name: Bean Origin
+      description: The country where the coffee beans were grown.
+    - id: packaging
+      display_name: Packaging Type
+      description: The type of bag or container the coffee is in.
+    - id: calories
+      display_name: Calories
+      description: Calories per serving.
+    - id: list_price
+      display_name: List Price
+      description: The original list price of the coffee.
+      cost_multiplier: 1.0
+    - id: weight_oz
+      display_name: Weight (Ounces)
+      description: The net weight of the coffee package in ounces.
+      cost_multiplier: 1.0
+
+
+  cues:
+    # - id: a_price
+    #   option_id: coffee_a
+    #   attribute_id: price
+    #   label: Option A Price
+    #   value: "$14.99"
+    #   normative_score: 0.0
+    - id: a_list_price
+      option_id: coffee_a
+      attribute_id: list_price
+      label: Option A List Price
+      value: "$13.99"
+      normative_score: 0.0
+    - id: a_weight
+      option_id: coffee_a
+      attribute_id: weight_oz
+      label: Option A Weight
+      value: "11.0 oz"
+      normative_score: 0.0
+    - id: a_roast
+      option_id: coffee_a
+      attribute_id: roast_date
+      label: Option A Roast Date
+      value: "2 weeks ago"
+      normative_score: 0.0
+    - id: a_origin
+      option_id: coffee_a
+      attribute_id: origin
+      label: Option A Origin
+      value: "Colombia"
+      normative_score: 0.0
+    - id: a_packaging
+      option_id: coffee_a
+      attribute_id: packaging
+      label: Option A Packaging
+      value: "Foil bag"
+      normative_score: 0.0
+    - id: a_calories
+      option_id: coffee_a
+      attribute_id: calories
+      label: Option A Calories
+      value: "3"
+      normative_score: 0.0
+    - id: a_brand
+      option_id: coffee_a
+      attribute_id: brand
+      label: Option A Brand
+      value: "Folgers"
+      normative_score: 0.0
+    - id: a_is_discounted
+      option_id: coffee_a
+      attribute_id: is_discounted
+      label: Option A Is Discounted
+      value: "Yes"
+      normative_score: 0.0
+    - id: a_discount_pct
+      option_id: coffee_a
+      attribute_id: discount_percentage
+      label: Option A Discount Percentage
+      value: "10%"
+      normative_score: 0.0
+    - id: a_deadline
+      option_id: coffee_a
+      attribute_id: promotion_deadline
+      label: Option A Promotion Deadline
+      value: "Expires TODAY"
+      normative_score: 0.0
+    - id: a_stock
+      option_id: coffee_a
+      attribute_id: stock_level
+      label: Option A Stock Level
+      value: "ONLY 1 LEFT!"
+      normative_score: 0.0
+
+    # - id: b_price
+    #   option_id: coffee_b
+    #   attribute_id: price
+    #   label: Option B Price
+    #   value: "$14.99"
+    #   normative_score: 0.0
+    - id: b_list_price
+      option_id: coffee_b
+      attribute_id: list_price
+      label: Option B List Price
+      value: "$13.00"
+      normative_score: 0.0
+    - id: b_weight
+      option_id: coffee_b
+      attribute_id: weight_oz
+      label: Option B Weight
+      value: "12.0 oz"
+      normative_score: 0.0
+    - id: b_roast
+      option_id: coffee_b
+      attribute_id: roast_date
+      label: Option B Roast Date
+      value: "2 weeks ago"
+      normative_score: 0.0
+    - id: b_origin
+      option_id: coffee_b
+      attribute_id: origin
+      label: Option B Origin
+      value: "Colombia"
+      normative_score: 0.0
+    - id: b_packaging
+      option_id: coffee_b
+      attribute_id: packaging
+      label: Option B Packaging
+      value: "Foil bag"
+      normative_score: 0.0
+    - id: b_calories
+      option_id: coffee_b
+      attribute_id: calories
+      label: Option B Calories
+      value: "3"
+      normative_score: 0.0
+    - id: b_brand
+      option_id: coffee_b
+      attribute_id: brand
+      label: Option B Brand
+      value: "Folgers"
+      normative_score: 0.0
+    - id: b_is_discounted
+      option_id: coffee_b
+      attribute_id: is_discounted
+      label: Option B Is Discounted
+      value: "No"
+      normative_score: 0.0
+    - id: b_discount_pct
+      option_id: coffee_b
+      attribute_id: discount_percentage
+      label: Option B Discount Percentage
+      value: "0%"
+      normative_score: 0.0
+    - id: b_deadline
+      option_id: coffee_b
+      attribute_id: promotion_deadline
+      label: Option B Promotion Deadline
+      value: "N/A"
+      normative_score: 0.0
+    - id: b_stock
+      option_id: coffee_b
+      attribute_id: stock_level
+      label: Option B Stock Level
+      value: "In Stock"
+      normative_score: 0.0

@@ -8,7 +8,8 @@ from tool_lab.config import ExperimentSpec
 from tool_lab.experiment.environment import build_environment
 from tool_lab.models import create_model_session
 from tool_lab.storage import ResultWriter
-from tool_lab.models.base import _to_serializable
+from tool_lab.models.base import _to_serializable, AssistantResponse, ToolInvocation
+
 
 class ExperimentRunner:
     def __init__(self, spec: ExperimentSpec, output_root: str = "results", verbose: bool = False) -> None:
@@ -76,8 +77,28 @@ class ExperimentRunner:
             elif environment.spec.budget_type=='points':
                 print(f"Budget: {environment.spec.budget_points} Points")
             
+            print("="*50)
+            print("EXPERIMENT MATRIX:")
+            opt_ids = [opt.id for opt in environment.spec.options]
+            header = f"{'Attribute':<25} | " + " | ".join([f"{opt:<20}" for opt in opt_ids])
+            print(header)
+            print("-" * len(header))
+            
+            for attr in environment.spec.attributes:
+                row_str = f"{attr.id:<25} | "
+                vals = []
+                for opt in opt_ids:
+                    val = "N/A"
+                    for c in environment.spec.cues:
+                        if c.option_id == opt and c.attribute_id == attr.id:
+                            val = str(c.value)
+                            break
+                    vals.append(f"{val:<20}")
+                row_str += " | ".join(vals)
+                print(row_str)
+
             print("="*50 + "\n")
-        # print('model_session.contents', model_session.contents)
+
         # exit()
 
         for iteration in range(self.spec.max_turns):
@@ -98,7 +119,11 @@ class ExperimentRunner:
                 tc = assistant_response.tool_calls[0]
                 assistant_data["tool_name"] = tc.name
                 assistant_data["tool_arguments"] = tc.arguments
-            
+
+                if assistant_data["tool_name"]=='submit_choice' and self.verbose:
+                    print('+'*50)
+                    print(assistant_response.reasoning)
+                    print('+'*50)
             # END: record assistant_response
             
             print(environment._step_index)

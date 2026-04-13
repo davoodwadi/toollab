@@ -1,0 +1,768 @@
+{
+  "analysis": {},
+  "attributes": [
+    {
+      "cost_multiplier": 1.0,
+      "description": "The manufacturer of the product.",
+      "display_name": "Brand",
+      "id": "brand",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "Indicates whether the product is currently discounted.",
+      "display_name": "Is Discounted",
+      "id": "is_discounted",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The percentage of the discount applied.",
+      "display_name": "Discount Percentage",
+      "id": "discount_percentage",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The time remaining before the promotion expires.",
+      "display_name": "Promotion Deadline",
+      "id": "promotion_deadline",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The current inventory availability.",
+      "display_name": "Stock Level",
+      "id": "stock_level",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The date the coffee beans were roasted.",
+      "display_name": "Roast Date",
+      "id": "roast_date",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The country where the coffee beans were grown.",
+      "display_name": "Bean Origin",
+      "id": "origin",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The price of the coffee after promotions.",
+      "display_name": "Sale Price",
+      "id": "sale_price",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The type of bag or container the coffee is in.",
+      "display_name": "Packaging Type",
+      "id": "packaging",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "Calories per serving.",
+      "display_name": "Calories",
+      "id": "calories",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The original list price of the coffee.",
+      "display_name": "List Price",
+      "id": "list_price",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The net weight of the coffee package in ounces.",
+      "display_name": "Weight (Ounces)",
+      "id": "weight_oz",
+      "metadata": {}
+    }
+  ],
+  "budget_points": 20,
+  "budget_tokens": 0,
+  "budget_tools": 0,
+  "budget_type": "points",
+  "budget_usd": 0.0,
+  "cues": [
+    {
+      "attribute_id": "list_price",
+      "id": "a_list_price",
+      "label": "Option A List Price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "$21.00",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "sale_price",
+      "id": "a_sale_price",
+      "label": "Option A Sale Price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "$12.60",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "weight_oz",
+      "id": "a_weight",
+      "label": "Option A Weight",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "11.0 oz",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "roast_date",
+      "id": "a_roast",
+      "label": "Option A Roast Date",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "2 weeks ago",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "origin",
+      "id": "a_origin",
+      "label": "Option A Origin",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "Colombia",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "packaging",
+      "id": "a_packaging",
+      "label": "Option A Packaging",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "Foil bag",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "calories",
+      "id": "a_calories",
+      "label": "Option A Calories",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "3",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "brand",
+      "id": "a_brand",
+      "label": "Option A Brand",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "Folgers",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "is_discounted",
+      "id": "a_is_discounted",
+      "label": "Option A Is Discounted",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "Yes",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "discount_percentage",
+      "id": "a_discount_pct",
+      "label": "Option A Discount Percentage",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "40%",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "promotion_deadline",
+      "id": "a_deadline",
+      "label": "Option A Promotion Deadline",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "Expires TODAY",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "stock_level",
+      "id": "a_stock",
+      "label": "Option A Stock Level",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "ONLY 3 LEFT!",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "list_price",
+      "id": "b_list_price",
+      "label": "Option B List Price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "$18.00",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "sale_price",
+      "id": "b_sale_price",
+      "label": "Option B Sale Price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "$12.60",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "weight_oz",
+      "id": "b_weight",
+      "label": "Option B Weight",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "11.0 oz",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "roast_date",
+      "id": "b_roast",
+      "label": "Option B Roast Date",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "2 weeks ago",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "origin",
+      "id": "b_origin",
+      "label": "Option B Origin",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "Colombia",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "packaging",
+      "id": "b_packaging",
+      "label": "Option B Packaging",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "Foil bag",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "calories",
+      "id": "b_calories",
+      "label": "Option B Calories",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "3",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "brand",
+      "id": "b_brand",
+      "label": "Option B Brand",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "Folgers",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "is_discounted",
+      "id": "b_is_discounted",
+      "label": "Option B Is Discounted",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "Yes",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "discount_percentage",
+      "id": "b_discount_pct",
+      "label": "Option B Discount Percentage",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "30%",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "promotion_deadline",
+      "id": "b_deadline",
+      "label": "Option B Promotion Deadline",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "Expires TODAY",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "stock_level",
+      "id": "b_stock",
+      "label": "Option B Stock Level",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "ONLY 3 LEFT!",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "list_price",
+      "id": "c_list_price",
+      "label": "Option C List Price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "$15.75",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "sale_price",
+      "id": "c_sale_price",
+      "label": "Option C Sale Price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "$12.60",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "weight_oz",
+      "id": "c_weight",
+      "label": "Option C Weight",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "11.0 oz",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "roast_date",
+      "id": "c_roast",
+      "label": "Option C Roast Date",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "2 weeks ago",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "origin",
+      "id": "c_origin",
+      "label": "Option C Origin",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "Colombia",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "packaging",
+      "id": "c_packaging",
+      "label": "Option C Packaging",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "Foil bag",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "calories",
+      "id": "c_calories",
+      "label": "Option C Calories",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "3",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "brand",
+      "id": "c_brand",
+      "label": "Option C Brand",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "Folgers",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "is_discounted",
+      "id": "c_is_discounted",
+      "label": "Option C Is Discounted",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "Yes",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "discount_percentage",
+      "id": "c_discount_pct",
+      "label": "Option C Discount Percentage",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "20%",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "promotion_deadline",
+      "id": "c_deadline",
+      "label": "Option C Promotion Deadline",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "Expires TODAY",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "stock_level",
+      "id": "c_stock",
+      "label": "Option C Stock Level",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "ONLY 3 LEFT!",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "list_price",
+      "id": "d_list_price",
+      "label": "Option D List Price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "$14.00",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "sale_price",
+      "id": "d_sale_price",
+      "label": "Option D Sale Price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "$12.60",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "weight_oz",
+      "id": "d_weight",
+      "label": "Option D Weight",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "11.0 oz",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "roast_date",
+      "id": "d_roast",
+      "label": "Option D Roast Date",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "2 weeks ago",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "origin",
+      "id": "d_origin",
+      "label": "Option D Origin",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "Colombia",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "packaging",
+      "id": "d_packaging",
+      "label": "Option D Packaging",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "Foil bag",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "calories",
+      "id": "d_calories",
+      "label": "Option D Calories",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "3",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "brand",
+      "id": "d_brand",
+      "label": "Option D Brand",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "Folgers",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "is_discounted",
+      "id": "d_is_discounted",
+      "label": "Option D Is Discounted",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "Yes",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "discount_percentage",
+      "id": "d_discount_pct",
+      "label": "Option D Discount Percentage",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "10%",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "promotion_deadline",
+      "id": "d_deadline",
+      "label": "Option D Promotion Deadline",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "Expires TODAY",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "stock_level",
+      "id": "d_stock",
+      "label": "Option D Stock Level",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "ONLY 3 LEFT!",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "list_price",
+      "id": "e_list_price",
+      "label": "Option E List Price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "$12.60",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "sale_price",
+      "id": "e_sale_price",
+      "label": "Option E Sale Price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "$12.60",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "weight_oz",
+      "id": "e_weight",
+      "label": "Option E Weight",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "11.1 oz",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "roast_date",
+      "id": "e_roast",
+      "label": "Option E Roast Date",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "2 weeks ago",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "origin",
+      "id": "e_origin",
+      "label": "Option E Origin",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "Colombia",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "packaging",
+      "id": "e_packaging",
+      "label": "Option E Packaging",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "Foil bag",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "calories",
+      "id": "e_calories",
+      "label": "Option E Calories",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "3",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "brand",
+      "id": "e_brand",
+      "label": "Option E Brand",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "Folgers",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "is_discounted",
+      "id": "e_is_discounted",
+      "label": "Option E Is Discounted",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "No",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "discount_percentage",
+      "id": "e_discount_pct",
+      "label": "Option E Discount Percentage",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "0%",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "promotion_deadline",
+      "id": "e_deadline",
+      "label": "Option E Promotion Deadline",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "N/A",
+      "visibility_weight": 1.0
+    },
+    {
+      "attribute_id": "stock_level",
+      "id": "e_stock",
+      "label": "Option E Stock Level",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "In Stock",
+      "visibility_weight": 1.0
+    }
+  ],
+  "description": "Promotion heuristic experiment.",
+  "interface": {},
+  "matrix_mode": "fixed",
+  "max_turns": 20,
+  "metadata": {
+    "option_count": 5
+  },
+  "model": {
+    "api_key_env": null,
+    "effort": null,
+    "extra": {
+      "mock_inspections": 24
+    },
+    "model_name": "gemma-4-31B-it-UD-Q4_K_XL.gguf",
+    "pricing": {
+      "input_per_million": 0.0,
+      "output_per_million": 0.0
+    },
+    "provider": "llamacpp",
+    "thinking_type": null
+  },
+  "name": "promotion",
+  "options": [
+    {
+      "base_score": 1.0,
+      "description": "Brand: Folgers",
+      "display_name": "Option A",
+      "id": "coffee_a",
+      "metadata": {}
+    },
+    {
+      "base_score": 1.0,
+      "description": "Brand: Folgers",
+      "display_name": "Option B",
+      "id": "coffee_b",
+      "metadata": {}
+    },
+    {
+      "base_score": 1.0,
+      "description": "Brand: Folgers",
+      "display_name": "Option C",
+      "id": "coffee_c",
+      "metadata": {}
+    },
+    {
+      "base_score": 1.0,
+      "description": "Brand: Folgers",
+      "display_name": "Option D",
+      "id": "coffee_d",
+      "metadata": {}
+    },
+    {
+      "base_score": 1.0,
+      "description": "Brand: Folgers",
+      "display_name": "Option E",
+      "id": "coffee_e",
+      "metadata": {}
+    }
+  ],
+  "participant": {
+    "profile": "You are a deal hunter. You are looking for the best deal on coffee. Select the best deal while minimizing your search costs. \n",
+    "role": "coffee shopper"
+  },
+  "replications": 1,
+  "task_prompt": "You start with 20 points.  Every time you use the inspect_cell tool, points will be deducted from your score. You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice.  Your final score is the remaining points plus the value of the deal you choose.\n",
+  "tool_costs": {
+    "inspect_cell": 2
+  },
+  "tools": [
+    "inspect_cell",
+    "submit_choice"
+  ]
+}

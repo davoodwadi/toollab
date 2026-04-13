@@ -103,7 +103,7 @@ class AnthropicModelSession:
             max_tokens=6_000,
             **extra
         )
-        print(response)
+        # print(response)
 
         meta['model_version'] = response.model
         
@@ -131,7 +131,12 @@ class AnthropicModelSession:
 
         
         text = "\n".join(text_parts)
-        reasoning = "\n".join(reasoning_parts)
+        
+        if reasoning_parts:
+            reasoning = "\n".join(reasoning_parts)
+        else:
+            reasoning = None
+
         
         input_tokens = response.usage.input_tokens
         output_tokens = response.usage.output_tokens

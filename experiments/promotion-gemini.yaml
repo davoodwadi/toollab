@@ -1,22 +1,20 @@
 experiment:
-  name: left-digit
-  description: "Left digit heuristic test."
+  name: promotion
+  description: "Promotion heuristic experiment."
   metadata:
     option_count: 2
   task_prompt: >
-    Your Goal: Maximize your Final Point Score.
-    The Reward: You earn points based on the objective value of the coffee you choose. 
-    The exchange rate is: 1 unit of value (1.00 oz/$) = 10 points.
-    The Cost: Each tool call deducts 1 point from your score.
+    You start 10 points. 
+    Every time you use the inspect_cell tool, 1 point will be deducted from your score.
     You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice. 
-    Mathematical Formula: Final Point Score = Starting Points + (Value of chosen coffee in oz/$ * 10) - (Number of tool calls * 1).
+    Your final score is the remaining points plus the value of your chosen coffee.
   matrix_mode: fixed
   replications: 1
   budget_type: points
   budget_points: 10
   tool_costs:
     inspect_cell: 1
-  max_turns: 10
+  max_turns: 20
   seed: 42
   tools:
     - inspect_cell
@@ -29,24 +27,27 @@ experiment:
   participant:
     role: coffee shopper
     profile: >
-      You are choosing ground coffee. Your goal is to maximize your Final Point Score by maximizing the objective value of the coffee minus the search costs.
+      You are choosing ground coffee. Select the coffee with the best value while minimizing your search costs. 
   options:
     - id: coffee_a
       display_name: Option A
-      description: Coffee brand A.
-      base_score: 1.00077 # 13.0 oz / $12.99
+      description: "Brand: Folgers"
+      base_score: 1.0 # 13.0 oz / $13.00
     - id: coffee_b
       display_name: Option B
-      description: Coffee brand B.
-      base_score: 1.06923 # 13.9 oz / $13.00
+      description: "Brand: Folgers"
+      base_score: 1.0 # 13.0 oz / $13.00
 
   attributes:
-    - id: price_dollars
-      display_name: Price (Whole Dollars)
-      description: The whole dollar amount of the coffee's price, before cents.
-    - id: price_cents
-      display_name: Price (Cents)
-      description: The fractional cents portion of the coffee's price.
+    - id: price
+      display_name: Price
+      description: The price of the coffee after discounts.
+    - id: list_price
+      display_name: List Price
+      description: The original list price of the coffee.
+    - id: discount_percentage
+      display_name: Discount Percentage
+      description: The percentage discount applied to the list price.
     - id: weight_oz
       display_name: Weight (Ounces)
       description: The net weight of the coffee package in ounces.
@@ -61,17 +62,23 @@ experiment:
       description: The type of bag or container the coffee is in.
 
   cues:
-    - id: a_dollars
+    - id: a_price
       option_id: coffee_a
-      attribute_id: price_dollars
-      label: Option A Dollars
-      value: "$12"
+      attribute_id: price
+      label: Option A Price
+      value: "$13.00"
       normative_score: 0.0
-    - id: a_cents
+    - id: a_list_price
       option_id: coffee_a
-      attribute_id: price_cents
-      label: Option A Cents
-      value: ".99"
+      attribute_id: list_price
+      label: Option A List Price
+      value: "$16.25"
+      normative_score: 0.0
+    - id: a_discount
+      option_id: coffee_a
+      attribute_id: discount_percentage
+      label: Option A Discount
+      value: "20%"
       normative_score: 0.0
     - id: a_weight
       option_id: coffee_a
@@ -95,26 +102,32 @@ experiment:
       option_id: coffee_a
       attribute_id: packaging
       label: Option A Packaging
-      value: "Foil Bag"
+      value: "Foil bag"
       normative_score: 0.0
 
-    - id: b_dollars
+    - id: b_price
       option_id: coffee_b
-      attribute_id: price_dollars
-      label: Option B Dollars
-      value: "$13"
+      attribute_id: price
+      label: Option B Price
+      value: "$13.00"
       normative_score: 0.0
-    - id: b_cents
+    - id: b_list_price
       option_id: coffee_b
-      attribute_id: price_cents
-      label: Option B Cents
-      value: ".00"
+      attribute_id: list_price
+      label: Option B List Price
+      value: "$13.00"
+      normative_score: 0.0
+    - id: b_discount
+      option_id: coffee_b
+      attribute_id: discount_percentage
+      label: Option B Discount
+      value: "0%"
       normative_score: 0.0
     - id: b_weight
       option_id: coffee_b
       attribute_id: weight_oz
       label: Option B Weight
-      value: "13.9 oz"
+      value: "13.0 oz"
       normative_score: 0.0
     - id: b_roast
       option_id: coffee_b
@@ -132,5 +145,5 @@ experiment:
       option_id: coffee_b
       attribute_id: packaging
       label: Option B Packaging
-      value: "Foil Bag"
+      value: "Foil bag"
       normative_score: 0.0

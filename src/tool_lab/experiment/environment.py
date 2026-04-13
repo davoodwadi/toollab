@@ -87,14 +87,23 @@ class ToolLabEnvironment(ABC):
 
     def build_user_prompt(self) -> str:
         option_lines = [
-            f"- {option.id}: {option.display_name}. {option.description}".strip()
+            (f"- {option.id}: {option.display_name}." + (f" {option.description}" if option.description else "")).strip()
             for option in self.spec.options
         ]
-        attribute_lines = [
-            f"- {attribute.id}: {attribute.display_name}. {attribute.description}".strip()
-            for attribute in self.spec.attributes
-        ]
-        
+
+        attribute_lines = []
+        for attribute in self.spec.attributes:
+            attr_str = f"- {attribute.id}: "
+            if attribute.display_name:
+                attr_str+=f'{attribute.display_name}.'
+            if attribute.description:
+                attr_str+=f' {attribute.description} '
+            if attribute.cost_multiplier and self.spec.budget_type=='points':
+                cost = self.spec.tool_costs['inspect_cell'] * attribute.cost_multiplier
+                attr_str+=f'(tool cost: {cost})'
+            
+            attribute_lines.append(attr_str)
+
         if self.spec.budget_type == 'usd':
             budget_str = f"Budget: ${self.spec.budget_usd:.4f}"
         elif self.spec.budget_type == 'tokens':
@@ -141,11 +150,18 @@ class ToolLabEnvironment(ABC):
         cost_points = 0
         cost_tokens = {'input_tokens':message.input_tokens, 'output_tokens':message.output_tokens}
         if message.tool_calls:
+            # print('+'*40)
+            # print(message.tool_calls[0])
             tool_name = message.tool_calls[0].name
-            if tool_name in self.spec.tool_costs:
-                cost_points += self.spec.tool_costs[tool_name]
-            if tool_name == 'inspect_cell':
-                cost_tools += 1
+            if tool_name=='inspect_cell':
+                attribute = message.tool_calls[0].arguments['attribute_id']
+                cost_multiplier = [att.cost_multiplier for att in self.spec.attributes if att.id==attribute][0]
+                
+                cost_tools += (1 * cost_multiplier)
+
+                if tool_name in self.spec.tool_costs:
+                    cost_points += self.spec.tool_costs[tool_name] * cost_multiplier
+
         return cost_usd, cost_tools, cost_tokens, cost_points
     
     def apply_model_cost(self, cost_usd: dict, cost_tools: int, cost_tokens: dict, cost_points: int) -> None:
@@ -282,7 +298,7 @@ class FixedMatrixEnvironment(ToolLabEnvironment):
         content_dict = {
                 "option_id": cue.option_id,
                 "attribute_id": cue.attribute_id,
-                "value": cue.value,
+                "result": cue.value,
         }
         if self.spec.budget_type=='usd':
             content_dict['turn_cost_usd'] = round(self.last_turn_cost_usd, 4)
@@ -297,7 +313,8 @@ class FixedMatrixEnvironment(ToolLabEnvironment):
             content_dict['budget_remaining_tokens'] = self.budget_remaining_tokens
         elif self.spec.budget_type=='points':
             content_dict['total_points_lost'] = self.cumulative_cost_points
-            content_dict['remaining_points'] = self.budget_remaining_points
+            content_dict['points_lost_for_this_tool'] = self.last_turn_cost_points
+            content_dict['points_remaining'] = self.budget_remaining_points
         else: 
             raise ValueError(f'budget_type not recognized: {self.spec.budget_type}')
         payload = {

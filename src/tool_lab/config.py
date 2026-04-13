@@ -39,7 +39,7 @@ MODEL_CONFIG = {
     'anthropic': {
         'claude-opus-4-6':PricingConfig(input_per_million=5.0, output_per_million=25.),
         'claude-sonnet-4-6': PricingConfig(input_per_million=3., output_per_million=15.),
-        'claude-haiku-4-5-20251001': PricingConfig(input_per_million=1., output_per_million=5.),
+        'claude-haiku-4-5': PricingConfig(input_per_million=1., output_per_million=5.),
     },
     'llamacpp': {
         'default': PricingConfig(input_per_million=0., output_per_million=0.)
@@ -82,6 +82,7 @@ class AttributeSpec:
     id: str
     display_name: str
     description: str = ""
+    cost_multiplier: float = 1.0
     metadata: dict[str, Any] = field(default_factory=dict)
 
 

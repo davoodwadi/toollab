@@ -124,8 +124,12 @@ class OpenAIModelSession:
                 ))
         
         text = "\n".join(text_parts)
-        reasoning = "\n".join(reasoning_parts)
-        
+
+        if reasoning_parts:
+            reasoning = "\n".join(reasoning_parts)
+        else:
+            reasoning = None
+
         input_tokens = response.usage.input_tokens
         output_tokens = response.usage.output_tokens
         

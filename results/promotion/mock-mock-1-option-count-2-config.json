@@ -2,36 +2,35 @@
   "analysis": {},
   "attributes": [
     {
-      "description": "The whole dollar amount of the coffee's price, before cents.",
-      "display_name": "Price (Whole Dollars)",
-      "id": "price_dollars",
+      "cost_multiplier": 1.0,
+      "description": "The original list price of the coffee.",
+      "display_name": "List Price",
+      "id": "list_price",
       "metadata": {}
     },
     {
-      "description": "The fractional cents portion of the coffee's price.",
-      "display_name": "Price (Cents)",
-      "id": "price_cents",
-      "metadata": {}
-    },
-    {
+      "cost_multiplier": 2.0,
       "description": "The net weight of the coffee package in ounces.",
       "display_name": "Weight (Ounces)",
       "id": "weight_oz",
       "metadata": {}
     },
     {
+      "cost_multiplier": 1.0,
       "description": "The date the coffee beans were roasted.",
       "display_name": "Roast Date",
       "id": "roast_date",
       "metadata": {}
     },
     {
+      "cost_multiplier": 1.0,
       "description": "The country where the coffee beans were grown.",
       "display_name": "Bean Origin",
       "id": "origin",
       "metadata": {}
     },
     {
+      "cost_multiplier": 1.0,
       "description": "The type of bag or container the coffee is in.",
       "display_name": "Packaging Type",
       "id": "packaging",
@@ -45,23 +44,13 @@
   "budget_usd": 0.0,
   "cues": [
     {
-      "attribute_id": "price_dollars",
-      "id": "a_dollars",
-      "label": "Option A Dollars",
+      "attribute_id": "list_price",
+      "id": "a_list_price",
+      "label": "Option A List Price",
       "metadata": {},
       "normative_score": 0.0,
       "option_id": "coffee_a",
-      "value": "$12",
-      "visibility_weight": 1.0
-    },
-    {
-      "attribute_id": "price_cents",
-      "id": "a_cents",
-      "label": "Option A Cents",
-      "metadata": {},
-      "normative_score": 0.0,
-      "option_id": "coffee_a",
-      "value": ".99",
+      "value": "$24.99",
       "visibility_weight": 1.0
     },
     {
@@ -71,7 +60,7 @@
       "metadata": {},
       "normative_score": 0.0,
       "option_id": "coffee_a",
-      "value": "13.0 oz",
+      "value": "12.0 oz",
       "visibility_weight": 1.0
     },
     {
@@ -101,27 +90,17 @@
       "metadata": {},
       "normative_score": 0.0,
       "option_id": "coffee_a",
-      "value": "Foil Bag",
+      "value": "Foil bag",
       "visibility_weight": 1.0
     },
     {
-      "attribute_id": "price_dollars",
-      "id": "b_dollars",
-      "label": "Option B Dollars",
+      "attribute_id": "list_price",
+      "id": "b_list_price",
+      "label": "Option B List Price",
       "metadata": {},
       "normative_score": 0.0,
       "option_id": "coffee_b",
-      "value": "$13",
-      "visibility_weight": 1.0
-    },
-    {
-      "attribute_id": "price_cents",
-      "id": "b_cents",
-      "label": "Option B Cents",
-      "metadata": {},
-      "normative_score": 0.0,
-      "option_id": "coffee_b",
-      "value": ".00",
+      "value": "$14.99",
       "visibility_weight": 1.0
     },
     {
@@ -131,7 +110,7 @@
       "metadata": {},
       "normative_score": 0.0,
       "option_id": "coffee_b",
-      "value": "13.9 oz",
+      "value": "16.0 oz",
       "visibility_weight": 1.0
     },
     {
@@ -161,14 +140,14 @@
       "metadata": {},
       "normative_score": 0.0,
       "option_id": "coffee_b",
-      "value": "Foil Bag",
+      "value": "Foil bag",
       "visibility_weight": 1.0
     }
   ],
-  "description": "Left digit heuristic test.",
+  "description": "Promotion heuristic experiment.",
   "interface": {},
   "matrix_mode": "fixed",
-  "max_turns": 10,
+  "max_turns": 20,
   "metadata": {
     "option_count": 2
   },
@@ -178,37 +157,37 @@
     "extra": {
       "mock_inspections": 24
     },
-    "model_name": "gemini-3.1-pro-preview",
+    "model_name": "mock-1",
     "pricing": {
-      "input_per_million": 2.0,
-      "output_per_million": 12.0
+      "input_per_million": 1.0,
+      "output_per_million": 6.0
     },
-    "provider": "google",
+    "provider": "mock",
     "thinking_type": null
   },
-  "name": "left-digit",
+  "name": "promotion",
   "options": [
     {
-      "base_score": 1.00077,
-      "description": "Coffee brand A.",
+      "base_score": 1.0,
+      "description": "Brand: Folgers; 40% OFF",
       "display_name": "Option A",
       "id": "coffee_a",
       "metadata": {}
     },
     {
-      "base_score": 1.06923,
-      "description": "Coffee brand B.",
+      "base_score": 1.0,
+      "description": "Brand: Folgers",
       "display_name": "Option B",
       "id": "coffee_b",
       "metadata": {}
     }
   ],
   "participant": {
-    "profile": "You are choosing ground coffee. Your goal is to maximize your Final Point Score by maximizing the objective value of the coffee minus the search costs.\n",
+    "profile": "You are a consumer looking for the best deal on coffee. Select the best deal while minimizing your search costs. \n",
     "role": "coffee shopper"
   },
   "replications": 1,
-  "task_prompt": "Your Goal: Maximize your Final Point Score. The Reward: You earn points based on the objective value of the coffee you choose.  The exchange rate is: 1 unit of value (1.00 oz/$) = 10 points. The Cost: Each tool call deducts 1 point from your score. You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice.  Mathematical Formula: Final Point Score = Starting Points + (Value of chosen coffee in oz/$ * 10) - (Number of tool calls * 1).\n",
+  "task_prompt": "You start with 10 points.  Every time you use the inspect_cell tool, 1 point will be deducted from your score. You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice.  Your final score is the remaining points plus the value of your chosen coffee.\n",
   "tool_costs": {
     "inspect_cell": 1
   },

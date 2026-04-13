@@ -15,7 +15,9 @@ experiment:
   tool_costs:
     inspect_cell: 2
   max_turns: 20
-  seed: 42
+  randomization:
+    randomize_attributes_options: true
+    seed: 42
   tools:
     - inspect_cell
     - submit_choice

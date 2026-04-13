@@ -756,6 +756,10 @@
     "profile": "You are a deal hunter. You are looking for the best deal on coffee. Select the best deal while minimizing your search costs. \n",
     "role": "coffee shopper"
   },
+  "randomization": {
+    "randomize_attributes_options": true,
+    "seed": 42
+  },
   "replications": 1,
   "task_prompt": "You start with 20 points.  Every time you use the inspect_cell tool, points will be deducted from your score. You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice.  Your final score is the remaining points plus the value of the deal you choose.\n",
   "tool_costs": {

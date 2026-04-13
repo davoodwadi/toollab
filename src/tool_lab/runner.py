@@ -43,9 +43,10 @@ class ExperimentRunner:
         # Based on the config, get the correct provider `session` with system_prompt, initial_user_message, and tools
         model_session = create_model_session(
             self.spec.model,
-            environment.build_system_prompt(), 
-            environment.build_user_prompt(),
+            environment.build_system_prompt(randomization = self.spec.randomization), 
+            environment.build_user_prompt(randomization = self.spec.randomization),
         )
+
         # print('model_session.system_prompt', model_session.system_prompt)
         # print('model_session.initial_user_message', model_session.initial_user_message)
         # exit()
@@ -96,10 +97,9 @@ class ExperimentRunner:
                     vals.append(f"{val:<20}")
                 row_str += " | ".join(vals)
                 print(row_str)
-
             print("="*50 + "\n")
 
-        # exit()
+        exit()
 
         for iteration in range(self.spec.max_turns):
             # calls the LLM -> gets response (tool_call, content, reasoning) -> adds it to session.transcript

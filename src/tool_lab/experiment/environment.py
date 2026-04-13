@@ -61,7 +61,7 @@ class ToolLabEnvironment(ABC):
         self._last_is_revisit: bool = False
         self._last_transition: str | None = None
 
-    def build_system_prompt(self) -> str:
+    def build_system_prompt(self, randomization=None) -> str:
         mode_rules = self._mode_rules()
         # Check which budget type is active to format the instruction
         if self.spec.budget_type == "tools":
@@ -85,7 +85,8 @@ class ToolLabEnvironment(ABC):
             # f"{budget_str} "
         )
 
-    def build_user_prompt(self) -> str:
+    def build_user_prompt(self, randomization=None) -> str:
+        print(f'USER PROMPT RANDOM: {randomization}')
         option_lines = [
             (f"- {option.id}: {option.display_name}." + (f" {option.description}" if option.description else "")).strip()
             for option in self.spec.options

@@ -104,6 +104,7 @@ class ExperimentSpec:
     description: str
     task_prompt: str
     participant: ParticipantSpec
+    randomization: dict
     options: list[OptionSpec]
     attributes: list[AttributeSpec]
     cues: list[CueSpec]
@@ -234,6 +235,7 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         description=experiment["description"],
         task_prompt=experiment["task_prompt"],
         participant=participant,
+        randomization=experiment.get('randomization'),
         options=options,
         attributes=attributes,
         cues=cues,

@@ -1,0 +1,62 @@
+experiment:
+  name: promotion
+  description: "Promotion heuristic experiment."
+  metadata:
+    option_count: 3
+  task_prompt: >
+    You start with 20 points. 
+    Every time you use the inspect_cell tool, points will be deducted from your score.
+    You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice. 
+    Your final score is the remaining points plus the value of the deal you choose.
+  matrix_mode: fixed
+  replications: 1
+  budget_type: points
+  budget_points: 20
+  tool_costs:
+    inspect_cell: 2
+  max_turns: 20
+  randomization:
+    randomize_attributes_options: true
+    seed: 42
+  tools:
+    - inspect_cell
+    - submit_choice
+  model:
+    provider: mock
+    model_name: mock-1
+    extra:
+      mock_inspections: 24
+  participant:
+    role: coffee shopper
+    profile: >
+      You are a deal hunter. You are looking for the best deal on coffee. Select the best deal while minimizing your search costs. 
+
+  attributes:
+    - id: brand
+      display_name: Brand
+      description: The manufacturer of the product.
+    - id: is_discounted
+      display_name: Is Discounted
+      description: Indicates whether the product is currently discounted.
+
+
+  options:
+    - id: coffee_a
+      base_score: 1.0 # 13.0 oz / $13.00
+      cues:
+        brand: "A"
+        is_discounted: "AA"
+
+
+    - id: coffee_b
+      base_score: 1.0 # 13.0 oz / $13.00
+      cues:
+        brand: "B"
+        is_discounted: "BB"
+
+
+    - id: coffee_c
+      base_score: 1.0 # 13.0 oz / $13.00
+      cues:
+        brand: "C"
+        is_discounted: "CC"

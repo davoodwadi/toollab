@@ -1,5 +1,10 @@
 # Qwen3.5
 ~/llama.cpp/build/bin/llama-server \
+    -m $LLAMA_CACHE/Qwen3.5-27B-GGUF/Qwen3.5-27B-UD-Q4_K_XL.gguf \
+    -ngl 999 \
+    --parallel 4
+
+~/llama.cpp/build/bin/llama-server \
     -m $LLAMA_CACHE/Qwen3.5-9B-GGUF/Qwen3.5-9B-UD-Q4_K_XL.gguf \
     -ngl 999 \
     --parallel 4

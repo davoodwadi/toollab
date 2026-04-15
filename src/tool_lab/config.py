@@ -42,7 +42,7 @@ MODEL_CONFIG = {
         'claude-haiku-4-5': PricingConfig(input_per_million=1., output_per_million=5.),
     },
     'llamacpp': {
-        'default': PricingConfig(input_per_million=0., output_per_million=0.)
+        'default': PricingConfig(input_per_million=1, output_per_million=3)
     },
 
     'mock': {
@@ -91,10 +91,8 @@ class CueSpec:
     id: str
     option_id: str
     attribute_id: str
-    label: str
     value: str
     normative_score: float = 0.0
-    visibility_weight: float = 1.0
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -217,18 +215,40 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         pricing=pricing,
         **model_data,
     )
-    # print(model)
-    # model = ModelConfig(
-    #     provider=model_data["provider"],
-    #     model_name=model_data["model_name"], 
-    #     api_key_env=model_data.get("api_key_env"),
-    #     pricing=pricing,
-    #     extra=model_data.get("extra", {}),
-    # )
-
-    options = [OptionSpec(**item) for item in experiment["options"]]
+    print('+'*50)
     attributes = [AttributeSpec(**item) for item in experiment["attributes"]]
-    cues = [CueSpec(**item) for item in experiment["cues"]]
+
+    options = []
+    cues = []
+    
+    # Loop through the simplified options list from the YAML
+    for opt_data in experiment["options"]:
+        # 1. Pop out the nested 'cues' dictionary
+        opt_cues = opt_data.pop("cues", {})
+        original_id = opt_data.get("id")
+        display_name = opt_data.get("display_name")
+
+        # 2. Build the OptionSpec
+        options.append(OptionSpec(
+            id=original_id,
+            display_name=display_name, # Placeholder: overwritten in runner
+            base_score=opt_data.get("base_score", 0.0),
+            metadata={"original_id": original_id}  # Save original ID for the final trace!
+        ))
+        
+        # 3. Automatically expand the dictionary into a flat list of CueSpecs
+        for attr_id, val in opt_cues.items():
+            cues.append(CueSpec(
+                id=f"{original_id}_{attr_id}",
+                option_id=original_id,
+                attribute_id=attr_id,
+                value=str(val)
+            ))
+            
+    # print(options[0])
+    # print('+'*50)
+    # print(cues[0])
+    # print('+'*50)
 
     return ExperimentSpec(
         name=experiment["name"],

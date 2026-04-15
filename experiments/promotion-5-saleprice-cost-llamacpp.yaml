@@ -4,17 +4,19 @@ experiment:
   metadata:
     option_count: 5
   task_prompt: >
-    You start with 20 points. 
     Every time you use the inspect_cell tool, points will be deducted from your score.
     You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice. 
     Your final score is the remaining points plus the value of the deal you choose.
   matrix_mode: fixed
-  replications: 1
-  budget_type: points
-  budget_points: 20
+  replications: 10
+  # budget_type: usd
+  # budget_usd: 0.01
+  budget_type: tools
+  budget_tools: 5
+  budget_points: 0
   tool_costs:
     inspect_cell: 2
-  max_turns: 20
+  max_turns: 20 
   randomization:
     randomize_attributes_options: true
     seed: null
@@ -22,8 +24,8 @@ experiment:
     - inspect_cell
     - submit_choice
   model:
-    provider: google
-    model_name: gemini-3.1-pro-preview
+    provider: llamacpp
+    model_name: gemma-4-31B-it-UD-Q4_K_XL.gguf
     extra:
       mock_inspections: 24
   participant:
@@ -53,10 +55,6 @@ experiment:
     - id: origin
       display_name: Bean Origin
       description: The country where the coffee beans were grown.
-    - id: sale_price
-      display_name: Sale Price
-      description: The price of the coffee after promotions.
-      cost_multiplier: 1.0
     - id: packaging
       display_name: Packaging Type
       description: The type of bag or container the coffee is in.
@@ -74,6 +72,7 @@ experiment:
 
   options:
     - id: coffee_a
+      display_name: "40% Discount"
       base_score: 1.0 # 13.0 oz / $13.00
       cues:
         brand: "Folgers"
@@ -83,13 +82,13 @@ experiment:
         stock_level: "ONLY 3 LEFT!"
         roast_date: "2 weeks ago"
         origin: "Colombia"
-        sale_price: "$12.60"
         packaging: "Foil bag"
         calories: "3"
         list_price: "$21.00"
-        weight_oz: "11.0 oz"
+        weight_oz: "11.1 oz"
 
     - id: coffee_b
+      display_name: "30% Discount"
       base_score: 1.0 # 13.0 oz / $13.00
       cues:
         brand: "Folgers"
@@ -99,13 +98,13 @@ experiment:
         stock_level: "ONLY 3 LEFT!"
         roast_date: "2 weeks ago"
         origin: "Colombia"
-        sale_price: "$12.60"
         packaging: "Foil bag"
         calories: "3"
         list_price: "$18.00"
-        weight_oz: "11.0 oz"
+        weight_oz: "11.2 oz"
 
     - id: coffee_c
+      display_name: "20% Discount"
       base_score: 1.0 # 13.0 oz / $13.00
       cues:
         brand: "Folgers"
@@ -115,13 +114,13 @@ experiment:
         stock_level: "ONLY 3 LEFT!"
         roast_date: "2 weeks ago"
         origin: "Colombia"
-        sale_price: "$12.60"
         packaging: "Foil bag"
         calories: "3"
         list_price: "$15.75"
-        weight_oz: "11.0 oz"
+        weight_oz: "11.3 oz"
 
     - id: coffee_d
+      display_name: "10% Discount"
       base_score: 1.0 # 13.0 oz / $13.00
       cues:
         brand: "Folgers"
@@ -131,13 +130,13 @@ experiment:
         stock_level: "ONLY 3 LEFT!"
         roast_date: "2 weeks ago"
         origin: "Colombia"
-        sale_price: "$12.60"
         packaging: "Foil bag"
         calories: "3"
         list_price: "$14.00"
-        weight_oz: "11.0 oz"
+        weight_oz: "11.4 oz"
 
     - id: coffee_e
+      display_name: "No Discount"
       base_score: 1.0 # 13.0 oz / $13.00
       cues:
         brand: "Folgers"
@@ -147,8 +146,7 @@ experiment:
         stock_level: "In Stock"
         roast_date: "2 weeks ago"
         origin: "Colombia"
-        sale_price: "$12.60"
         packaging: "Foil bag"
         calories: "3"
         list_price: "$12.60"
-        weight_oz: "11.1 oz"
+        weight_oz: "11.5 oz"

@@ -14,6 +14,8 @@ from tool_lab.models.base import (
 from tool_lab.config import AttributeSpec, CueSpec, ExperimentSpec, OptionSpec
 from tool_lab.models.base import AssistantResponse
 
+import random
+
 def build_environment(spec: ExperimentSpec) -> "ToolLabEnvironment":
     if spec.matrix_mode == "fixed":
         return FixedMatrixEnvironment(spec)
@@ -61,7 +63,7 @@ class ToolLabEnvironment(ABC):
         self._last_is_revisit: bool = False
         self._last_transition: str | None = None
 
-    def build_system_prompt(self, randomization=None) -> str:
+    def build_system_prompt(self, ) -> str:
         mode_rules = self._mode_rules()
         # Check which budget type is active to format the instruction
         if self.spec.budget_type == "tools":
@@ -85,8 +87,7 @@ class ToolLabEnvironment(ABC):
             # f"{budget_str} "
         )
 
-    def build_user_prompt(self, randomization=None) -> str:
-        print(f'USER PROMPT RANDOM: {randomization}')
+    def build_user_prompt(self, ) -> str:
         option_lines = [
             (f"- {option.id}: {option.display_name}." + (f" {option.description}" if option.description else "")).strip()
             for option in self.spec.options
@@ -211,6 +212,7 @@ class ToolLabEnvironment(ABC):
         if tool_name == "inspect_cell":
             extra["is_revisit"] = self._last_is_revisit
             extra["transition"] = self._last_transition
+
         # exit()
         payload_data = payload.get("content") if payload.get("content") else payload.get("error")
         self._record_event(
@@ -229,7 +231,11 @@ class ToolLabEnvironment(ABC):
         if option_id not in self.options:
             raise ValueError(f"Unknown option_id: {option_id}")
 
-        self.choice = option_id
+        # --- THIS IS THE CRITICAL FIX ---
+        # Map back to the original option id (e.g. "coffee_a") for the final results trace
+        original_id = self.options[option_id].metadata.get('original_id', option_id)
+        self.choice = original_id 
+        # --------------------------------
 
         payload = {
             "role": "tool",
@@ -304,10 +310,10 @@ class FixedMatrixEnvironment(ToolLabEnvironment):
         if self.spec.budget_type=='usd':
             content_dict['turn_cost_usd'] = round(self.last_turn_cost_usd, 4)
             content_dict['budget_remaining_usd'] = round(self.budget_remaining_usd, 4)
-        elif self.spec.budget_type=='tools' and self.spec.budget_tools>0:
+        elif self.spec.budget_type=='tools' and self.spec.budget_tools>=0:
             content_dict['cumulative_cost_tools'] = self.cumulative_cost_tools
             content_dict['budget_remaining_tools'] = self.budget_remaining_tools
-        elif self.spec.budget_type=='tools' and self.spec.budget_tools<=0:
+        elif self.spec.budget_type=='tools' and self.spec.budget_tools<0:
             content_dict['cumulative_cost_tools'] = self.cumulative_cost_tools
         elif self.spec.budget_type=='tokens':
             content_dict['turn_cost_tokens'] = self.last_turn_cost_tokens

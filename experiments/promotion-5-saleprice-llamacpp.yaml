@@ -17,40 +17,19 @@ experiment:
   max_turns: 20
   randomization:
     randomize_attributes_options: true
-    seed: 42
+    seed: null
   tools:
     - inspect_cell
     - submit_choice
   model:
     provider: llamacpp
-    model_name: gemma-4-31B-it-UD-Q4_K_XL.gguf
+    model_name: Qwen3.5-9B-UD-Q4_K_XL.gguf
     extra:
       mock_inspections: 24
   participant:
     role: coffee shopper
     profile: >
       You are a deal hunter. You are looking for the best deal on coffee. Select the best deal while minimizing your search costs. 
-  options:
-    - id: coffee_a
-      display_name: Option A
-      description: "Brand: Folgers"
-      base_score: 1.0 # 13.0 oz / $13.00
-    - id: coffee_b
-      display_name: Option B
-      description: "Brand: Folgers"
-      base_score: 1.0 # 13.0 oz / $13.00
-    - id: coffee_c
-      display_name: Option C
-      description: "Brand: Folgers"
-      base_score: 1.0 # 13.0 oz / $13.00
-    - id: coffee_d
-      display_name: Option D
-      description: "Brand: Folgers"
-      base_score: 1.0 # 13.0 oz / $13.00
-    - id: coffee_e
-      display_name: Option E
-      description: "Brand: Folgers"
-      base_score: 1.0 # 13.0 oz / $13.00
 
   attributes:
     - id: brand
@@ -93,370 +72,83 @@ experiment:
       description: The net weight of the coffee package in ounces.
       cost_multiplier: 1.0
 
-  cues:
+  options:
+    - id: coffee_a
+      base_score: 1.0 # 13.0 oz / $13.00
+      cues:
+        brand: "Folgers"
+        is_discounted: "Yes"
+        discount_percentage: "40%"
+        promotion_deadline: "Expires TODAY"
+        stock_level: "ONLY 3 LEFT!"
+        roast_date: "2 weeks ago"
+        origin: "Colombia"
+        sale_price: "$12.60"
+        packaging: "Foil bag"
+        calories: "3"
+        list_price: "$21.00"
+        weight_oz: "11.0 oz"
 
-    - id: a_list_price
-      option_id: coffee_a
-      attribute_id: list_price
-      label: Option A List Price
-      value: "$21.00"
-      normative_score: 0.0
-    - id: a_sale_price
-      option_id: coffee_a
-      attribute_id: sale_price
-      label: Option A Sale Price
-      value: "$12.60"
-      normative_score: 0.0
-    - id: a_weight
-      option_id: coffee_a
-      attribute_id: weight_oz
-      label: Option A Weight
-      value: "11.0 oz"
-      normative_score: 0.0
-    - id: a_roast
-      option_id: coffee_a
-      attribute_id: roast_date
-      label: Option A Roast Date
-      value: "2 weeks ago"
-      normative_score: 0.0
-    - id: a_origin
-      option_id: coffee_a
-      attribute_id: origin
-      label: Option A Origin
-      value: "Colombia"
-      normative_score: 0.0
-    - id: a_packaging
-      option_id: coffee_a
-      attribute_id: packaging
-      label: Option A Packaging
-      value: "Foil bag"
-      normative_score: 0.0
-    - id: a_calories
-      option_id: coffee_a
-      attribute_id: calories
-      label: Option A Calories
-      value: "3"
-      normative_score: 0.0
-    - id: a_brand
-      option_id: coffee_a
-      attribute_id: brand
-      label: Option A Brand
-      value: "Folgers"
-      normative_score: 0.0
-    - id: a_is_discounted
-      option_id: coffee_a
-      attribute_id: is_discounted
-      label: Option A Is Discounted
-      value: "Yes"
-      normative_score: 0.0
-    - id: a_discount_pct
-      option_id: coffee_a
-      attribute_id: discount_percentage
-      label: Option A Discount Percentage
-      value: "40%"
-      normative_score: 0.0
-    - id: a_deadline
-      option_id: coffee_a
-      attribute_id: promotion_deadline
-      label: Option A Promotion Deadline
-      value: "Expires TODAY"
-      normative_score: 0.0
-    - id: a_stock
-      option_id: coffee_a
-      attribute_id: stock_level
-      label: Option A Stock Level
-      value: "ONLY 3 LEFT!"
-      normative_score: 0.0
+    - id: coffee_b
+      base_score: 1.0 # 13.0 oz / $13.00
+      cues:
+        brand: "Folgers"
+        is_discounted: "Yes"
+        discount_percentage: "30%"
+        promotion_deadline: "Expires TODAY"
+        stock_level: "ONLY 3 LEFT!"
+        roast_date: "2 weeks ago"
+        origin: "Colombia"
+        sale_price: "$12.60"
+        packaging: "Foil bag"
+        calories: "3"
+        list_price: "$18.00"
+        weight_oz: "11.0 oz"
 
+    - id: coffee_c
+      base_score: 1.0 # 13.0 oz / $13.00
+      cues:
+        brand: "Folgers"
+        is_discounted: "Yes"
+        discount_percentage: "20%"
+        promotion_deadline: "Expires TODAY"
+        stock_level: "ONLY 3 LEFT!"
+        roast_date: "2 weeks ago"
+        origin: "Colombia"
+        sale_price: "$12.60"
+        packaging: "Foil bag"
+        calories: "3"
+        list_price: "$15.75"
+        weight_oz: "11.0 oz"
 
-    - id: b_list_price
-      option_id: coffee_b
-      attribute_id: list_price
-      label: Option B List Price
-      value: "$18.00"
-      normative_score: 0.0
-    - id: b_sale_price
-      option_id: coffee_b
-      attribute_id: sale_price
-      label: Option B Sale Price
-      value: "$12.60"
-      normative_score: 0.0
-    - id: b_weight
-      option_id: coffee_b
-      attribute_id: weight_oz
-      label: Option B Weight
-      value: "11.0 oz"
-      normative_score: 0.0
-    - id: b_roast
-      option_id: coffee_b
-      attribute_id: roast_date
-      label: Option B Roast Date
-      value: "2 weeks ago"
-      normative_score: 0.0
-    - id: b_origin
-      option_id: coffee_b
-      attribute_id: origin
-      label: Option B Origin
-      value: "Colombia"
-      normative_score: 0.0
-    - id: b_packaging
-      option_id: coffee_b
-      attribute_id: packaging
-      label: Option B Packaging
-      value: "Foil bag"
-      normative_score: 0.0
-    - id: b_calories
-      option_id: coffee_b
-      attribute_id: calories
-      label: Option B Calories
-      value: "3"
-      normative_score: 0.0
-    - id: b_brand
-      option_id: coffee_b
-      attribute_id: brand
-      label: Option B Brand
-      value: "Folgers"
-      normative_score: 0.0
-    - id: b_is_discounted
-      option_id: coffee_b
-      attribute_id: is_discounted
-      label: Option B Is Discounted
-      value: "Yes"
-      normative_score: 0.0
-    - id: b_discount_pct
-      option_id: coffee_b
-      attribute_id: discount_percentage
-      label: Option B Discount Percentage
-      value: "30%"
-      normative_score: 0.0
-    - id: b_deadline
-      option_id: coffee_b
-      attribute_id: promotion_deadline
-      label: Option B Promotion Deadline
-      value: "Expires TODAY"
-      normative_score: 0.0
-    - id: b_stock
-      option_id: coffee_b
-      attribute_id: stock_level
-      label: Option B Stock Level
-      value: "ONLY 3 LEFT!"
-      normative_score: 0.0
+    - id: coffee_d
+      base_score: 1.0 # 13.0 oz / $13.00
+      cues:
+        brand: "Folgers"
+        is_discounted: "Yes"
+        discount_percentage: "10%"
+        promotion_deadline: "Expires TODAY"
+        stock_level: "ONLY 3 LEFT!"
+        roast_date: "2 weeks ago"
+        origin: "Colombia"
+        sale_price: "$12.60"
+        packaging: "Foil bag"
+        calories: "3"
+        list_price: "$14.00"
+        weight_oz: "11.0 oz"
 
-    - id: c_list_price
-      option_id: coffee_c
-      attribute_id: list_price
-      label: Option C List Price
-      value: "$15.75"
-      normative_score: 0.0
-    - id: c_sale_price
-      option_id: coffee_c
-      attribute_id: sale_price
-      label: Option C Sale Price
-      value: "$12.60"
-      normative_score: 0.0
-    - id: c_weight
-      option_id: coffee_c
-      attribute_id: weight_oz
-      label: Option C Weight
-      value: "11.0 oz"
-      normative_score: 0.0
-    - id: c_roast
-      option_id: coffee_c
-      attribute_id: roast_date
-      label: Option C Roast Date
-      value: "2 weeks ago"
-      normative_score: 0.0
-    - id: c_origin
-      option_id: coffee_c
-      attribute_id: origin
-      label: Option C Origin
-      value: "Colombia"
-      normative_score: 0.0
-    - id: c_packaging
-      option_id: coffee_c
-      attribute_id: packaging
-      label: Option C Packaging
-      value: "Foil bag"
-      normative_score: 0.0
-    - id: c_calories
-      option_id: coffee_c
-      attribute_id: calories
-      label: Option C Calories
-      value: "3"
-      normative_score: 0.0
-    - id: c_brand
-      option_id: coffee_c
-      attribute_id: brand
-      label: Option C Brand
-      value: "Folgers"
-      normative_score: 0.0
-    - id: c_is_discounted
-      option_id: coffee_c
-      attribute_id: is_discounted
-      label: Option C Is Discounted
-      value: "Yes"
-      normative_score: 0.0
-    - id: c_discount_pct
-      option_id: coffee_c
-      attribute_id: discount_percentage
-      label: Option C Discount Percentage
-      value: "20%"
-      normative_score: 0.0
-    - id: c_deadline
-      option_id: coffee_c
-      attribute_id: promotion_deadline
-      label: Option C Promotion Deadline
-      value: "Expires TODAY"
-      normative_score: 0.0
-    - id: c_stock
-      option_id: coffee_c
-      attribute_id: stock_level
-      label: Option C Stock Level
-      value: "ONLY 3 LEFT!"
-      normative_score: 0.0
-
-    - id: d_list_price
-      option_id: coffee_d
-      attribute_id: list_price
-      label: Option D List Price
-      value: "$14.00"
-      normative_score: 0.0
-    - id: d_sale_price
-      option_id: coffee_d
-      attribute_id: sale_price
-      label: Option D Sale Price
-      value: "$12.60"
-      normative_score: 0.0
-    - id: d_weight
-      option_id: coffee_d
-      attribute_id: weight_oz
-      label: Option D Weight
-      value: "11.0 oz"
-      normative_score: 0.0
-    - id: d_roast
-      option_id: coffee_d
-      attribute_id: roast_date
-      label: Option D Roast Date
-      value: "2 weeks ago"
-      normative_score: 0.0
-    - id: d_origin
-      option_id: coffee_d
-      attribute_id: origin
-      label: Option D Origin
-      value: "Colombia"
-      normative_score: 0.0
-    - id: d_packaging
-      option_id: coffee_d
-      attribute_id: packaging
-      label: Option D Packaging
-      value: "Foil bag"
-      normative_score: 0.0
-    - id: d_calories
-      option_id: coffee_d
-      attribute_id: calories
-      label: Option D Calories
-      value: "3"
-      normative_score: 0.0
-    - id: d_brand
-      option_id: coffee_d
-      attribute_id: brand
-      label: Option D Brand
-      value: "Folgers"
-      normative_score: 0.0
-    - id: d_is_discounted
-      option_id: coffee_d
-      attribute_id: is_discounted
-      label: Option D Is Discounted
-      value: "Yes"
-      normative_score: 0.0
-    - id: d_discount_pct
-      option_id: coffee_d
-      attribute_id: discount_percentage
-      label: Option D Discount Percentage
-      value: "10%"
-      normative_score: 0.0
-    - id: d_deadline
-      option_id: coffee_d
-      attribute_id: promotion_deadline
-      label: Option D Promotion Deadline
-      value: "Expires TODAY"
-      normative_score: 0.0
-    - id: d_stock
-      option_id: coffee_d
-      attribute_id: stock_level
-      label: Option D Stock Level
-      value: "ONLY 3 LEFT!"
-      normative_score: 0.0
-
-    - id: e_list_price
-      option_id: coffee_e
-      attribute_id: list_price
-      label: Option E List Price
-      value: "$12.60"
-      normative_score: 0.0
-    - id: e_sale_price
-      option_id: coffee_e
-      attribute_id: sale_price
-      label: Option E Sale Price
-      value: "$12.60"
-      normative_score: 0.0
-    - id: e_weight
-      option_id: coffee_e
-      attribute_id: weight_oz
-      label: Option E Weight
-      value: "11.1 oz"
-      normative_score: 0.0
-    - id: e_roast
-      option_id: coffee_e
-      attribute_id: roast_date
-      label: Option E Roast Date
-      value: "2 weeks ago"
-      normative_score: 0.0
-    - id: e_origin
-      option_id: coffee_e
-      attribute_id: origin
-      label: Option E Origin
-      value: "Colombia"
-      normative_score: 0.0
-    - id: e_packaging
-      option_id: coffee_e
-      attribute_id: packaging
-      label: Option E Packaging
-      value: "Foil bag"
-      normative_score: 0.0
-    - id: e_calories
-      option_id: coffee_e
-      attribute_id: calories
-      label: Option E Calories
-      value: "3"
-      normative_score: 0.0
-    - id: e_brand
-      option_id: coffee_e
-      attribute_id: brand
-      label: Option E Brand
-      value: "Folgers"
-      normative_score: 0.0
-    - id: e_is_discounted
-      option_id: coffee_e
-      attribute_id: is_discounted
-      label: Option E Is Discounted
-      value: "No"
-      normative_score: 0.0
-    - id: e_discount_pct
-      option_id: coffee_e
-      attribute_id: discount_percentage
-      label: Option E Discount Percentage
-      value: "0%"
-      normative_score: 0.0
-    - id: e_deadline
-      option_id: coffee_e
-      attribute_id: promotion_deadline
-      label: Option E Promotion Deadline
-      value: "N/A"
-      normative_score: 0.0
-    - id: e_stock
-      option_id: coffee_e
-      attribute_id: stock_level
-      label: Option E Stock Level
-      value: "In Stock"
-      normative_score: 0.0
+    - id: coffee_e
+      base_score: 1.0 # 13.0 oz / $13.00
+      cues:
+        brand: "Folgers"
+        is_discounted: "No"
+        discount_percentage: "0%"
+        promotion_deadline: "N/A"
+        stock_level: "In Stock"
+        roast_date: "2 weeks ago"
+        origin: "Colombia"
+        sale_price: "$12.60"
+        packaging: "Foil bag"
+        calories: "3"
+        list_price: "$12.60"
+        weight_oz: "11.1 oz"

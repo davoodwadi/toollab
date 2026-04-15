@@ -28,6 +28,7 @@ class ExperimentRunner:
             )
             if index==0:
                 writer.write_config(self.spec.to_dict())
+            
             record = self._run_single(index + 1, session_name = writer.session_name)
             writer.write_events(record)
  
@@ -36,26 +37,60 @@ class ExperimentRunner:
         }
 
     def _run_single(self, replicate_index: int, session_name: str) -> dict[str, Any]:
+        import random
+        from copy import deepcopy
 
-        # build_environment: fixed or scrolling -> ToolLabEnvironment: with methods for _inspect_cell
-        environment = build_environment(self.spec)
+        run_spec = deepcopy(self.spec)
+
+        # 2. Apply Randomization if configured
+        if run_spec.randomization and run_spec.randomization.get("randomize_attributes_options"):
+            base_seed = run_spec.randomization.get("seed")
+            if base_seed is not None:
+                rng = random.Random(base_seed + replicate_index)
+                print(f'randomizing with seed: {base_seed + replicate_index}')
+            else:
+                rng = random.Random()
+                print('randomizing without seed')
+            
+            rng.shuffle(run_spec.options)
+            rng.shuffle(run_spec.attributes)
+            
+        # 3. Rewrite option IDs to positional names (e.g. option_1)
+        for i, option in enumerate(run_spec.options):
+            original_id = option.metadata.get('original_id', option.id)
+            position = i + 1
+            new_id = f"option_{position}"
+            new_name = option.display_name
+            
+            # Ensure the original ID is saved so we can map it back later
+            option.metadata['original_id'] = original_id
+            
+            # Rewrite for the LLM
+            option.id = new_id
+            option.display_name = new_name
+            
+            # Update all cues that belonged to this option
+            for cue in run_spec.cues:
+                if cue.option_id == original_id:
+                    cue.option_id = new_id
+                    
+        environment = build_environment(run_spec)
 
         # Based on the config, get the correct provider `session` with system_prompt, initial_user_message, and tools
         model_session = create_model_session(
             self.spec.model,
-            environment.build_system_prompt(randomization = self.spec.randomization), 
-            environment.build_user_prompt(randomization = self.spec.randomization),
+            environment.build_system_prompt(), 
+            environment.build_user_prompt(),
         )
 
         # print('model_session.system_prompt', model_session.system_prompt)
         # print('model_session.initial_user_message', model_session.initial_user_message)
-        # exit()
         started_at = datetime.now(timezone.utc).isoformat()
         forced_choice = False
         
         if self.verbose:
-            num_options = len(environment.options)
-            num_attributes = len(environment.attributes)
+            num_options = len(run_spec.options)
+            num_attributes = len(run_spec.attributes)
             total_cells = num_options * num_attributes
             print("\n" + "="*50)
             print("INITIALIZING EXPERIMENT")
@@ -80,17 +115,17 @@ class ExperimentRunner:
             
             print("="*50)
             print("EXPERIMENT MATRIX:")
-            opt_ids = [opt.id for opt in environment.spec.options]
+            opt_ids = [opt.id for opt in run_spec.options]
             header = f"{'Attribute':<25} | " + " | ".join([f"{opt:<20}" for opt in opt_ids])
             print(header)
             print("-" * len(header))
             
-            for attr in environment.spec.attributes:
+            for attr in run_spec.attributes:
                 row_str = f"{attr.id:<25} | "
                 vals = []
                 for opt in opt_ids:
                     val = "N/A"
-                    for c in environment.spec.cues:
+                    for c in run_spec.cues:
                         if c.option_id == opt and c.attribute_id == attr.id:
                             val = str(c.value)
                             break
@@ -99,7 +134,7 @@ class ExperimentRunner:
                 print(row_str)
             print("="*50 + "\n")
 
-        exit()
+        # exit()
 
         for iteration in range(self.spec.max_turns):
             # calls the LLM -> gets response (tool_call, content, reasoning) -> adds it to session.transcript
@@ -185,6 +220,7 @@ class ExperimentRunner:
             model_session.add_tool_results(tool_results_and_name)
 
             if assistant_response.tool_calls[0].name == "submit_choice":
+                print(f"Choice: {environment.choice}")
                 break
             print('*'*50)
             # END: execute tools
@@ -216,6 +252,7 @@ class ExperimentRunner:
             
             **self.spec.metadata,
             'trace': environment.trace,
+            "option_mapping": {opt.id: opt.metadata.get('original_id', opt.id) for opt in run_spec.options},
             "started_at": started_at,
             "finished_at": datetime.now(timezone.utc).isoformat(),
         }
@@ -224,10 +261,11 @@ class ExperimentRunner:
 
 def is_budget_exhausted(environment):
     if environment.spec.budget_type=='usd':
-        return environment.budget_remaining_usd<=0
-    elif environment.spec.budget_type=='tools' and environment.spec.budget_tools>0:
+        return False
+        # return environment.budget_remaining_usd<=0
+    elif environment.spec.budget_type=='tools' and environment.spec.budget_tools>=0:
         return environment.budget_remaining_tools<0
-    elif environment.spec.budget_type=='tools' and environment.spec.budget_tools<=0:
+    elif environment.spec.budget_type=='tools' and environment.spec.budget_tools<0:
         return False
     elif environment.spec.budget_type=='tokens':
         return environment.budget_remaining_tokens<0

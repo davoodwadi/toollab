@@ -98,6 +98,24 @@ source .venv/bin/activate
 PYTHONPATH=src python src/tool_lab/cli.py run --config experiments/promotion-5-saleprice-discounthidden-llamacpp.yaml --verbose --budget_tool 10
 ```
 
+Data collection (grid):
+```
+source .venv/bin/activate
+
+PYTHONPATH=src python src/tool_lab/cli.py grid \
+--config experiments/promotion-5-saleprice-discountshown-llamacpp.yaml \
+--verbose \
+--budget_tools 20 10 5 1 \
+--models \
+llamacpp:Qwen3.5-9B-UD-Q4_K_XL.gguf \
+llamacpp:Qwen3.5-4B-UD-Q4_K_XL.gguf \
+llamacpp:gemma-4-31B-it-UD-Q4_K_XL.gguf \
+llamacpp:gemma-4-E4B-it-UD-Q4_K_XL.gguf \
+llamacpp:gemma-4-E2B-it-UD-Q4_K_XL.gguf \
+--replications 10
+```
+
+
 Analysis
 ```
 PYTHONPATH=src python src/tool_lab/analysis/analyze.py

@@ -10,17 +10,17 @@
     --parallel 4
 
 # Gemma 4
-## 31B
-~/llama.cpp/build/bin/llama-server \
-    -m $LLAMA_CACHE/gemma-4-31B-it-GGUF/gemma-4-31B-it-UD-Q4_K_XL.gguf \
-    -ngl 999 \
-    --parallel 1
-
 ## 26B-A4B
 ~/llama.cpp/build/bin/llama-server \
     -m $LLAMA_CACHE/gemma-4-26B-A4B-it-GGUF/gemma-4-26B-A4B-it-UD-Q4_K_XL.gguf \
     -ngl 999 \
     --parallel 4
+
+## 31B
+~/llama.cpp/build/bin/llama-server \
+    -m $LLAMA_CACHE/gemma-4-31B-it-GGUF/gemma-4-31B-it-UD-Q4_K_XL.gguf \
+    -ngl 999 \
+    --parallel 1
 
 ## E4B
 ~/llama.cpp/build/bin/llama-server \

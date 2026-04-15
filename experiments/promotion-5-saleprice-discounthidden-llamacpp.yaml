@@ -26,7 +26,7 @@ experiment:
     - submit_choice
   model:
     provider: llamacpp
-    model_name: gemma-4-31B-it-UD-Q4_K_XL.gguf
+    model_name: gemma-4-E4B-it-UD-Q4_K_XL.gguf
     extra:
       mock_inspections: 24
   participant:

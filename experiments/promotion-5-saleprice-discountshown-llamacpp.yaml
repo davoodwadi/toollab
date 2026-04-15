@@ -1,5 +1,5 @@
 experiment:
-  name: promotion-test
+  name: promotion
   description: "Promotion heuristic experiment."
   metadata:
     option_count: 5
@@ -17,7 +17,7 @@ experiment:
   budget_points: 0
   tool_costs:
     inspect_cell: 2
-  max_turns: 20 
+  max_turns: 30 
   randomization:
     randomize_attributes_options: true
     seed: null

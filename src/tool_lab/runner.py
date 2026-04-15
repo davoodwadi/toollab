@@ -100,14 +100,7 @@ class ExperimentRunner:
             print("INITIALIZING EXPERIMENT")
             print("="*50)
             print(f'Model: {environment.spec.model.model_name}\n')
-            print('*'*50)
-            print(f"System Prompt:\n{model_session.system_prompt}\n")
-            print('*'*50)
-            print(f"User Prompt:\n{model_session.initial_user_message}\n")
-            print('*'*50)
-            print(f"Num Options: {num_options}")
-            print(f"Num Attributes: {num_attributes}")
-            print(f"Total cells: {total_cells}")
+            print(f'Replications: {environment.spec.replications}\n')
             if environment.spec.budget_type=='usd':
                 print(f"Budget: ${environment.spec.budget_usd}")
             elif environment.spec.budget_type=='tools':
@@ -116,6 +109,15 @@ class ExperimentRunner:
                 print(f"Budget: {environment.spec.budget_tokens} Tokens")
             elif environment.spec.budget_type=='points':
                 print(f"Budget: {environment.spec.budget_points} Points")
+            print('*'*50)
+            print(f"System Prompt:\n{model_session.system_prompt}\n")
+            print('*'*50)
+            print(f"User Prompt:\n{model_session.initial_user_message}\n")
+            print('*'*50)
+            print(f"Num Options: {num_options}")
+            print(f"Num Attributes: {num_attributes}")
+            print(f"Total cells: {total_cells}")
+
             
             print("="*50)
             print("EXPERIMENT MATRIX:")

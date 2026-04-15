@@ -88,10 +88,14 @@ class ToolLabEnvironment(ABC):
         )
 
     def build_user_prompt(self, ) -> str:
-        option_lines = [
-            (f"- {option.id}: {option.display_name}." + (f" {option.description}" if option.description else "")).strip()
-            for option in self.spec.options
-        ]
+        option_lines = []
+        for option in self.spec.options:
+            s = f'- {option.id}'
+            if option.display_name:
+                s += f': {option.display_name}'
+            if option.description:
+                s += f" {option.description}"
+            option_lines.append(s.strip())            
 
         attribute_lines = []
         for attribute in self.spec.attributes:
@@ -240,11 +244,13 @@ class ToolLabEnvironment(ABC):
         payload = {
             "role": "tool",
             "tool_call_id": tool_call_id,
-            "content": json.dumps({
-                "option_id": option_id,
-                "option_label": self.options[option_id].display_name,
-            }),
         }
+        
+        if self.options[option_id].display_name:
+            arguments['option_label'] = self.options[option_id].display_name
+        
+        payload['content'] = json.dumps(arguments)
+        
         return payload
 
     def _mode_rules(self) -> str:

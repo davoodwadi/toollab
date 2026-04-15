@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Any, Optional
+from typing import Any, Optional, Literal
 from pydantic import BaseModel, Field
 from uuid import uuid4
 
@@ -14,14 +14,9 @@ from openai import OpenAI
 
 class SubmitChoiceInput(BaseModel):
     option_id: str
-    # confidence: Optional[float] = Field(default=None, ge=0, le=1)
-    # justification: Optional[str] = None
-
-class InspectCellInput(BaseModel):
-    option_id: str
-    attribute_id: str
-
-
+    most_important_attribute: str = Field(
+        description="The attribute that influenced your choice most."
+    )
 submit_choice_tool = dict(
     type= "function",
     name="submit_choice",
@@ -30,6 +25,9 @@ submit_choice_tool = dict(
     parameters=SubmitChoiceInput.model_json_schema(),
 )
 
+class InspectCellInput(BaseModel):
+    option_id: str
+    attribute_id: str
 inspect_cell_tool = dict(
     type= "function",
     name="inspect_cell",
@@ -88,6 +86,7 @@ class LlamaCPPModelSession:
         meta = {}
         assert self._client.models.list().data[0].id==self.config.model_name, f'the hosted model {self._client.models.list().data[0].id} is different {self.config.model_name}'
         # print('self.config.model_name', self.config.model_name)
+        # print(self.tools)
         response = self._client.responses.create(
             model=self.config.model_name,
             tools=self.tools,

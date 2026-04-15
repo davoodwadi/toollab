@@ -95,7 +95,7 @@ To adapt the framework, edit or add a new YAML file with:
 Data collection:
 ```
 source .venv/bin/activate
-PYTHONPATH=src python src/tool_lab/cli.py run --config experiments/health_insurance_choice.yaml
+PYTHONPATH=src python src/tool_lab/cli.py run --config experiments/promotion-5-saleprice-discounthidden-llamacpp.yaml --verbose --budget_tool 10
 ```
 
 Analysis

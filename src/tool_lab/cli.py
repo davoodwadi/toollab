@@ -22,6 +22,7 @@ def main() -> None:
         help="Override the experiment interface mode",
     )
     run_parser.add_argument("--replications", type=int, help="Override replication count")
+    run_parser.add_argument("--budget_tools", type=int, help="Override max tool calls")
     run_parser.add_argument("--api-key-env", help="Override the API key environment variable name")
     run_parser.add_argument("--output-root", default="results", help="Directory for result artifacts")
     run_parser.add_argument("--mock", action="store_true", help="Run a local mock trial to verify the design")
@@ -42,12 +43,13 @@ def main() -> None:
                 "model_name": "mock-v1",
                 "replications": 1
             }
-        
+        # print()
         spec = load_experiment_spec(args.config).with_runtime_overrides(
             matrix_mode=args.matrix_mode,
             provider=args.provider or mock_overrides.get("provider"),
             model_name=args.model or mock_overrides.get("model_name"),
             replications=args.replications or mock_overrides.get("replications"), 
+            budget_tools=args.budget_tools,
             api_key_env=args.api_key_env,
         )
         runner = ExperimentRunner(

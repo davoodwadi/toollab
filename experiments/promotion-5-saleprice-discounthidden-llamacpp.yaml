@@ -1,18 +1,19 @@
 experiment:
-  name: promotion
+  name: promotion-discount-hidden
   description: "Promotion heuristic experiment."
   metadata:
     option_count: 5
   task_prompt: >
-    Every time you use the inspect_cell tool, points will be deducted from your score.
+    Every time you use the inspect_cell tool, you suffer a cost.
+    submit_choice has no cost.
     You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice. 
-    Your final score is the remaining points plus the value of the deal you choose.
+    Your final score is the value of the deal you choose minus the number of inspect_cell tool calls you have made.
   matrix_mode: fixed
   replications: 10
   # budget_type: usd
   # budget_usd: 0.01
   budget_type: tools
-  budget_tools: 5
+  budget_tools: 1
   budget_points: 0
   tool_costs:
     inspect_cell: 2
@@ -69,10 +70,14 @@ experiment:
       display_name: Weight (Ounces)
       description: The net weight of the coffee package in ounces.
       cost_multiplier: 1.0
+    # - id: sale_price
+    #   display_name: Price after discounts
+    #   description: The final sale price of the coffee.
+    #   cost_multiplier: 1.0
 
   options:
     - id: coffee_a
-      display_name: "40% Discount"
+      # display_name: "40% Discount"
       base_score: 1.0 # 13.0 oz / $13.00
       cues:
         brand: "Folgers"
@@ -86,9 +91,10 @@ experiment:
         calories: "3"
         list_price: "$21.00"
         weight_oz: "11.1 oz"
+        # sale_price: "$12.60"
 
     - id: coffee_b
-      display_name: "30% Discount"
+      # display_name: "30% Discount"
       base_score: 1.0 # 13.0 oz / $13.00
       cues:
         brand: "Folgers"
@@ -102,9 +108,10 @@ experiment:
         calories: "3"
         list_price: "$18.00"
         weight_oz: "11.2 oz"
+        # sale_price: "$12.60"
 
     - id: coffee_c
-      display_name: "20% Discount"
+      # display_name: "20% Discount"
       base_score: 1.0 # 13.0 oz / $13.00
       cues:
         brand: "Folgers"
@@ -118,9 +125,10 @@ experiment:
         calories: "3"
         list_price: "$15.75"
         weight_oz: "11.3 oz"
+        # sale_price: "$12.60"
 
     - id: coffee_d
-      display_name: "10% Discount"
+      # display_name: "10% Discount"
       base_score: 1.0 # 13.0 oz / $13.00
       cues:
         brand: "Folgers"
@@ -134,9 +142,10 @@ experiment:
         calories: "3"
         list_price: "$14.00"
         weight_oz: "11.4 oz"
+        # sale_price: "$12.60"
 
     - id: coffee_e
-      display_name: "No Discount"
+      # display_name: "No Discount"
       base_score: 1.0 # 13.0 oz / $13.00
       cues:
         brand: "Folgers"
@@ -150,3 +159,4 @@ experiment:
         calories: "3"
         list_price: "$12.60"
         weight_oz: "11.5 oz"
+        # sale_price: "$12.60"

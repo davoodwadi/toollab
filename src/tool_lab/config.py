@@ -171,6 +171,7 @@ class ExperimentSpec:
         provider: str | None = None,
         model_name: str | None = None,
         replications: int | None = None,
+        budget_tools: int | None = None,
         api_key_env: str | None = None,
     ) -> "ExperimentSpec":
         resolved_mode = matrix_mode or self.matrix_mode
@@ -189,6 +190,7 @@ class ExperimentSpec:
             self,
             matrix_mode=resolved_mode,
             replications=self.replications if replications is None else replications,
+            budget_tools=self.budget_tools if budget_tools is None else budget_tools,
             tools=resolved_tools,
             model=resolved_model,
         )
@@ -231,7 +233,7 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         # 2. Build the OptionSpec
         options.append(OptionSpec(
             id=original_id,
-            display_name=display_name, # Placeholder: overwritten in runner
+            display_name=display_name if display_name else '', # Placeholder: overwritten in runner
             base_score=opt_data.get("base_score", 0.0),
             metadata={"original_id": original_id}  # Save original ID for the final trace!
         ))

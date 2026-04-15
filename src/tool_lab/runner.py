@@ -88,7 +88,11 @@ class ExperimentRunner:
         started_at = datetime.now(timezone.utc).isoformat()
         forced_choice = False
         
-        if self.verbose:
+        print("\n" + "+"*50)
+        print(f'replicate_index: {replicate_index}')
+
+
+        if self.verbose and replicate_index==1:
             num_options = len(run_spec.options)
             num_attributes = len(run_spec.attributes)
             total_cells = num_options * num_attributes
@@ -209,8 +213,9 @@ class ExperimentRunner:
                         tool_call_id=tc.tool_call_id,
                     )
                     tool_results_and_name.append((tool_response, tc.name))
-                    print(tc.name)
-                    print(tool_response['content'])
+                    print(f"Tool Name: {tc.name}")
+                    print(f"Tool Arguments: {tc.arguments}")
+                    print(f"Tool Response: {tool_response['content']}")
                 else:
                     # error the remaining tools, if any
                     # return error

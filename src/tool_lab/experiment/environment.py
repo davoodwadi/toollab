@@ -103,12 +103,14 @@ class ToolLabEnvironment(ABC):
             if attribute.display_name:
                 attr_str+=f'{attribute.display_name}.'
             if attribute.description:
-                attr_str+=f' {attribute.description} '
+                attr_str+=f' {attribute.description}'
             if attribute.cost_multiplier and self.spec.budget_type=='points':
                 cost = self.spec.tool_costs['inspect_cell'] * attribute.cost_multiplier
                 attr_str+=f'(tool cost: {cost})'
             
             attribute_lines.append(attr_str)
+        
+        attribute_lines_str = '\n'.join(attribute_lines)
 
         if self.spec.budget_type == 'usd':
             budget_str = f"Budget: ${self.spec.budget_usd:.4f}"
@@ -130,7 +132,7 @@ class ToolLabEnvironment(ABC):
             *option_lines,
             "",
             "Attributes available in this task:",
-            *attribute_lines,
+            attribute_lines_str,
             "",
             budget_str,
         ]

@@ -1,0 +1,83 @@
+experiment:
+  name: left-digit
+  description: "Left digit heuristic test."
+  metadata:
+    option_count: 2
+  task_prompt: >
+    Every time you use the inspect_cell tool, you suffer a cost.
+    submit_choice has no cost.
+    You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice. 
+    Your final score is the value of the deal you choose minus the number of inspect_cell tool calls you have made.
+  matrix_mode: fixed
+  replications: 1
+  budget_type: tools
+  budget_tools: 1
+  tool_costs:
+    inspect_cell: 1 
+  max_turns: 30
+  randomization:
+    randomize_attributes_options: true
+    seed: null
+  tools:
+    - inspect_cell
+    - submit_choice
+  model:
+    provider: llamacpp
+    model_name: ""
+  participant:
+    role: coffee shopper
+    profile: >
+      You are a deal hunter. You are looking for the best deal on coffee. Select the best deal while minimizing your search costs. 
+
+  attributes:
+    - id: price_dollars
+      display_name: Price (Whole Dollars)
+      description: The whole dollar amount of the coffee's price, before cents.
+    - id: price_cents
+      display_name: Price (Cents)
+      description: The fractional cents portion of the coffee's price.
+    - id: weight_oz
+      display_name: Weight (Ounces)
+      description: The net weight of the coffee package in ounces.
+    - id: roast_date
+      display_name: Roast Date
+      description: The date the coffee beans were roasted.
+    - id: origin
+      display_name: Bean Origin
+      description: The country where the coffee beans were grown.
+    - id: packaging
+      display_name: Packaging Type
+      description: The type of bag or container the coffee is in.
+    - id: calories
+      display_name: Calories
+      description: Calories per serving.
+    - id: brand
+      display_name: Brand
+      description: The manufacturer of the product.
+
+  options:
+    - id: coffee_a
+      # display_name: "40% Discount"
+      base_score: 1.0 # 13.0 oz / $12.99
+      cues:
+        price_dollars: "$12"
+        price_cents: "99 cents"
+        weight_oz: "13.0 oz"
+        roast_date: "2 weeks ago"
+        origin: "Colombia"
+        packaging: "Foil bag"
+        calories: "3"
+        brand: "Folgers"
+
+    - id: coffee_b
+      # display_name: "30% Discount"
+      base_score: 1.069 # 13.9 oz / $13.00
+      cues:
+        price_dollars: "$13"
+        price_cents: "0 cents"
+        weight_oz: "13.9 oz"
+        roast_date: "2 weeks ago"
+        origin: "Colombia"
+        packaging: "Foil bag"
+        calories: "3"
+        brand: "Folgers"

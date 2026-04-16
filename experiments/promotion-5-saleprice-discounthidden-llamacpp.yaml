@@ -10,8 +10,6 @@ experiment:
     Your final score is the value of the deal you choose minus the number of inspect_cell tool calls you have made.
   matrix_mode: fixed
   replications: 10
-  # budget_type: usd
-  # budget_usd: 0.01
   budget_type: tools
   budget_tools: 1
   budget_points: 0
@@ -27,13 +25,10 @@ experiment:
   model:
     provider: llamacpp
     model_name: gemma-4-E4B-it-UD-Q4_K_XL.gguf
-    extra:
-      mock_inspections: 24
   participant:
     role: coffee shopper
     profile: >
       You are a deal hunter. You are looking for the best deal on coffee. Select the best deal while minimizing your search costs. 
-
   attributes:
     - id: brand
       display_name: Brand

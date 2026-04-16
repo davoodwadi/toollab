@@ -126,6 +126,21 @@ google:gemini-3.1-flash-lite-preview \
 --replications 10
 ```
 
+```
+PYTHONPATH=src python src/tool_lab/cli.py grid \
+--config experiments/left_digit-llamacpp.yaml \
+--verbose \
+--budget_tools 16 6 4 1 \
+--models \
+llamacpp:Qwen3.5-27B-UD-Q4_K_XL.gguf \
+llamacpp:Qwen3.5-9B-UD-Q4_K_XL.gguf \
+llamacpp:Qwen3.5-4B-UD-Q4_K_XL.gguf \
+llamacpp:gemma-4-31B-it-UD-Q4_K_XL.gguf \
+llamacpp:gemma-4-E4B-it-UD-Q4_K_XL.gguf \
+llamacpp:gemma-4-E2B-it-UD-Q4_K_XL.gguf \
+--replications 10
+```
+
 
 Analysis
 ```

@@ -141,6 +141,28 @@ llamacpp:gemma-4-E2B-it-UD-Q4_K_XL.gguf \
 --replications 10
 ```
 
+```
+PYTHONPATH=src python src/tool_lab/cli.py grid \
+--config experiments/left_digit-llamacpp.yaml \
+--verbose \
+--budget_tools 16 6 4 1 \
+--models \
+google:gemini-3.1-flash-lite-preview \
+google:gemini-3-flash-preview \
+google:gemini-3.1-pro-preview \
+--replications 10
+```
+
+```
+PYTHONPATH=src python src/tool_lab/cli.py grid \
+--config experiments/left_digit-llamacpp.yaml \
+--verbose \
+--budget_tools 6 \
+--models \
+google:gemini-3.1-flash-lite-preview \
+--replications 7
+```
+
 
 Analysis
 ```

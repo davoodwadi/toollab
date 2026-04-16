@@ -25,6 +25,7 @@ class AssistantResponse:
     output_cost: float = 0.0
     tool_cost: int = 0
     point_cost: int = 0
+    tool_usd_cost: float = 0.
     tool_calls: list[ToolInvocation] = field(default_factory=list)
     finish_reason: str | None = None
     meta: dict[str, Any] | None = None

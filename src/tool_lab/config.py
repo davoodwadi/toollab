@@ -100,7 +100,6 @@ class CueSpec:
 class ExperimentSpec:
     name: str
     description: str
-    task_prompt: str
     participant: ParticipantSpec
     randomization: dict
     options: list[OptionSpec]
@@ -109,7 +108,7 @@ class ExperimentSpec:
     model: ModelConfig
     matrix_mode: MatrixMode = "scrolling"
     replications: int = 5
-    budget_type: Literal["usd", "tools", 'tokens', 'points'] = "usd"
+    budget_type: Literal["usd", "tools", "tool_usd", 'tokens', 'points'] = "usd"
     budget_usd: float | None = None
     budget_tools: int | None = None
     budget_tokens: int | None = None
@@ -205,19 +204,20 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
     file_path = Path(path)
     raw = _load_structured_file(file_path)
     experiment = raw.get("experiment", raw)
-
+    # print('experiment', experiment)
+    # exit()
     participant = ParticipantSpec(**experiment["participant"])
     model_data = experiment["model"]
     pricing = MODEL_CONFIG[model_data['provider']].get(model_data['model_name'])
     if not pricing:
         # for llamacpp models
         pricing = MODEL_CONFIG[model_data['provider']].get('default')
-    print(model_data)
+    # print(model_data)
     model = ModelConfig(
         pricing=pricing,
         **model_data,
     )
-    print('+'*50)
+    # print('+'*50)
     attributes = [AttributeSpec(**item) for item in experiment["attributes"]]
 
     options = []
@@ -255,7 +255,6 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
     return ExperimentSpec(
         name=experiment["name"],
         description=experiment["description"],
-        task_prompt=experiment["task_prompt"],
         participant=participant,
         randomization=experiment.get('randomization'),
         options=options,

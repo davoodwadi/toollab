@@ -106,6 +106,8 @@ class ExperimentRunner:
                 print(f"Budget: ${environment.spec.budget_usd}")
             elif environment.spec.budget_type=='tools':
                 print(f"Budget: {environment.spec.budget_tools} Tools")
+            elif environment.spec.budget_type=='tool_usd':
+                print(f"Tool cost: ${environment.spec.tool_costs.get("inspect_cell")}")
             elif environment.spec.budget_type=='tokens':
                 print(f"Budget: {environment.spec.budget_tokens} Tokens")
             elif environment.spec.budget_type=='points':
@@ -255,6 +257,8 @@ class ExperimentRunner:
             "cumulative_cost_tools": environment.cumulative_cost_tools,
             "budget_remaining_tools": environment.budget_remaining_tools,
             
+            "cumulative_cost_tool_usd": environment.cumulative_cost_tool_usd,
+
             "cumulative_cost_tokens": environment.cumulative_cost_tokens,
             "budget_remaining_tokens": environment.budget_remaining_tokens,
             
@@ -280,6 +284,8 @@ def is_budget_exhausted(environment):
         return False
     elif environment.spec.budget_type=='tokens':
         return environment.budget_remaining_tokens<0
+    elif environment.spec.budget_type=='tool_usd':
+        return False
     elif environment.spec.budget_type=='points':
         # return environment.budget_remaining_points<0
         return False

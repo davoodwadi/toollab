@@ -169,6 +169,9 @@ class SubmitChoiceInput(BaseModel):
     most_important_attribute: str = Field(
         description="The attribute that influenced your choice most."
     )
+    confidence_score: int = Field(
+        description="Your confidence in this decision from 1 (completely guessing) to 5 (absolutely certain)."
+    )
 
 submit_choice_tool = dict(
     type= "function",

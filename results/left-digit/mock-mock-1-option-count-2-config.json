@@ -2,66 +2,66 @@
   "analysis": {},
   "attributes": [
     {
-      "cost_multiplier": 1.0,
+      "cost_multiplier": 50,
       "description": "The whole dollar amount of the coffee's price, before cents.",
       "display_name": "Price (Whole Dollars)",
       "id": "price_dollars",
       "metadata": {}
     },
     {
-      "cost_multiplier": 1.0,
+      "cost_multiplier": 50,
       "description": "The fractional cents portion of the coffee's price.",
       "display_name": "Price (Cents)",
       "id": "price_cents",
       "metadata": {}
     },
     {
-      "cost_multiplier": 1.0,
+      "cost_multiplier": 50,
       "description": "The net weight of the coffee package in ounces.",
       "display_name": "Weight (Ounces)",
       "id": "weight_oz",
       "metadata": {}
     },
     {
-      "cost_multiplier": 1.0,
+      "cost_multiplier": 50,
       "description": "The date the coffee beans were roasted.",
       "display_name": "Roast Date",
       "id": "roast_date",
       "metadata": {}
     },
     {
-      "cost_multiplier": 1.0,
+      "cost_multiplier": 50,
       "description": "The country where the coffee beans were grown.",
       "display_name": "Bean Origin",
       "id": "origin",
       "metadata": {}
     },
     {
-      "cost_multiplier": 1.0,
+      "cost_multiplier": 50,
       "description": "The type of bag or container the coffee is in.",
       "display_name": "Packaging Type",
       "id": "packaging",
       "metadata": {}
     },
     {
-      "cost_multiplier": 1.0,
+      "cost_multiplier": 50,
       "description": "Calories per serving.",
       "display_name": "Calories",
       "id": "calories",
       "metadata": {}
     },
     {
-      "cost_multiplier": 1.0,
+      "cost_multiplier": 50,
       "description": "The manufacturer of the product.",
       "display_name": "Brand",
       "id": "brand",
       "metadata": {}
     }
   ],
-  "budget_points": 1,
+  "budget_points": 0,
   "budget_tokens": 0,
-  "budget_tools": 20,
-  "budget_type": "points",
+  "budget_tools": -1,
+  "budget_type": "tools",
   "budget_usd": 0.0,
   "cues": [
     {
@@ -204,12 +204,12 @@
     "api_key_env": null,
     "effort": null,
     "extra": {},
-    "model_name": "gemini-3.1-flash-lite-preview",
+    "model_name": "mock-1",
     "pricing": {
       "input_per_million": 1,
       "output_per_million": 3
     },
-    "provider": "google",
+    "provider": "mock",
     "thinking_type": null
   },
   "name": "left-digit",
@@ -234,17 +234,17 @@
     }
   ],
   "participant": {
-    "profile": "You are a deal hunter. You are looking for the best deal on coffee. Select the best deal while minimizing your search costs. \nEvery time you use the inspect_cell tool, you suffer a cost. submit_choice has no cost. You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice.  Your final score is the value of the deal you choose minus the number of inspect_cell tool calls you have made.\n",
+    "profile": "You are a deal hunter. You are looking for the best deal on coffee. Select the coffee that maximizes your final score. \nYou can open the cells to get information about the product using the inspect_cell tool, or you can stop searching and submit your choice with the submit_choice tool. \nEvery time you use the inspect_cell tool, you suffer a cost. submit_choice has no cost.  Here's how your final score is computed:\nFinal Score = (oz/price) * 1000 - (number_of_inspect_cell_calls * 50)\n",
     "role": "coffee shopper"
   },
   "randomization": {
     "randomize_attributes_options": true,
     "seed": null
   },
-  "replications": 10,
+  "replications": 1,
   "task_prompt": "",
   "tool_costs": {
-    "inspect_cell": 50
+    "inspect_cell": 1
   },
   "tools": [
     "inspect_cell",

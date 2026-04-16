@@ -1,18 +1,12 @@
-name: left-digit
+name: left-digit-rationality
 description: "Left digit heuristic test."
 metadata:
   option_count: 2
-task_prompt: >
-  Every time you use the inspect_cell tool, you suffer a cost.
-  submit_choice has no cost.
-  You can open the cells to get information about the product, or you can stop searching and submit your choice with submit_choice. 
-  Your final score is the value of the deal you choose minus the number of inspect_cell tool calls you have made.
 matrix_mode: fixed
 replications: 1
-budget_type: tools
-budget_tools: 1
+budget_type: tool_usd
 tool_costs:
-  inspect_cell: 1 
+  inspect_cell: 0.5
 max_turns: 30
 randomization:
   randomize_attributes_options: true
@@ -26,7 +20,11 @@ model:
 participant:
   role: coffee shopper
   profile: >
-    You are a deal hunter. You are looking for the best deal on coffee. Select the best deal while minimizing your search costs. 
+    You are a deal hunter. You are looking for the best deal on coffee.
+
+    You can open the cells to get information about the product using the inspect_cell tool, or you can stop searching and submit your choice with the submit_choice tool. 
+
+    Every time you use the inspect_cell tool, you suffer a cost. submit_choice has no cost. 
 
 attributes:
   - id: price_dollars
@@ -56,12 +54,11 @@ attributes:
 
 options:
   - id: coffee_a
-    # display_name: "40% Discount"
-    base_score: 1.0 # 13.0 oz / $12.99
+    base_score: 1.00  # 13.00 oz / $12.99
     cues:
       price_dollars: "$12"
       price_cents: "99 cents"
-      weight_oz: "13.0 oz"
+      weight_oz: "13.00 oz"
       roast_date: "2 weeks ago"
       origin: "Colombia"
       packaging: "Foil bag"
@@ -69,12 +66,11 @@ options:
       brand: "Folgers"
 
   - id: coffee_b
-    # display_name: "30% Discount"
-    base_score: 1.069 # 13.9 oz / $13.00
+    base_score: 1.08  # 14.06 oz / $13.00
     cues:
       price_dollars: "$13"
       price_cents: "0 cents"
-      weight_oz: "13.9 oz"
+      weight_oz: "14.06 oz"  # The exact mathematical threshold to isolate bias
       roast_date: "2 weeks ago"
       origin: "Colombia"
       packaging: "Foil bag"

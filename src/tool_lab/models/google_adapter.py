@@ -15,8 +15,12 @@ from google.genai import types
 
 class SubmitChoiceInput(BaseModel):
     option_id: str
-    confidence: Optional[float] = Field(default=None, ge=0, le=1)
-    justification: Optional[str] = None
+    most_important_attribute: str = Field(
+        description="The attribute that influenced your choice most."
+    )
+
+    # confidence: Optional[float] = Field(default=None, ge=0, le=1)
+    # justification: Optional[str] = None
 
 class InspectCellInput(BaseModel):
     option_id: str
@@ -76,7 +80,6 @@ class GoogleModelSession:
                 include_thoughts=True
             )
         )
-
         response = self._client.models.generate_content(
             model=self.config.model_name,
             contents=self.contents,

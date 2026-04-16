@@ -10,6 +10,7 @@ from tool_lab.models import create_model_session
 from tool_lab.storage import ResultWriter
 from tool_lab.models.base import _to_serializable, AssistantResponse, ToolInvocation
 
+import time
 
 class ExperimentRunner:
     def __init__(self, spec: ExperimentSpec, output_root: str = "results", verbose: bool = False) -> None:
@@ -143,6 +144,9 @@ class ExperimentRunner:
         # exit()
 
         for iteration in range(self.spec.max_turns):
+            # if self.spec.model.provider!='llamacpp':
+                # print(self.spec.model.provider, self.spec.model.model_name)
+                # time.sleep()
             # calls the LLM -> gets response (tool_call, content, reasoning) -> adds it to session.transcript
             # gets: LLM's response             
             assistant_response = model_session._call_model()

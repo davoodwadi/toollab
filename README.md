@@ -107,11 +107,22 @@ PYTHONPATH=src python src/tool_lab/cli.py grid \
 --verbose \
 --budget_tools 20 10 5 1 \
 --models \
+llamacpp:Qwen3.5-27B-UD-Q4_K_XL.gguf \
 llamacpp:Qwen3.5-9B-UD-Q4_K_XL.gguf \
 llamacpp:Qwen3.5-4B-UD-Q4_K_XL.gguf \
 llamacpp:gemma-4-31B-it-UD-Q4_K_XL.gguf \
 llamacpp:gemma-4-E4B-it-UD-Q4_K_XL.gguf \
 llamacpp:gemma-4-E2B-it-UD-Q4_K_XL.gguf \
+--replications 10
+```
+
+```
+PYTHONPATH=src python src/tool_lab/cli.py grid \
+--config experiments/promotion-5-saleprice-discounthidden-llamacpp.yaml \
+--verbose \
+--budget_tools 20 10 5 1 \
+--models \
+google:gemini-3.1-flash-lite-preview \
 --replications 10
 ```
 

@@ -14,8 +14,11 @@ import anthropic
 
 class SubmitChoiceInput(BaseModel):
     option_id: str
-    confidence: Optional[float] = Field(default=None, ge=0, le=1)
-    justification: Optional[str] = None
+    most_important_attribute: str = Field(
+        description="The attribute that influenced your choice most."
+    )
+    # confidence: Optional[float] = Field(default=None, ge=0, le=1)
+    # justification: Optional[str] = None
 
 class InspectCellInput(BaseModel):
     option_id: str

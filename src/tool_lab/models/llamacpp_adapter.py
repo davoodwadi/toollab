@@ -22,10 +22,13 @@ from pathlib import Path
 class LlamaCppClient:
     BASE_URL = "http://127.0.0.1:8080/v1"
     LLAMA_SERVER_BIN = os.path.expanduser("~/llama.cpp/build/bin/llama-server")
-    LLAMA_CACHE = os.environ.get("LLAMA_CACHE", os.path.expanduser("~/.cache/llama"))
+    # LLAMA_CACHE = os.environ.get("LLAMA_CACHE")
+    LLAMA_CACHE = os.environ.get("LLAMA_CACHE", os.path.expanduser("~/data/.lcpp_cache"))
 
     def __init__(self, config):
         self.config = config
+        print(f'Cache Dir: {self.LLAMA_CACHE}')
+
         self._ensure_server()
 
     # ------------------------------------------------------------------

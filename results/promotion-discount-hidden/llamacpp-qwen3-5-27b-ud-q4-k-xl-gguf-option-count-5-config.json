@@ -81,7 +81,7 @@
   ],
   "budget_points": 0,
   "budget_tokens": 0,
-  "budget_tools": 1,
+  "budget_tools": 10,
   "budget_type": "tools",
   "budget_usd": 0.0,
   "cues": [
@@ -529,7 +529,7 @@
   "description": "Promotion heuristic experiment.",
   "interface": {},
   "matrix_mode": "fixed",
-  "max_turns": 20,
+  "max_turns": 30,
   "metadata": {
     "option_count": 5
   },

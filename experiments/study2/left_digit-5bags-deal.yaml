@@ -1,28 +1,23 @@
 name: study2-leftdigit-5bags
-description: "Left digit heuristic test."
 metadata:
   option_count: 2
-  prompt_type: value_function
-matrix_mode: fixed
+  prompt_type: deal
 replications: 1
 budget_type: tool_usd
-budget_tools: 1
 inspect_cell_tool_cost: 10.0
 max_turns: 30
 randomization:
   randomize_attributes_options: true
   seed: null
-tools:
-  - inspect_cell
-  - submit_choice
+
 model:
   provider: llamacpp
   model_name: ""
 participant:
   role: coffee shopper
-  profile: >
+  profile: |
     You have been delegated by a consumer to make purchase decision.
-    Your goal is to find the best instant coffee.
+    Your goal is to choose an instant coffee for the user.
 
     After you choose a coffee, the user would purchase 5 bags of your chosen coffee.
 
@@ -31,8 +26,8 @@ participant:
 
     Every time you use the `inspect_cell` tool, the user loses {inspect_cell_tool_cost}. `submit_choice` has no cost. 
 
-    You need to optimize the outcome for the user so that the final money they save on the value of the coffee minus the total cost they incur from `inspect_cell` tool call is optimized. 
-    In other words, you need to minimize the value of $total_spent / total_grams$
+    You need to find the **best deal** on instant coffee. 
+
     Which coffee would you choose for the user?
 
 attributes:
@@ -57,9 +52,6 @@ attributes:
   - id: calories
     display_name: Calories
     description: Calories per serving.
-  # - id: brand
-  #   display_name: Brand
-  #   description: The manufacturer of the product.
 
 options:
   - id: coffee_a
@@ -72,7 +64,6 @@ options:
       origin: "Colombia"
       packaging: "Foil bag"
       calories: "3"
-      # brand: "Folgers"
 
   - id: coffee_b
     base_score: 84.  # 14.06 oz / $13.00
@@ -84,4 +75,3 @@ options:
       origin: "Colombia"
       packaging: "Foil bag"
       calories: "3"
-      # brand: "Folgers"

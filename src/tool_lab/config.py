@@ -7,17 +7,7 @@ import json
 
 import yaml
 
-MatrixMode = Literal["fixed", "scrolling"]
 
-DEFAULT_TOOLS_BY_MODE: dict[MatrixMode, list[str]] = {
-    "fixed": ["inspect_cell", "submit_choice"],
-    "scrolling": ["inspect_item", "advance_window", "submit_choice"],
-}
-
-REQUIRED_TOOLS_BY_MODE: dict[MatrixMode, set[str]] = {
-    "fixed": {"inspect_cell", "submit_choice"},
-    "scrolling": {"inspect_item", "submit_choice"},
-}
 
 @dataclass(slots=True)
 class PricingConfig:
@@ -99,14 +89,12 @@ class CueSpec:
 @dataclass(slots=True)
 class ExperimentSpec:
     name: str
-    description: str
     participant: ParticipantSpec
     randomization: dict
     options: list[OptionSpec]
     attributes: list[AttributeSpec]
     cues: list[CueSpec]
     model: ModelConfig
-    matrix_mode: MatrixMode = "scrolling"
     replications: int = 5
     budget_type: Literal["usd", "tools", "tool_usd", 'tokens', 'points'] = "usd"
     budget_usd: float | None = None
@@ -115,14 +103,9 @@ class ExperimentSpec:
     budget_points: int | None = None
     inspect_cell_tool_cost: float | None = None
     max_turns: int = 20
-    tools: list[str] = field(default_factory=list)
-    interface: dict[str, Any] = field(default_factory=dict)
-    analysis: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        if not self.tools:
-            self.tools = list(DEFAULT_TOOLS_BY_MODE[self.matrix_mode])
         self.validate()
 
     def validate(self) -> None:
@@ -144,12 +127,6 @@ class ExperimentSpec:
             if cue.attribute_id not in attribute_ids:
                 raise ValueError(f"Cue {cue.id} references unknown attribute {cue.attribute_id}")
 
-        if not REQUIRED_TOOLS_BY_MODE[self.matrix_mode].issubset(set(self.tools)):
-            required = ", ".join(sorted(REQUIRED_TOOLS_BY_MODE[self.matrix_mode]))
-            raise ValueError(
-                f"Tool set for {self.matrix_mode} mode must include: {required}"
-            )
-
         if self.replications < 1:
             raise ValueError("replications must be at least 1")
         if self.budget_type=='usd' and self.budget_usd<=0:
@@ -166,18 +143,12 @@ class ExperimentSpec:
     def with_runtime_overrides(
         self,
         *,
-        matrix_mode: MatrixMode | None = None,
         provider: str | None = None,
         model_name: str | None = None,
         replications: int | None = None,
-        budget_tools: int | None = None,
         api_key_env: str | None = None,
         **budget_override,
     ) -> "ExperimentSpec":
-        resolved_mode = matrix_mode or self.matrix_mode
-        resolved_tools = list(self.tools)
-        if matrix_mode and not REQUIRED_TOOLS_BY_MODE[resolved_mode].issubset(set(resolved_tools)):
-            resolved_tools = list(DEFAULT_TOOLS_BY_MODE[resolved_mode])
 
         resolved_model = replace(
             self.model,
@@ -188,9 +159,7 @@ class ExperimentSpec:
 
         updated = replace(
             self,
-            matrix_mode=resolved_mode,
             replications=self.replications if replications is None else replications,
-            tools=resolved_tools,
             model=resolved_model,
             **budget_override
         )
@@ -206,20 +175,16 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
     file_path = Path(path)
     raw = _load_structured_file(file_path)
     experiment = raw.get("experiment", raw)
-    # print('experiment', experiment)
-    # exit()
     participant = ParticipantSpec(**experiment["participant"])
     model_data = experiment["model"]
     pricing = MODEL_CONFIG[model_data['provider']].get(model_data['model_name'])
     if not pricing:
         # for llamacpp models
         pricing = MODEL_CONFIG[model_data['provider']].get('default')
-    # print(model_data)
     model = ModelConfig(
         pricing=pricing,
         **model_data,
     )
-    # print('+'*50)
     attributes = [AttributeSpec(**item) for item in experiment["attributes"]]
 
     options = []
@@ -249,21 +214,15 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
                 value=str(val)
             ))
             
-    # print(options[0])
-    # print('+'*50)
-    # print(cues[0])
-    # print('+'*50)
 
     return ExperimentSpec(
         name=experiment["name"],
-        description=experiment["description"],
         participant=participant,
         randomization=experiment.get('randomization'),
         options=options,
         attributes=attributes,
         cues=cues,
         model=model,
-        matrix_mode=experiment.get("matrix_mode", "scrolling"),
         replications=experiment.get("replications", 5),
         budget_type=experiment.get("budget_type"),
         budget_usd=experiment.get("budget_usd", 0.0),
@@ -272,9 +231,6 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         budget_points=experiment.get("budget_points", 0),
         inspect_cell_tool_cost=experiment.get("inspect_cell_tool_cost", 0),
         max_turns=experiment.get("max_turns", 20),
-        tools=experiment.get("tools", []),
-        interface=experiment.get("interface", {}),
-        analysis=experiment.get("analysis", {}),
         metadata=experiment.get("metadata", {}),
     )
 

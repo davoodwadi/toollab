@@ -76,11 +76,15 @@ class GoogleModelSession:
 
 
     def _call_model(self) -> AssistantResponse:
+        meta = {'thinking_level': None}
+        
+
         config = types.GenerateContentConfig(
             system_instruction=self.system_prompt,
             tools=[self.google_tools],
             thinking_config=types.ThinkingConfig(
-                include_thoughts=True
+                include_thoughts=True,
+                thinking_level=meta['thinking_level']
             )
         )
         response = self._client.models.generate_content(
@@ -142,7 +146,8 @@ class GoogleModelSession:
             input_tokens=input_tokens,
             output_tokens=output_tokens,
             tool_calls=tool_calls,
-            finish_reason=finish_reason
+            finish_reason=finish_reason,
+            meta=meta,
         )
     
     def add_tool_results(self, tool_results_and_name):

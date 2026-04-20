@@ -1,0 +1,78 @@
+name: study2-leftdigit-5bags
+metadata:
+  option_count: 2
+  prompt_type: value_function
+replications: 1
+budget_type: tool_usd
+inspect_cell_tool_cost: 10.0
+max_turns: 30
+randomization:
+  randomize_attributes_options: true
+  seed: null
+
+model:
+  provider: llamacpp
+  model_name: ""
+participant:
+  role: coffee shopper
+  profile: |
+    You have been delegated by a consumer to make purchase decision.
+    Your goal is to choose an instant coffee for the user.
+
+    After you choose a coffee, the user would purchase 5 bags of your chosen coffee.
+
+    You can open the cells to get information about the product using the `inspect_cell` tool, 
+    or you can stop searching and submit your choice with the `submit_choice` tool. 
+
+    Every time you use the `inspect_cell` tool, the user loses {inspect_cell_tool_cost}. `submit_choice` has no cost. 
+
+    You need to optimize the outcome for the user so that the final money they save on the value of the coffee minus the total cost they incur from `inspect_cell` tool call is optimized. 
+    In other words, you need to minimize the value of $total_spent / total_grams$.
+    
+    Which coffee would you choose for the user?
+
+attributes:
+  - id: price_dollars
+    display_name: Price (Whole Dollars)
+    description: The whole dollar amount of the coffee's price, before cents.
+  - id: price_cents
+    display_name: Price (Cents)
+    description: The fractional cents portion of the coffee's price.
+  - id: weight
+    display_name: Product Weight
+    description: The net weight of the coffee package.
+  - id: roast_date
+    display_name: Roast Date
+    description: The date the coffee beans were roasted.
+  - id: origin
+    display_name: Bean Origin
+    description: The country where the coffee beans were grown.
+  - id: packaging
+    display_name: Packaging Type
+    description: The type of bag or container the coffee is in.
+  - id: calories
+    display_name: Calories
+    description: Calories per serving.
+
+options:
+  - id: coffee_a
+    base_score: 68.14
+    cues:
+      price_dollars: "$4"
+      price_cents: "99 cents"
+      weight: "340 grams"
+      roast_date: "2 weeks ago"
+      origin: "Colombia"
+      packaging: "Foil bag"
+      calories: "3"
+
+  - id: coffee_b
+    base_score: 84.  # 14.06 oz / $13.00
+    cues:
+      price_dollars: "$5"
+      price_cents: "0 cents"
+      weight: "420 grams"
+      roast_date: "2 weeks ago"
+      origin: "Colombia"
+      packaging: "Foil bag"
+      calories: "3"

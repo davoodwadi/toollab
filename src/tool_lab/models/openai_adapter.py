@@ -93,7 +93,7 @@ class OpenAIModelSession:
         # for tool in self.tools:
             # print(tool)
         # exit()
-        meta = {}
+        meta = {} 
         response = self._client.responses.create(
             model=self.config.model_name,
             tools=self.tools,

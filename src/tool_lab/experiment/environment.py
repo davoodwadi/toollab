@@ -17,8 +17,7 @@ from tool_lab.models.base import AssistantResponse
 import random
 
 def build_environment(spec: ExperimentSpec) -> "ToolLabEnvironment":
-    if spec.matrix_mode == "fixed":
-        return FixedMatrixEnvironment(spec)
+    return FixedMatrixEnvironment(spec)
 
 
 
@@ -95,7 +94,7 @@ class ToolLabEnvironment(ABC):
             if attribute.description:
                 attr_str+=f' {attribute.description}'
             if attribute.cost_multiplier and self.spec.budget_type=='points':
-                cost = self.spec.tool_costs['inspect_cell'] * attribute.cost_multiplier
+                cost = self.spec.inspect_cell_tool_cost * attribute.cost_multiplier
                 attr_str+=f'(tool cost: {cost})'
             
             attribute_lines.append(attr_str)
@@ -261,15 +260,8 @@ class ToolLabEnvironment(ABC):
         return payload
 
     def _mode_rules(self) -> str:
-        if self.spec.matrix_mode == "fixed":
-            return (
-                "You may reveal any cell with inspect_cell."
-            )
-        window_size = int(self.spec.interface.get("window_size", 6))
-        step_size = int(self.spec.interface.get("auto_advance_steps", 1))
         return (
-            "Only a limited window of cue labels is visible at a time. "
-            f"The visible window contains {window_size} labels and advances by {step_size} step(s) after every tool action."
+            "You may reveal any cell with inspect_cell."
         )
 
     def _record_event(

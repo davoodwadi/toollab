@@ -3,7 +3,7 @@ from __future__ import annotations
 from argparse import ArgumentParser
 import json
 
-from tool_lab.config import MatrixMode, load_experiment_spec
+from tool_lab.config import load_experiment_spec
 from tool_lab.runner import ExperimentRunner
 from tool_lab.storage import read_jsonl
 
@@ -16,13 +16,10 @@ def main() -> None:
     run_parser.add_argument("--config", required=True, help="Path to a YAML or JSON experiment spec")
     run_parser.add_argument("--provider", help="Model provider override: openai, anthropic, google, or mock")
     run_parser.add_argument("--model", help="Model name override")
-    run_parser.add_argument(
-        "--matrix-mode",
-        choices=["fixed", "scrolling"],
-        help="Override the experiment interface mode",
-    )
+    
     run_parser.add_argument("--replications", type=int, help="Override replication count")
     run_parser.add_argument("--budget_tools", type=int, help="Override max tool calls")
+    run_parser.add_argument("--inspect_cell_tool_cost", type=float, help="Override inspect tool cost")
     run_parser.add_argument("--api-key-env", help="Override the API key environment variable name")
     run_parser.add_argument("--output-root", default="results", help="Directory for result artifacts")
     run_parser.add_argument("--mock", action="store_true", help="Run a local mock trial to verify the design")
@@ -33,11 +30,7 @@ def main() -> None:
     grid_parser.add_argument("--models", nargs="+", required=True, help="List of provider:model combinations (e.g. openai:gpt-5.4-mini llamacpp:default)")
     grid_parser.add_argument("--budget_tools", nargs="+", type=int, help="List of max tool calls to iterate over (e.g. 10 20 30)")
     grid_parser.add_argument("--inspect_cell_tool_cost", nargs="+", type=float, help="List of inspect tool cost to iterate over")
-    grid_parser.add_argument(
-        "--matrix-mode",
-        choices=["fixed", "scrolling"],
-        help="Override the experiment interface mode",
-    )
+    
     grid_parser.add_argument("--replications", type=int, help="Override replication count")
     grid_parser.add_argument("--api-key-env", help="Override the API key environment variable name")
     grid_parser.add_argument("--output-root", default="results", help="Directory for result artifacts")
@@ -63,14 +56,19 @@ def main() -> None:
                 "model_name": "mock-v1",
                 "replications": 1
             }
+        budget_override = {}
+        if budget_type == 'tools' and getattr(args, 'budget_tools', None) is not None:
+            budget_override['budget_tools'] = args.budget_tools
+        elif budget_type == 'tool_usd' and getattr(args, 'inspect_cell_tool_cost', None) is not None:
+            budget_override['inspect_cell_tool_cost'] = args.inspect_cell_tool_cost
+
         # print()
         spec = load_experiment_spec(args.config).with_runtime_overrides(
-            matrix_mode=args.matrix_mode,
             provider=args.provider or mock_overrides.get("provider"),
             model_name=args.model or mock_overrides.get("model_name"),
             replications=args.replications or mock_overrides.get("replications"), 
-            budget_tools=args.budget_tools,
             api_key_env=args.api_key_env,
+            **budget_override
         )
         runner = ExperimentRunner(
             spec, 
@@ -104,7 +102,6 @@ def main() -> None:
                             budget_override['inspect_cell_tool_cost'] = budget
 
                         spec = load_experiment_spec(args.config).with_runtime_overrides(
-                            matrix_mode=args.matrix_mode,
                             provider=provider,
                             model_name=model_name,
                             replications=args.replications or mock_overrides.get("replications"),
@@ -127,7 +124,6 @@ def main() -> None:
                 print(f"{'='*50}\n")
                 try:
                     spec = load_experiment_spec(args.config).with_runtime_overrides(
-                        matrix_mode=args.matrix_mode,
                         provider=provider,
                         model_name=model_name,
                         replications=args.replications or mock_overrides.get("replications"),

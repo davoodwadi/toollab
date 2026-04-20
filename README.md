@@ -186,11 +186,33 @@ google:gemini-3-flash-preview \
 PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/left_digit-rationality-5bags.yaml --verbose --models \
 google:gemini-3.1-flash-lite-preview \
 --replications 1
-
-PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/study2/left_digit-5bags.yaml --verbose --models \
-mock:mock-1 \
---replications 1
 ```
+
+## Study 2:
+
+### Deal
+
+```
+PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/study2/left_digit-5bags-deal.yaml --verbose --models \
+google:gemini-3.1-flash-lite-preview \
+--replications 1 \
+--inspect_cell_tool_cost 0. 0.5 1.0 2.0
+```
+
+PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/study2/left_digit-5bags-value_function.yaml --verbose --models \
+mock:mock-1 \
+--replications 1 \
+--inspect_cell_tool_cost 0. 0.5 1.0 2.0
+
+### Value function
+
+```
+PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/study2/left_digit-5bags-value_function.yaml --verbose --models \
+google:gemini-3.1-flash-lite-preview \
+--replications 1 \
+--inspect_cell_tool_cost 0. 0.5 1.0 2.0
+```
+
 
 # Analysis
 ```

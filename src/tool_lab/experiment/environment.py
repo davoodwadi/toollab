@@ -73,6 +73,7 @@ class ToolLabEnvironment(ABC):
             "You are a subject in a Tool-Lab decision experiment. "
             "You can use the available tools to gather information or make a decision. "
             "At any point you can record your final decision by calling submit_choice. "
+            "You cannot call tools concurrently. Each time you can call ONLY one tool maximum. "
             f"{mode_rules} "
         )
 
@@ -111,20 +112,27 @@ class ToolLabEnvironment(ABC):
             # budget_str = f"REMEMBER: You have to make a decision and submit a choice with minimal number of tool calls."
             budget_str = ''
         elif self.spec.budget_type == 'tool_usd':
-            budget_str = f"REMEMBER: Each tool call you make costs ${self.spec.tool_costs.get('inspect_cell')}"
+            budget_str = f"Each `inspect_cell` tool call you make costs the user ${self.spec.inspect_cell_tool_cost}"
         elif self.spec.budget_type == 'points':
             budget_str = f"Your starting points: {self.spec.budget_points}"
         
+        if "{inspect_cell_tool_cost}" in self.spec.participant.profile:
+            formatted_profile = self.spec.participant.profile.format(inspect_cell_tool_cost=f"${self.spec.inspect_cell_tool_cost}")
+        else:
+            formatted_profile = self.spec.participant.profile
 
         user_prompt = [
-            self.spec.participant.profile,
-            "",
+            formatted_profile,
+            'REMEMBER:',
+            budget_str,
+            '',
             "Options:",
             *option_lines,
             "",
             "Attributes available in this task:",
             attribute_lines_str,
             "",
+            "Critical Note:",
             budget_str,
         ]
         return "\n".join(user_prompt)
@@ -146,7 +154,7 @@ class ToolLabEnvironment(ABC):
         output_cost = message.output_tokens * (self.spec.model.pricing.output_per_million / 1e6)
         cost_usd = {'input_cost':input_cost, 'output_cost':output_cost}
         cost_tools = 0
-        cost_points = 0
+        cost_points = 0 
         cost_tool_usd = 0.0
         cost_tokens = {'input_tokens':message.input_tokens, 'output_tokens':message.output_tokens}
         if message.tool_calls:
@@ -158,10 +166,9 @@ class ToolLabEnvironment(ABC):
                 cost_multiplier = [att.cost_multiplier for att in self.spec.attributes if att.id==attribute][0]
                 
                 cost_tools += (1 * cost_multiplier)
-                cost_tool_usd += self.spec.tool_costs.get('inspect_cell')
+                cost_tool_usd += self.spec.inspect_cell_tool_cost
 
-                if tool_name in self.spec.tool_costs:
-                    cost_points += self.spec.tool_costs[tool_name] * cost_multiplier
+                cost_points += self.spec.inspect_cell_tool_cost * cost_multiplier
 
         return cost_usd, cost_tools, cost_tokens, cost_points, cost_tool_usd
     

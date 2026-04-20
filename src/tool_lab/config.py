@@ -113,9 +113,9 @@ class ExperimentSpec:
     budget_tools: int | None = None
     budget_tokens: int | None = None
     budget_points: int | None = None
+    inspect_cell_tool_cost: float | None = None
     max_turns: int = 20
     tools: list[str] = field(default_factory=list)
-    tool_costs: dict[str, float] = field(default_factory=dict)
     interface: dict[str, Any] = field(default_factory=dict)
     analysis: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -172,6 +172,7 @@ class ExperimentSpec:
         replications: int | None = None,
         budget_tools: int | None = None,
         api_key_env: str | None = None,
+        **budget_override,
     ) -> "ExperimentSpec":
         resolved_mode = matrix_mode or self.matrix_mode
         resolved_tools = list(self.tools)
@@ -189,10 +190,11 @@ class ExperimentSpec:
             self,
             matrix_mode=resolved_mode,
             replications=self.replications if replications is None else replications,
-            budget_tools=self.budget_tools if budget_tools is None else budget_tools,
             tools=resolved_tools,
             model=resolved_model,
+            **budget_override
         )
+
         updated.validate()
         return updated
 
@@ -268,9 +270,9 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         budget_tools=experiment.get("budget_tools", 0),
         budget_tokens=experiment.get("budget_tokens", 0),
         budget_points=experiment.get("budget_points", 0),
+        inspect_cell_tool_cost=experiment.get("inspect_cell_tool_cost", 0),
         max_turns=experiment.get("max_turns", 20),
         tools=experiment.get("tools", []),
-        tool_costs=experiment.get("tool_costs", {}),
         interface=experiment.get("interface", {}),
         analysis=experiment.get("analysis", {}),
         metadata=experiment.get("metadata", {}),

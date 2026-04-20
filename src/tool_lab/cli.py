@@ -32,6 +32,7 @@ def main() -> None:
     grid_parser.add_argument("--config", required=True, help="Path to a YAML or JSON experiment spec")
     grid_parser.add_argument("--models", nargs="+", required=True, help="List of provider:model combinations (e.g. openai:gpt-5.4-mini llamacpp:default)")
     grid_parser.add_argument("--budget_tools", nargs="+", type=int, help="List of max tool calls to iterate over (e.g. 10 20 30)")
+    grid_parser.add_argument("--inspect_cell_tool_cost", nargs="+", type=float, help="List of inspect tool cost to iterate over")
     grid_parser.add_argument(
         "--matrix-mode",
         choices=["fixed", "scrolling"],
@@ -43,12 +44,16 @@ def main() -> None:
     grid_parser.add_argument("--mock", action="store_true", help="Run a local mock trial to verify the design")
     grid_parser.add_argument("--verbose", action="store_true", help="Show more logs")
 
-    summarize_parser = subparsers.add_parser(
-        "summarize", help="Recompute summary statistics from an existing runs.jsonl file"
-    )
-    summarize_parser.add_argument("--runs", required=True, help="Path to runs.jsonl")
-
     args = parser.parse_args()
+
+    spec = load_experiment_spec(args.config)
+    budget_type = spec.budget_type
+    budget_list = None
+    if budget_type=='tool_usd':
+        budget_list = args.inspect_cell_tool_cost
+    elif budget_type=='tools':
+        budget_list = args.budget_tools
+    
 
     if args.command == "run":
         mock_overrides = {}
@@ -76,12 +81,7 @@ def main() -> None:
         return
 
     if args.command == "grid":
-        mock_overrides = {}
-        if args.mock:
-            mock_overrides = {
-                "replications": 1
-            }
-        print(f'Running a grid over: \n{args.models}\ntool calls: \n{args.budget_tools}\n')
+        print(f'Running a grid over: \n{args.models}\nbudget_type: {budget_type}\ntool calls: \n{budget_list}\n')
         for model_str in args.models:
             if ":" not in model_str:
                 print(f"Error: Invalid model format '{model_str}'. Must be provider:model_name")
@@ -90,20 +90,26 @@ def main() -> None:
             if args.mock:
                 provider = "mock"
                 model_name = "mock-v1"
-            if args.budget_tools:
-                for budget in args.budget_tools:
+            if budget_list:
+                for budget in budget_list:
                     print(f"\n{'='*50}")
-                    print(f"Running grid cell: provider={provider}, model={model_name}, budget_tools={budget}")
+                    print(f"Running grid cell: provider={provider}, model={model_name}, budget_type={budget_type}, budget={budget}")
                     print(f"{'='*50}\n")
                     # continue
                     try:
+                        budget_override = {}
+                        if budget_type=='tools':
+                            budget_override['budget_tools'] = budget
+                        elif budget_type=='tool_usd':
+                            budget_override['inspect_cell_tool_cost'] = budget
+
                         spec = load_experiment_spec(args.config).with_runtime_overrides(
                             matrix_mode=args.matrix_mode,
                             provider=provider,
                             model_name=model_name,
-                            budget_tools=budget,
                             replications=args.replications or mock_overrides.get("replications"),
                             api_key_env=args.api_key_env,
+                            **budget_override
                         )
                         runner = ExperimentRunner(
                             spec, 
@@ -140,9 +146,6 @@ def main() -> None:
 
 
         return
-
-    if args.command == "summarize":
-        records = read_jsonl(args.runs)
 
 
 if __name__ == "__main__":

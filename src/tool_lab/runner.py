@@ -19,6 +19,8 @@ class ExperimentRunner:
         self.verbose = verbose 
 
     def run(self) -> dict[str, Any]:
+        # print('self.spec.budget_type', self.spec.budget_type)
+        # print('self.spec.inspect_cell_tool_cost', self.spec.inspect_cell_tool_cost)
         for index in range(self.spec.replications):
             writer = ResultWriter(
                 output_root=self.output_root,
@@ -107,7 +109,7 @@ class ExperimentRunner:
             elif environment.spec.budget_type=='tools':
                 print(f"Budget: {environment.spec.budget_tools} Tools")
             elif environment.spec.budget_type=='tool_usd':
-                print(f"Tool cost: ${environment.spec.tool_costs.get("inspect_cell")}")
+                print(f"Tool cost: ${environment.spec.inspect_cell_tool_cost}")
             elif environment.spec.budget_type=='tokens':
                 print(f"Budget: {environment.spec.budget_tokens} Tokens")
             elif environment.spec.budget_type=='points':
@@ -241,6 +243,7 @@ class ExperimentRunner:
         print(f'Total cost: ${environment.cumulative_cost_usd}')
         print('+'*50)
         # session ended -> record the response
+
         run_record = {
             "session_name": session_name,
             "experiment_name": self.spec.name,
@@ -270,7 +273,11 @@ class ExperimentRunner:
             "option_mapping": {opt.id: opt.metadata.get('original_id', opt.id) for opt in run_spec.options},
             "started_at": started_at,
             "finished_at": datetime.now(timezone.utc).isoformat(),
+            'system_prompt' : model_session.system_prompt,
+            'user_message' : model_session.initial_user_message,
         }
+        if environment.spec.budget_type=='tool_usd':
+            run_record['inspect_cell_tool_cost'] = environment.spec.inspect_cell_tool_cost
         return run_record
 
 

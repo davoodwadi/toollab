@@ -1,0 +1,252 @@
+{
+  "analysis": {},
+  "attributes": [
+    {
+      "cost_multiplier": 1.0,
+      "description": "The whole dollar amount of the coffee's price, before cents.",
+      "display_name": "Price (Whole Dollars)",
+      "id": "price_dollars",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The fractional cents portion of the coffee's price.",
+      "display_name": "Price (Cents)",
+      "id": "price_cents",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The net weight of the coffee package in ounces.",
+      "display_name": "Weight (Ounces)",
+      "id": "weight_oz",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The date the coffee beans were roasted.",
+      "display_name": "Roast Date",
+      "id": "roast_date",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The country where the coffee beans were grown.",
+      "display_name": "Bean Origin",
+      "id": "origin",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The type of bag or container the coffee is in.",
+      "display_name": "Packaging Type",
+      "id": "packaging",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "Calories per serving.",
+      "display_name": "Calories",
+      "id": "calories",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The manufacturer of the product.",
+      "display_name": "Brand",
+      "id": "brand",
+      "metadata": {}
+    }
+  ],
+  "budget_points": 0,
+  "budget_tokens": 0,
+  "budget_tools": 0,
+  "budget_type": "tool_usd",
+  "budget_usd": 0.0,
+  "cues": [
+    {
+      "attribute_id": "price_dollars",
+      "id": "coffee_a_price_dollars",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "$12"
+    },
+    {
+      "attribute_id": "price_cents",
+      "id": "coffee_a_price_cents",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "99 cents"
+    },
+    {
+      "attribute_id": "weight_oz",
+      "id": "coffee_a_weight_oz",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "13.00 oz"
+    },
+    {
+      "attribute_id": "roast_date",
+      "id": "coffee_a_roast_date",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "2 weeks ago"
+    },
+    {
+      "attribute_id": "origin",
+      "id": "coffee_a_origin",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "Colombia"
+    },
+    {
+      "attribute_id": "packaging",
+      "id": "coffee_a_packaging",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "Foil bag"
+    },
+    {
+      "attribute_id": "calories",
+      "id": "coffee_a_calories",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "3"
+    },
+    {
+      "attribute_id": "brand",
+      "id": "coffee_a_brand",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_a",
+      "value": "Folgers"
+    },
+    {
+      "attribute_id": "price_dollars",
+      "id": "coffee_b_price_dollars",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "$13"
+    },
+    {
+      "attribute_id": "price_cents",
+      "id": "coffee_b_price_cents",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "0 cents"
+    },
+    {
+      "attribute_id": "weight_oz",
+      "id": "coffee_b_weight_oz",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "14.06 oz"
+    },
+    {
+      "attribute_id": "roast_date",
+      "id": "coffee_b_roast_date",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "2 weeks ago"
+    },
+    {
+      "attribute_id": "origin",
+      "id": "coffee_b_origin",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "Colombia"
+    },
+    {
+      "attribute_id": "packaging",
+      "id": "coffee_b_packaging",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "Foil bag"
+    },
+    {
+      "attribute_id": "calories",
+      "id": "coffee_b_calories",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "3"
+    },
+    {
+      "attribute_id": "brand",
+      "id": "coffee_b_brand",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_b",
+      "value": "Folgers"
+    }
+  ],
+  "description": "Left digit heuristic test.",
+  "interface": {},
+  "matrix_mode": "fixed",
+  "max_turns": 30,
+  "metadata": {
+    "option_count": 2
+  },
+  "model": {
+    "api_key_env": null,
+    "effort": null,
+    "extra": {},
+    "model_name": "gemini-3.1-flash-lite-preview",
+    "pricing": {
+      "input_per_million": 1,
+      "output_per_million": 3
+    },
+    "provider": "google",
+    "thinking_type": null
+  },
+  "name": "left-digit-rationality",
+  "options": [
+    {
+      "base_score": 1.0,
+      "description": "",
+      "display_name": "",
+      "id": "coffee_a",
+      "metadata": {
+        "original_id": "coffee_a"
+      }
+    },
+    {
+      "base_score": 1.08,
+      "description": "",
+      "display_name": "",
+      "id": "coffee_b",
+      "metadata": {
+        "original_id": "coffee_b"
+      }
+    }
+  ],
+  "participant": {
+    "profile": "You are a deal hunter. You are looking for the best deal on coffee.\nYou can open the cells to get information about the product using the inspect_cell tool, or you can stop searching and submit your choice with the submit_choice tool. \nEvery time you use the inspect_cell tool, you suffer a cost. submit_choice has no cost. \n",
+    "role": "coffee shopper"
+  },
+  "randomization": {
+    "randomize_attributes_options": true,
+    "seed": null
+  },
+  "replications": 10,
+  "tool_costs": {
+    "inspect_cell": 0.5
+  },
+  "tools": [
+    "inspect_cell",
+    "submit_choice"
+  ]
+}

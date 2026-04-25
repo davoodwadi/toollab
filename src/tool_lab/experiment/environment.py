@@ -162,11 +162,15 @@ class ToolLabEnvironment(ABC):
             tool_name = message.tool_calls[0].name
             if tool_name=='inspect_cell':
                 attribute = message.tool_calls[0].arguments['attribute_id']
-                cost_multiplier = [att.cost_multiplier for att in self.spec.attributes if att.id==attribute][0]
                 
+                cost_multiplier_list = [att.cost_multiplier for att in self.spec.attributes if att.id==attribute]
+                if cost_multiplier_list:
+                    cost_multiplier = cost_multiplier_list[0]
+                else:
+                    cost_multiplier = 1.
+
                 cost_tools += (1 * cost_multiplier)
                 cost_tool_usd += self.spec.inspect_cell_tool_cost
-
                 cost_points += self.spec.inspect_cell_tool_cost * cost_multiplier
 
         return cost_usd, cost_tools, cost_tokens, cost_points, cost_tool_usd
@@ -215,7 +219,7 @@ class ToolLabEnvironment(ABC):
             payload = {
                 "role": "tool",
                 "tool_call_id": tool_call_id,
-                "error": str(exc),
+                "error": json.dumps({"error": str(exc)}),
             }
 
         extra = {}

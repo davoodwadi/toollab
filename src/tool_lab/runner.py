@@ -225,7 +225,7 @@ class ExperimentRunner:
                     tool_results_and_name.append((tool_response, tc.name))
                     print(f"Tool Name: {tc.name}")
                     print(f"Tool Arguments: {tc.arguments}")
-                    print(f"Tool Response: {tool_response['content']}")
+                    print(f"Tool Response: {tool_response.get('content')}")
                 else:
                     # error the remaining tools, if any
                     # return error

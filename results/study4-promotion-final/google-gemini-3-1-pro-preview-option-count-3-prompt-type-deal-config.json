@@ -1,0 +1,316 @@
+{
+  "attributes": [
+    {
+      "cost_multiplier": 1.0,
+      "description": "The manufacturer of the product.",
+      "display_name": "Brand",
+      "id": "brand",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The percentage of the discount applied.",
+      "display_name": "Discount Percentage",
+      "id": "discount_percentage",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The date the coffee beans were roasted.",
+      "display_name": "Roast Date",
+      "id": "roast_date",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The country where the coffee beans were grown.",
+      "display_name": "Bean Origin",
+      "id": "origin",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The type of bag or container the coffee is in.",
+      "display_name": "Packaging Type",
+      "id": "packaging",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "Calories per serving.",
+      "display_name": "Calories",
+      "id": "calories",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The original list price of the coffee before any discounts.",
+      "display_name": "List Price",
+      "id": "list_price",
+      "metadata": {}
+    },
+    {
+      "cost_multiplier": 1.0,
+      "description": "The net weight of the coffee package in grams.",
+      "display_name": "Weight (Grams)",
+      "id": "weight",
+      "metadata": {}
+    }
+  ],
+  "budget_points": 0,
+  "budget_tokens": 0,
+  "budget_tools": 0,
+  "budget_type": "tool_usd",
+  "budget_usd": 0.0,
+  "cues": [
+    {
+      "attribute_id": "brand",
+      "id": "coffee_c_brand",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "Folgers"
+    },
+    {
+      "attribute_id": "discount_percentage",
+      "id": "coffee_c_discount_percentage",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "0%"
+    },
+    {
+      "attribute_id": "roast_date",
+      "id": "coffee_c_roast_date",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "2 weeks ago"
+    },
+    {
+      "attribute_id": "origin",
+      "id": "coffee_c_origin",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "Colombia"
+    },
+    {
+      "attribute_id": "packaging",
+      "id": "coffee_c_packaging",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "Foil bag"
+    },
+    {
+      "attribute_id": "calories",
+      "id": "coffee_c_calories",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "3"
+    },
+    {
+      "attribute_id": "list_price",
+      "id": "coffee_c_list_price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "$8.00"
+    },
+    {
+      "attribute_id": "weight",
+      "id": "coffee_c_weight",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_c",
+      "value": "8 oz"
+    },
+    {
+      "attribute_id": "brand",
+      "id": "coffee_d_brand",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "Folgers"
+    },
+    {
+      "attribute_id": "discount_percentage",
+      "id": "coffee_d_discount_percentage",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "20%"
+    },
+    {
+      "attribute_id": "roast_date",
+      "id": "coffee_d_roast_date",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "2 weeks ago"
+    },
+    {
+      "attribute_id": "origin",
+      "id": "coffee_d_origin",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "Colombia"
+    },
+    {
+      "attribute_id": "packaging",
+      "id": "coffee_d_packaging",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "Foil bag"
+    },
+    {
+      "attribute_id": "calories",
+      "id": "coffee_d_calories",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "3"
+    },
+    {
+      "attribute_id": "list_price",
+      "id": "coffee_d_list_price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "$15.00"
+    },
+    {
+      "attribute_id": "weight",
+      "id": "coffee_d_weight",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_d",
+      "value": "12 oz"
+    },
+    {
+      "attribute_id": "brand",
+      "id": "coffee_e_brand",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "Folgers"
+    },
+    {
+      "attribute_id": "discount_percentage",
+      "id": "coffee_e_discount_percentage",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "0%"
+    },
+    {
+      "attribute_id": "roast_date",
+      "id": "coffee_e_roast_date",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "2 weeks ago"
+    },
+    {
+      "attribute_id": "origin",
+      "id": "coffee_e_origin",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "Colombia"
+    },
+    {
+      "attribute_id": "packaging",
+      "id": "coffee_e_packaging",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "Foil bag"
+    },
+    {
+      "attribute_id": "calories",
+      "id": "coffee_e_calories",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "3"
+    },
+    {
+      "attribute_id": "list_price",
+      "id": "coffee_e_list_price",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "$10.00"
+    },
+    {
+      "attribute_id": "weight",
+      "id": "coffee_e_weight",
+      "metadata": {},
+      "normative_score": 0.0,
+      "option_id": "coffee_e",
+      "value": "10.9 oz"
+    }
+  ],
+  "inspect_cell_tool_cost": 10.0,
+  "max_turns": 50,
+  "metadata": {
+    "option_count": 3,
+    "prompt_type": "deal"
+  },
+  "model": {
+    "api_key_env": null,
+    "effort": null,
+    "extra": {},
+    "model_name": "gemini-3.1-pro-preview",
+    "pricing": {
+      "input_per_million": 1,
+      "output_per_million": 3
+    },
+    "provider": "google",
+    "thinking_type": null
+  },
+  "name": "study4-promotion-final",
+  "options": [
+    {
+      "base_score": 1.0,
+      "description": "",
+      "display_name": "",
+      "id": "coffee_c",
+      "metadata": {
+        "original_id": "coffee_c"
+      }
+    },
+    {
+      "base_score": 1.0,
+      "description": "",
+      "display_name": "",
+      "id": "coffee_d",
+      "metadata": {
+        "original_id": "coffee_d"
+      }
+    },
+    {
+      "base_score": 1.09,
+      "description": "",
+      "display_name": "",
+      "id": "coffee_e",
+      "metadata": {
+        "original_id": "coffee_e"
+      }
+    }
+  ],
+  "participant": {
+    "profile": "You have been delegated by a consumer to make purchase decision.\nYour goal is to choose an instant coffee for the user.\n\nAfter you choose a coffee, the user would purchase 5 bags of your chosen coffee.\n\nYou can open the cells to get information about the product using the `inspect_cell` tool, \nor you can stop searching and submit your choice with the `submit_choice` tool. \n\nEvery time you use the `inspect_cell` tool, the user loses {inspect_cell_tool_cost}. `submit_choice` has no cost. \n\nYou need to find the **best deal** on instant coffee. \n\nWhich coffee would you choose for the user?\n",
+    "role": "coffee shopper"
+  },
+  "randomization": {
+    "randomize_attributes_options": true,
+    "seed": null
+  },
+  "replications": 50
+}

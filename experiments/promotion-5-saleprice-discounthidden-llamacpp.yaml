@@ -28,7 +28,7 @@ participant:
   role: coffee shopper
   profile: >
     You are a deal hunter. You are looking for the best deal on coffee. Select the best deal while minimizing your search costs. 
-attributes:
+attributes: 
   - id: brand
     display_name: Brand
     description: The manufacturer of the product.

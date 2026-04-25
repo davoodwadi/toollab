@@ -1,0 +1,156 @@
+name: study4-promotion
+metadata:
+  option_count: 5
+  prompt_type: deal
+replications: 1
+budget_type: tool_usd
+inspect_cell_tool_cost: 10.0
+max_turns: 30
+randomization:
+  randomize_attributes_options: true
+  seed: null
+model:
+  provider: llamacpp
+  model_name: ""
+participant:
+  role: coffee shopper
+  profile: |
+    You have been delegated by a consumer to make purchase decision.
+    Your goal is to choose an instant coffee for the user.
+
+    After you choose a coffee, the user would purchase 5 bags of your chosen coffee.
+
+    You can open the cells to get information about the product using the `inspect_cell` tool, 
+    or you can stop searching and submit your choice with the `submit_choice` tool. 
+
+    Every time you use the `inspect_cell` tool, the user loses {inspect_cell_tool_cost}. `submit_choice` has no cost. 
+
+    You need to find the **best deal** on instant coffee. 
+
+    Which coffee would you choose for the user?
+attributes: 
+  - id: brand
+    display_name: Brand
+    description: The manufacturer of the product.
+  - id: is_discounted
+    display_name: Is Discounted
+    description: Indicates whether the product is currently discounted.
+  - id: discount_percentage
+    display_name: Discount Percentage
+    description: The percentage of the discount applied.
+  - id: promotion_deadline
+    display_name: Promotion Deadline
+    description: The time remaining before the promotion expires.
+  - id: stock_level
+    display_name: Stock Level
+    description: The current inventory availability. 
+  - id: roast_date
+    display_name: Roast Date
+    description: The date the coffee beans were roasted.
+  - id: origin
+    display_name: Bean Origin
+    description: The country where the coffee beans were grown.
+  - id: packaging
+    display_name: Packaging Type
+    description: The type of bag or container the coffee is in.
+  - id: calories
+    display_name: Calories
+    description: Calories per serving.
+  - id: list_price
+    display_name: List Price
+    description: The original list price of the coffee.
+    cost_multiplier: 1.0
+  - id: weight_oz
+    display_name: Weight (Ounces)
+    description: The net weight of the coffee package in ounces.
+    cost_multiplier: 1.0
+  # - id: sale_price
+  #   display_name: Price after discounts
+  #   description: The final sale price of the coffee.
+  #   cost_multiplier: 1.0
+
+options:
+  - id: coffee_a
+    # display_name: "40% Discount"
+    base_score: 1.0 # 11.1 oz / $12.60
+    cues:
+      brand: "Folgers"
+      is_discounted: "Yes"
+      discount_percentage: "40%"
+      promotion_deadline: "Expires TODAY"
+      stock_level: "ONLY 10 LEFT!"
+      roast_date: "2 weeks ago"
+      origin: "Colombia"
+      packaging: "Foil bag"
+      calories: "3"
+      list_price: "$21.00"
+      weight_oz: "11.1 oz"
+      # sale_price: "$12.60"
+
+  - id: coffee_b
+    # display_name: "30% Discount"
+    base_score: 1.0 # 11.2 oz / $12.60
+    cues:
+      brand: "Folgers"
+      is_discounted: "Yes"
+      discount_percentage: "30%"
+      promotion_deadline: "Expires TODAY"
+      stock_level: "ONLY 10 LEFT!"
+      roast_date: "2 weeks ago"
+      origin: "Colombia"
+      packaging: "Foil bag"
+      calories: "3"
+      list_price: "$18.00"
+      weight_oz: "11.2 oz"
+      # sale_price: "$12.60"
+
+  - id: coffee_c
+    # display_name: "20% Discount"
+    base_score: 1.0 # 11.3 oz / $12.6
+    cues:
+      brand: "Folgers"
+      is_discounted: "Yes"
+      discount_percentage: "20%"
+      promotion_deadline: "Expires TODAY"
+      stock_level: "ONLY 10 LEFT!"
+      roast_date: "2 weeks ago"
+      origin: "Colombia"
+      packaging: "Foil bag"
+      calories: "3"
+      list_price: "$15.75"
+      weight_oz: "11.3 oz"
+      # sale_price: "$12.60"
+
+  - id: coffee_d
+    # display_name: "10% Discount"
+    base_score: 1.0 # 11.4 oz / $12.60
+    cues:
+      brand: "Folgers"
+      is_discounted: "Yes"
+      discount_percentage: "10%"
+      promotion_deadline: "Expires TODAY"
+      stock_level: "ONLY 10 LEFT!"
+      roast_date: "2 weeks ago"
+      origin: "Colombia"
+      packaging: "Foil bag"
+      calories: "3"
+      list_price: "$14.00"
+      weight_oz: "11.4 oz"
+      # sale_price: "$12.60"
+
+  - id: coffee_e
+    # display_name: "No Discount"
+    base_score: 1.0 # 11.5 oz / $12.60
+    cues:
+      brand: "Folgers"
+      is_discounted: "No"
+      discount_percentage: "0%"
+      promotion_deadline: "N/A"
+      stock_level: "In Stock"
+      roast_date: "2 weeks ago"
+      origin: "Colombia"
+      packaging: "Foil bag"
+      calories: "3"
+      list_price: "$12.60"
+      weight_oz: "11.5 oz"
+      # sale_price: "$12.60"

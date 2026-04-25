@@ -93,67 +93,14 @@ To adapt the framework, edit or add a new YAML file with:
 # TEST
 
 Data collection:
-```
+
 source .venv/bin/activate
 PYTHONPATH=src python src/tool_lab/cli.py run --config experiments/promotion-5-saleprice-discounthidden-llamacpp.yaml --verbose --budget_tool 10
-```
 
 Data collection (grid):
-```
+
 source .venv/bin/activate
 
-PYTHONPATH=src python src/tool_lab/cli.py grid \
---config experiments/promotion-5-saleprice-discountshown-llamacpp.yaml \
---verbose \
---budget_tools 20 10 5 1 \
---models \
-llamacpp:Qwen3.5-27B-UD-Q4_K_XL.gguf \
-llamacpp:Qwen3.5-9B-UD-Q4_K_XL.gguf \
-llamacpp:Qwen3.5-4B-UD-Q4_K_XL.gguf \
-llamacpp:gemma-4-31B-it-UD-Q4_K_XL.gguf \
-llamacpp:gemma-4-E4B-it-UD-Q4_K_XL.gguf \
-llamacpp:gemma-4-E2B-it-UD-Q4_K_XL.gguf \
---replications 10
-```
-
-```
-PYTHONPATH=src python src/tool_lab/cli.py grid \
---config experiments/promotion-5-saleprice-discounthidden-llamacpp.yaml \
---verbose \
---budget_tools 20 10 5 1 \
---models \
-google:gemini-3.1-flash-lite-preview \
---replications 10
-```
-
-```
-PYTHONPATH=src python src/tool_lab/cli.py grid \
---config experiments/left_digit-llamacpp.yaml \
---verbose \
---budget_tools 16 6 4 1 \
---models \
-llamacpp:Qwen3.5-27B-UD-Q4_K_XL.gguf \
-llamacpp:Qwen3.5-9B-UD-Q4_K_XL.gguf \
-llamacpp:Qwen3.5-4B-UD-Q4_K_XL.gguf \
-llamacpp:gemma-4-31B-it-UD-Q4_K_XL.gguf \
-llamacpp:gemma-4-E4B-it-UD-Q4_K_XL.gguf \
-llamacpp:gemma-4-E2B-it-UD-Q4_K_XL.gguf \
---replications 10
-```
-
-```
-PYTHONPATH=src python src/tool_lab/cli.py grid \
---config experiments/left_digit-llamacpp.yaml \
---verbose \
---budget_tools 16 6 4 1 \
---models \
-google:gemini-3.1-flash-lite-preview \
-google:gemini-3-flash-preview \
-google:gemini-3.1-pro-preview \
---replications 10
-```
-
-```
 PYTHONPATH=src python src/tool_lab/cli.py grid \
 --config experiments/left_digit-llamacpp.yaml \
 --verbose \
@@ -161,57 +108,54 @@ PYTHONPATH=src python src/tool_lab/cli.py grid \
 --models \
 google:gemini-3.1-flash-lite-preview \
 --replications 7
-```
 
 
-# Resource rationality
-
-```
-PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/left_digit-rationality.yaml --verbose --models \
-google:gemini-3.1-flash-lite-preview \
---replications 10
-
-PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/left_digit-rationality.yaml --verbose --models \
-google:gemini-3-flash-preview \
---replications 10
-
-PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/left_digit-rationality-5bags.yaml --verbose --models \
-google:gemini-3.1-pro-preview \
---replications 1
-
-PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/left_digit-rationality-5bags.yaml --verbose --models \
-google:gemini-3-flash-preview \
---replications 1
-
-PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/left_digit-rationality-5bags.yaml --verbose --models \
-google:gemini-3.1-flash-lite-preview \
---replications 1
-```
-
-## Study 2:
+## Final left digit
 
 ### Deal
 
-```
-PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/study2/left_digit-5bags-deal.yaml --verbose --models \
+PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/study2-final/left_digit-5bags-deal.yaml \
+--verbose \
+--models \
+google:gemini-3.1-flash-lite-preview \
+google:gemini-3.1-pro-preview \
+--replications 50 \
+--inspect_cell_tool_cost 0. 10.0
+
+### Value_function
+
+<!-- PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/study2-final/left_digit-5bags-value_function.yaml \
+--verbose \
+--models \
+google:gemini-3.1-flash-lite-preview \
+google:gemini-3.1-pro-preview \
+--replications 10 \
+--inspect_cell_tool_cost 0. 10.0 -->
+
+
+## Promotion:
+
+### Deal
+
+PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/study4-promotion-final/promotion-5bags-deal.yaml \
+--verbose \
+--models \
 google:gemini-3.1-flash-lite-preview \
 --replications 1 \
---inspect_cell_tool_cost 0. 0.5 1.0 2.0
-```
-
-PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/study2/left_digit-5bags-value_function.yaml --verbose --models \
-mock:mock-1 \
---replications 1 \
---inspect_cell_tool_cost 0. 0.5 1.0 2.0
+--inspect_cell_tool_cost 10.
 
 ### Value function
 
-```
-PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/study2/left_digit-5bags-value_function.yaml --verbose --models \
+PYTHONPATH=src python src/tool_lab/cli.py grid --config experiments/study4-promotion-final/promotion-5bags-value_function.yaml \
+--verbose \
+--models \
 google:gemini-3.1-flash-lite-preview \
 --replications 1 \
---inspect_cell_tool_cost 0. 0.5 1.0 2.0
-```
+--inspect_cell_tool_cost 10.0
+
+
+
+
 
 
 # Analysis

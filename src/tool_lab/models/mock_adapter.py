@@ -22,14 +22,17 @@ class MockModelSession:
         config: ModelConfig,
         system_prompt: str,
         initial_user_message: str, 
+        environment
     ) -> None:
         self._behavior = str(config.extra.get("mock_behavior", "submit_after_few_tools"))
         self._max_mock_inspections = int(config.extra.get("mock_inspections", 4))
         self._inspection_count = 0
 
-        self._option_ids = self._parse_section_ids(initial_user_message, "Options:")
-        self._attribute_ids = self._parse_section_ids(initial_user_message, "Attributes available in this task:")
-
+        self.environment = environment
+        self._option_ids = [o.id for o in environment.spec.options]
+        self._attribute_ids = [a.id for a in environment.spec.attributes] if environment.spec.attributes else None
+        # print('self._attribute_ids', self._attribute_ids)
+        # exit()
         self.messages = [
             {'role':'system', 'content':system_prompt},
             {'role':'user', 'content':initial_user_message},
@@ -38,21 +41,6 @@ class MockModelSession:
         self.config = config
         self.system_prompt = system_prompt
         self.initial_user_message = initial_user_message
-
-    @staticmethod
-    def _parse_section_ids(prompt: str, section_header: str) -> list[str]:
-        ids = []
-        in_section = False
-        for line in prompt.splitlines():
-            if line.strip() == section_header:
-                in_section = True
-                continue
-            if in_section:
-                if not line.strip():
-                    break
-                if line.startswith("- "):
-                    ids.append(line[2:].split(":")[0].strip())
-        return ids
 
     def _call_model(self) -> AssistantResponse:
         # submit_choice if we've hit the inspection limit, or randomly (~5% chance)
@@ -63,7 +51,8 @@ class MockModelSession:
         # print('_max_mock_inspections', self._inspection_count, self._max_mock_inspections)
 
         if should_submit and self._option_ids:
-            option_id = self._option_ids[np.random.randint(len(self._option_ids))]
+            # option_id = self._option_ids[np.random.randint(len(self._option_ids))]
+            option_id = self._option_ids[0]
             tool_calls = [
                 ToolInvocation(
                     tool_call_id=f"mock_{uuid4().hex[:8]}",
@@ -73,14 +62,28 @@ class MockModelSession:
             ]
         else:
             option_id = self._option_ids[np.random.randint(len(self._option_ids))]
-            attribute_id = self._attribute_ids[np.random.randint(len(self._attribute_ids))]
-            tool_calls = [
-                ToolInvocation(
-                    tool_call_id=f"mock_{uuid4().hex[:8]}",
-                    name="inspect_cell",
-                    arguments={"option_id": option_id, "attribute_id": attribute_id},
-                )
-            ]
+            if self.environment.spec.inspect_mode == 'full':
+                tool_calls = [
+                    ToolInvocation(
+                        tool_call_id=f"mock_{uuid4().hex[:8]}",
+                        name="inspect",
+                        arguments={"option_id": option_id},
+                    )
+                ]
+            elif self.environment.spec.inspect_mode == 'cell':
+                attribute_id = self._attribute_ids[np.random.randint(len(self._attribute_ids))]
+                tool_calls = [
+                    ToolInvocation(
+                        tool_call_id=f"mock_{uuid4().hex[:8]}",
+                        name="inspect",
+                        arguments={"option_id": option_id, "attribute_id": attribute_id},
+                    )
+                ]
+            else:
+                raise ValueError(f'inspect_mode Invalid: {self.environment.spec.inspect_mode}')
+            # print('tool_calls[0]', tool_calls[0])
+            # exit()
+
             self._inspection_count += 1
 
         # maybe reasoning
@@ -88,7 +91,7 @@ class MockModelSession:
         if np.random.random() > 0.2:
             reasoning = 'Let me think...'
 
-        text = "Submitting choice." if tool_calls[0].name == "submit_choice" else "Inspecting a cell."
+        text = "Submitting choice." if tool_calls[0].name == "submit_choice" else "Inspecting..."
 
         input_tokens = estimate_tokens_from_text(self.messages)
         output_tokens = estimate_tokens_from_text(text, tool_calls[0].arguments)

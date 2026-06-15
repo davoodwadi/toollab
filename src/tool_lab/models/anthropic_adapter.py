@@ -12,37 +12,6 @@ from tool_lab.models.base import AssistantResponse, ToolInvocation
 import anthropic
 
 
-class SubmitChoiceInput(BaseModel):
-    option_id: str
-    most_important_attribute: str = Field(
-        description="The attribute that influenced your choice most."
-    )
-    confidence_score: int = Field(
-        description="Your confidence in this decision from 1 (completely guessing) to 5 (absolutely certain)."
-    )
-    # confidence: Optional[float] = Field(default=None, ge=0, le=1)
-    # justification: Optional[str] = None
-
-class InspectCellInput(BaseModel):
-    option_id: str
-    attribute_id: str
-
-
-submit_choice_tool = dict(
-    name="submit_choice",
-    description="Record the final decision.",
-    # strict= True,
-    input_schema=SubmitChoiceInput.model_json_schema(),
-)
-
-inspect_cell_tool = dict(
-    name="inspect_cell",
-    description="Reveal one hidden cell in the fixed information matrix by option and attribute.",
-    # strict= True,
-    input_schema=InspectCellInput.model_json_schema(),
-)
-
-tools = [submit_choice_tool, inspect_cell_tool]
  
 if __name__=='__main__':
     api_key_env = "ANTHROPIC_API_KEY"
@@ -64,13 +33,14 @@ if __name__=='__main__':
     print(response)
 
 class AnthropicModelSession:
-    provider_name = "openai"
+    provider_name = "anthropic"
 
     def __init__(
         self,
         config: ModelConfig,
         system_prompt: str,
         initial_user_message: str,
+        environment
     ) -> None:
         api_key_env = config.api_key_env or "ANTHROPIC_API_KEY"
         api_key = os.environ.get(api_key_env)
@@ -85,6 +55,50 @@ class AnthropicModelSession:
         self.config = config
         self.system_prompt = system_prompt
         self.initial_user_message = initial_user_message
+        
+
+        class SubmitChoiceInput(BaseModel):
+            option_id: str
+            most_important_attribute: str = Field(
+                description="The attribute that influenced your choice most."
+            )
+            confidence_score: int = Field(
+                description="Your confidence in this decision from 1 (completely guessing) to 5 (absolutely certain)."
+            )
+            # confidence: Optional[float] = Field(default=None, ge=0, le=1)
+            # justification: Optional[str] = None
+
+        if environment.spec.inspect_mode=='cell':
+            class InspectInput(BaseModel):
+                option_id: str
+                attribute_id: str
+            inspect_tool = dict(
+                name="inspect",
+                description="Reveal one hidden cell in the fixed information matrix by option and attribute.",
+                # strict= True,
+                input_schema=InspectInput.model_json_schema(),
+            )
+
+        elif environment.spec.inspect_mode=='full':
+            class InspectInput(BaseModel):
+                option_id: str
+            inspect_tool = dict(
+                name="inspect",
+                description="Reveal the full details of one option in the fixed information matrix.",
+                # strict= True,
+                input_schema=InspectInput.model_json_schema(),
+            )
+        else:
+            raise ValueError('invalid inspect_mode', environment.spec.inspect_mode)
+    
+        submit_choice_tool = dict(
+            name="submit_choice",
+            description="Record the final decision.",
+            input_schema=SubmitChoiceInput.model_json_schema(),
+        )
+
+
+        tools = [submit_choice_tool, inspect_tool]
         self.tools = tools
 
 

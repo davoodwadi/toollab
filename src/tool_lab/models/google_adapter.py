@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Any, Optional
-from pydantic import BaseModel, Field
+from typing import Any, Literal, Optional, get_args
+from pydantic import BaseModel, Field, create_model
 from uuid import uuid4
 
 from tool_lab.config import ModelConfig
@@ -13,39 +13,9 @@ from google import genai
 from google.genai import types
 
 
-class SubmitChoiceInput(BaseModel):
-    option_id: str
-    most_important_attribute: str = Field(
-        description="The attribute that influenced your choice most."
-    )
-    confidence_score: int = Field(
-        description="Your confidence in this decision from 1 (completely guessing) to 5 (absolutely certain)."
-    )
 
-    # confidence: Optional[float] = Field(default=None, ge=0, le=1)
-    # justification: Optional[str] = None
-
-class InspectCellInput(BaseModel):
-    option_id: str
-    attribute_id: str
-
-
-submit_choice_tool = types.FunctionDeclaration(
-    name="submit_choice",
-    description="Record the final decision.",
-    parameters=SubmitChoiceInput.model_json_schema(),
-)
-
-inspect_cell_tool = types.FunctionDeclaration(
-    name="inspect_cell",
-    description="Reveal one hidden cell in the fixed information matrix by option and attribute.",
-    parameters=InspectCellInput.model_json_schema(),
-)
-
-google_tools = types.Tool(function_declarations=[submit_choice_tool, inspect_cell_tool])
-
-if __name__=='__main__':
-    print(google_tools)
+# if __name__=='__main__':
+#     print(google_tools)
 
 class GoogleModelSession:
     provider_name = "google"
@@ -55,6 +25,7 @@ class GoogleModelSession:
         config: ModelConfig,
         system_prompt: str,
         initial_user_message: str,
+        environment
     ) -> None:
         api_key_env = config.api_key_env or "GEMINI_API_KEY"
         api_key = os.environ.get(api_key_env)
@@ -72,6 +43,80 @@ class GoogleModelSession:
         self.config = config
         self.system_prompt = system_prompt
         self.initial_user_message = initial_user_message
+
+        if environment.spec.inspect_mode=='cell':
+            class InspectInput(BaseModel):
+                option_id: str
+                attribute_id: str
+
+            inspect_tool = types.FunctionDeclaration(
+                name="inspect",
+                description="Reveal one hidden cell in the fixed information matrix by option and attribute.",
+                parameters=InspectInput.model_json_schema(),
+            )
+        elif environment.spec.inspect_mode=='full':
+            class InspectInput(BaseModel):
+                option_id: str
+
+            inspect_tool = types.FunctionDeclaration(
+                name="inspect",
+                description="Reveal the full details of one option in the fixed information matrix.",
+                # strict= True,
+                parameters=InspectInput.model_json_schema(),
+            )
+        else:
+            raise ValueError('invalid inspect_mode', environment.spec.inspect_mode)
+
+
+        # submit_choice
+        # Build most_important_attribute field with enum if attributes are defined
+        if environment.attributes:
+            attribute_keys = tuple(environment.attributes.keys())
+            most_important_attribute_field = (
+                Literal[attribute_keys],
+                Field(description="The attribute that influenced your choice most.")
+            )
+        else:
+            most_important_attribute_field = (
+                str,
+                Field(description="The attribute that influenced your choice most.")
+            )
+
+        SubmitChoiceInput = create_model(
+            "SubmitChoiceInput",
+            option_id=(str, ...),
+            most_important_attribute=most_important_attribute_field,
+            confidence_score=(
+                int,
+                Field(description="Your confidence in this decision from 1 (completely guessing) to 5 (absolutely certain).")
+            ),
+        )
+
+        submit_choice_tool = types.FunctionDeclaration(
+            name="submit_choice",
+            description="Record the final decision.",
+            parameters=SubmitChoiceInput.model_json_schema(),
+        )
+        # print('SubmitChoiceInput.model_json_schema()', SubmitChoiceInput.model_json_schema())
+
+        # class SubmitChoiceInput(BaseModel):
+        #     option_id: str
+        #     most_important_attribute: str = Field(
+        #         description="The attribute that influenced your choice most."
+        #     )
+        #     confidence_score: int = Field(
+        #         description="Your confidence in this decision from 1 (completely guessing) to 5 (absolutely certain)."
+        #     )
+
+            # confidence: Optional[float] = Field(default=None, ge=0, le=1)
+            # justification: Optional[str] = None
+        # submit_choice_tool = types.FunctionDeclaration(
+        #     name="submit_choice",
+        #     description="Record the final decision.",
+        #     parameters=SubmitChoiceInput.model_json_schema(),
+        # )
+        google_tools = types.Tool(function_declarations=[submit_choice_tool, inspect_tool])
+
         self.google_tools = google_tools
 
 
@@ -126,7 +171,7 @@ class GoogleModelSession:
                         name=fc.name,
                         arguments=args_dict
                     ))
-        
+         
         text = "\n".join(text_parts)
         reasoning = "\n".join(reasoning_parts)
         

@@ -6,7 +6,7 @@ import json
 from tool_lab.config import load_experiment_spec
 from tool_lab.runner import ExperimentRunner
 from tool_lab.storage import read_jsonl
-
+ 
  
 def main() -> None:
     parser = ArgumentParser(prog="tool-lab")
@@ -19,7 +19,7 @@ def main() -> None:
     
     run_parser.add_argument("--replications", type=int, help="Override replication count")
     run_parser.add_argument("--budget_tools", type=int, help="Override max tool calls")
-    run_parser.add_argument("--inspect_cell_tool_cost", type=float, help="Override inspect tool cost")
+    run_parser.add_argument("--inspect_tool_cost", type=float, help="Override inspect tool cost")
     run_parser.add_argument("--api-key-env", help="Override the API key environment variable name")
     run_parser.add_argument("--output-root", default="results", help="Directory for result artifacts")
     run_parser.add_argument("--mock", action="store_true", help="Run a local mock trial to verify the design")
@@ -29,7 +29,7 @@ def main() -> None:
     grid_parser.add_argument("--config", required=True, help="Path to a YAML or JSON experiment spec")
     grid_parser.add_argument("--models", nargs="+", required=True, help="List of provider:model combinations (e.g. openai:gpt-5.4-mini llamacpp:default)")
     grid_parser.add_argument("--budget_tools", nargs="+", type=int, help="List of max tool calls to iterate over (e.g. 10 20 30)")
-    grid_parser.add_argument("--inspect_cell_tool_cost", nargs="+", type=float, help="List of inspect tool cost to iterate over")
+    grid_parser.add_argument("--inspect_tool_cost", nargs="+", type=float, help="List of inspect tool cost to iterate over")
     
     grid_parser.add_argument("--replications", type=int, help="Override replication count")
     grid_parser.add_argument("--api-key-env", help="Override the API key environment variable name")
@@ -43,7 +43,7 @@ def main() -> None:
     budget_type = spec.budget_type
     budget_list = None
     if budget_type=='tool_usd':
-        budget_list = args.inspect_cell_tool_cost
+        budget_list = args.inspect_tool_cost
     elif budget_type=='tools':
         budget_list = args.budget_tools
     
@@ -59,8 +59,8 @@ def main() -> None:
         budget_override = {}
         if budget_type == 'tools' and getattr(args, 'budget_tools', None) is not None:
             budget_override['budget_tools'] = args.budget_tools
-        elif budget_type == 'tool_usd' and getattr(args, 'inspect_cell_tool_cost', None) is not None:
-            budget_override['inspect_cell_tool_cost'] = args.inspect_cell_tool_cost
+        elif budget_type == 'tool_usd' and getattr(args, 'inspect_tool_cost', None) is not None:
+            budget_override['inspect_tool_cost'] = args.inspect_tool_cost
 
         # print()
         spec = load_experiment_spec(args.config).with_runtime_overrides(
@@ -70,6 +70,8 @@ def main() -> None:
             api_key_env=args.api_key_env,
             **budget_override
         )
+        # print(spec)
+        # exit()
         runner = ExperimentRunner(
             spec, 
             output_root=args.output_root, 
@@ -99,7 +101,7 @@ def main() -> None:
                         if budget_type=='tools':
                             budget_override['budget_tools'] = budget
                         elif budget_type=='tool_usd':
-                            budget_override['inspect_cell_tool_cost'] = budget
+                            budget_override['inspect_tool_cost'] = budget
 
                         spec = load_experiment_spec(args.config).with_runtime_overrides(
                             provider=provider,

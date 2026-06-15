@@ -164,37 +164,9 @@ class LlamaCppClient:
         )
 
 
-class SubmitChoiceInput(BaseModel):
-    option_id: str
-    most_important_attribute: str = Field(
-        description="The attribute that influenced your choice most."
-    )
-    confidence_score: int = Field(
-        description="Your confidence in this decision from 1 (completely guessing) to 5 (absolutely certain)."
-    )
-
-submit_choice_tool = dict(
-    type= "function",
-    name="submit_choice",
-    description="Record the final decision.",
-    # strict= True,
-    parameters=SubmitChoiceInput.model_json_schema(),
-)
 
 
-class InspectCellInput(BaseModel):
-    option_id: str
-    attribute_id: str
 
-inspect_cell_tool = dict(
-    type= "function",
-    name="inspect_cell",
-    description="Reveal one hidden cell in the fixed information matrix by option and attribute.",
-    # strict= True,
-    parameters=InspectCellInput.model_json_schema(),
-)
-
-tools = [submit_choice_tool, inspect_cell_tool]
  
 if __name__=='__main__':
     client = OpenAI(
@@ -223,6 +195,7 @@ class LlamaCPPModelSession:
         config: ModelConfig,
         system_prompt: str,
         initial_user_message: str,
+        environment
     ) -> None:
         # run the server
         LlamaCppClient(config)
@@ -239,7 +212,6 @@ class LlamaCPPModelSession:
         self.config = config
         self.system_prompt = system_prompt
         self.initial_user_message = initial_user_message
-        self.tools = tools
 
         # see if the endpoint 'http://127.0.0.1:8080/v1' is running
 
@@ -249,6 +221,50 @@ class LlamaCPPModelSession:
         # if no, serve self.config.model_name
 
         # self.config.model_name
+
+        if environment.spec.inspect_mode=='cell':
+            class InspectInput(BaseModel):
+                option_id: str
+                attribute_id: str
+
+            inspect_tool = dict(
+                type= "function",
+                name="inspect",
+                description="Reveal one hidden cell in the fixed information matrix by option and attribute.",
+                parameters=InspectInput.model_json_schema(),
+            )
+        elif environment.spec.inspect_mode=='full':
+            class InspectInput(BaseModel):
+                option_id: str
+
+            inspect_tool = dict(
+                type= "function",
+                name="inspect",
+                description="Reveal the full details of one option in the fixed information matrix.",
+                parameters=InspectInput.model_json_schema(),
+            )
+        else:
+            raise ValueError('invalid inspect_mode', environment.spec.inspect_mode)
+
+        class SubmitChoiceInput(BaseModel):
+            option_id: str
+            most_important_attribute: str = Field(
+                description="The attribute that influenced your choice most."
+            )
+            confidence_score: int = Field(
+                description="Your confidence in this decision from 1 (completely guessing) to 5 (absolutely certain)."
+            )
+
+        submit_choice_tool = dict(
+            type= "function",
+            name="submit_choice",
+            description="Record the final decision.",
+            # strict= True,
+            parameters=SubmitChoiceInput.model_json_schema(),
+        )
+        tools = [submit_choice_tool, inspect_tool]
+
+        self.tools = tools
 
         assert self._client.models.list().data[0].id==self.config.model_name, f'the hosted model {self._client.models.list().data[0].id} is different {self.config.model_name}'
 

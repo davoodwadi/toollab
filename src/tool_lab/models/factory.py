@@ -12,16 +12,17 @@ def create_model_session(
     config: ModelConfig,
     system_prompt: str,
     initial_user_message: str,
+    environment
 ):
     provider = config.provider.lower()
     if provider == "anthropic":
-        return AnthropicModelSession(config, system_prompt, initial_user_message)
+        return AnthropicModelSession(config, system_prompt, initial_user_message, environment=environment)
     if provider == "google":
-        return GoogleModelSession(config, system_prompt, initial_user_message)
+        return GoogleModelSession(config, system_prompt, initial_user_message, environment=environment)
     if provider == "mock":
-        return MockModelSession(config, system_prompt, initial_user_message)
+        return MockModelSession(config, system_prompt, initial_user_message, environment=environment)
     if provider == "openai":
-        return OpenAIModelSession(config, system_prompt, initial_user_message)
+        return OpenAIModelSession(config, system_prompt, initial_user_message, environment=environment)
     if provider == "llamacpp":
-        return LlamaCPPModelSession(config, system_prompt, initial_user_message)
+        return LlamaCPPModelSession(config, system_prompt, initial_user_message, environment=environment)
     raise ValueError(f"Unsupported provider: {config.provider}")

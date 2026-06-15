@@ -11,58 +11,24 @@ from tool_lab.models.base import AssistantResponse, ToolInvocation
  
 from openai import OpenAI
 
-
-class SubmitChoiceInput(BaseModel):
-    option_id: str
-    most_important_attribute: str = Field(
-        description="The attribute that influenced your choice most."
-    )
-    confidence_score: int = Field(
-        description="Your confidence in this decision from 1 (completely guessing) to 5 (absolutely certain)."
-    )
-    # confidence: Optional[float] = Field(default=None, ge=0, le=1)
-    # justification: Optional[str] = None
-
-class InspectCellInput(BaseModel):
-    option_id: str
-    attribute_id: str
-
-
-submit_choice_tool = dict(
-    type= "function",
-    name="submit_choice",
-    description="Record the final decision.",
-    # strict= True,
-    parameters=SubmitChoiceInput.model_json_schema(),
-)
-
-inspect_cell_tool = dict(
-    type= "function",
-    name="inspect_cell",
-    description="Reveal one hidden cell in the fixed information matrix by option and attribute.",
-    # strict= True,
-    parameters=InspectCellInput.model_json_schema(),
-)
-
-tools = [submit_choice_tool, inspect_cell_tool]
  
-if __name__=='__main__':
-    api_key_env = "OPENAI_API_KEY"
-    api_key = os.environ.get(api_key_env)
-    if not api_key:
-        raise RuntimeError(f"Missing API key in environment variable {api_key_env}")
-    client = OpenAI(api_key=api_key)
-    messages = [
-        {'role':'user', 'content':'tell me a story'}
-    ]
-    response = client.responses.create(
-        model='gpt-5.4-nano',
-        # tools=tools,
-        input=messages,
-        max_output_tokens=17
-    )
-    print(hasattr(response.output[0], 'content'))
-    print(response)
+# if __name__=='__main__':
+#     api_key_env = "OPENAI_API_KEY"
+#     api_key = os.environ.get(api_key_env)
+#     if not api_key:
+#         raise RuntimeError(f"Missing API key in environment variable {api_key_env}")
+#     client = OpenAI(api_key=api_key)
+#     messages = [
+#         {'role':'user', 'content':'tell me a story'}
+#     ]
+#     response = client.responses.create(
+#         model='gpt-5.4-nano',
+#         # tools=tools,
+#         input=messages,
+#         max_output_tokens=17
+#     )
+#     print(hasattr(response.output[0], 'content'))
+#     print(response)
 
 class OpenAIModelSession:
     provider_name = "openai"
@@ -72,6 +38,7 @@ class OpenAIModelSession:
         config: ModelConfig,
         system_prompt: str,
         initial_user_message: str,
+        environment
     ) -> None:
         api_key_env = config.api_key_env or "OPENAI_API_KEY"
         api_key = os.environ.get(api_key_env)
@@ -86,6 +53,52 @@ class OpenAIModelSession:
         self.config = config
         self.system_prompt = system_prompt
         self.initial_user_message = initial_user_message
+
+        if environment.spec.inspect_mode=='cell':
+            class InspectInput(BaseModel):
+                option_id: str
+                attribute_id: str
+
+            inspect_tool = dict(
+                type= "function",
+                name="inspect",
+                description="Reveal one hidden cell in the fixed information matrix by option and attribute.",
+                # strict= True,
+                parameters=InspectInput.model_json_schema(),
+            )
+        elif environment.spec.inspect_mode=='full':
+            class InspectInput(BaseModel):
+                option_id: str
+
+            inspect_tool = dict(
+                type= "function",
+                name="inspect",
+                description="Reveal the full details of one option in the fixed information matrix.",
+                # strict= True,
+                parameters=InspectInput.model_json_schema(),
+            )
+        else:
+            raise ValueError('invalid inspect_mode', environment.spec.inspect_mode)
+
+
+        class SubmitChoiceInput(BaseModel):
+            option_id: str
+            most_important_attribute: str = Field(
+                description="The attribute that influenced your choice most."
+            )
+            confidence_score: int = Field(
+                description="Your confidence in this decision from 1 (completely guessing) to 5 (absolutely certain)."
+            )
+            # confidence: Optional[float] = Field(default=None, ge=0, le=1)
+            # justification: Optional[str] = None
+        submit_choice_tool = dict(
+            type= "function",
+            name="submit_choice",
+            description="Record the final decision.",
+            # strict= True,
+            parameters=SubmitChoiceInput.model_json_schema(),
+        )
+        tools = [submit_choice_tool, inspect_tool]
         self.tools = tools
 
 

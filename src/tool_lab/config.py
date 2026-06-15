@@ -92,16 +92,17 @@ class ExperimentSpec:
     participant: ParticipantSpec
     randomization: dict
     options: list[OptionSpec]
-    attributes: list[AttributeSpec]
+    attributes: list[AttributeSpec] | None
     cues: list[CueSpec]
     model: ModelConfig
+    inspect_mode: Literal['full', 'cell'] = 'cell'
     replications: int = 5
-    budget_type: Literal["usd", "tools", "tool_usd", 'tokens', 'points'] = "usd"
+    budget_type: Literal["usd", "tools", "tool_usd", 'tokens', 'points'] = "tool_usd"
     budget_usd: float | None = None
     budget_tools: int | None = None
     budget_tokens: int | None = None
     budget_points: int | None = None
-    inspect_cell_tool_cost: float | None = None
+    inspect_tool_cost: float | None = None
     max_turns: int = 20
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -110,12 +111,15 @@ class ExperimentSpec:
 
     def validate(self) -> None:
         option_ids = {option.id for option in self.options}
-        attribute_ids = {attribute.id for attribute in self.attributes}
+        if self.attributes:
+            attribute_ids = {attribute.id for attribute in self.attributes}
+        else:
+            attribute_ids = []
         cue_ids: set[str] = set()
 
         if len(option_ids) != len(self.options):
             raise ValueError("Option ids must be unique.")
-        if len(attribute_ids) != len(self.attributes):
+        if self.attributes and len(attribute_ids) != len(self.attributes):
             raise ValueError("Attribute ids must be unique.")
 
         for cue in self.cues:
@@ -124,8 +128,8 @@ class ExperimentSpec:
             cue_ids.add(cue.id)
             if cue.option_id not in option_ids:
                 raise ValueError(f"Cue {cue.id} references unknown option {cue.option_id}")
-            if cue.attribute_id not in attribute_ids:
-                raise ValueError(f"Cue {cue.id} references unknown attribute {cue.attribute_id}")
+            # if cue.attribute_id not in attribute_ids:
+            #     raise ValueError(f"Cue {cue.id} references unknown attribute {cue.attribute_id}")
 
         if self.replications < 1:
             raise ValueError("replications must be at least 1")
@@ -185,38 +189,78 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         pricing=pricing,
         **model_data,
     )
-    attributes = [AttributeSpec(**item) for item in experiment["attributes"]]
+    inspect_mode = experiment.get('inspect_mode')
+    # print('inspect_mode', inspect_mode)
 
-    options = []
-    cues = []
-    
-    # Loop through the simplified options list from the YAML
-    for opt_data in experiment["options"]:
-        # 1. Pop out the nested 'cues' dictionary
-        opt_cues = opt_data.pop("cues", {})
-        original_id = opt_data.get("id")
-        display_name = opt_data.get("display_name")
+    if inspect_mode=='full':
+        attributes = None
+        options = []
+        cues = []
 
-        # 2. Build the OptionSpec
-        options.append(OptionSpec(
-            id=original_id,
-            display_name=display_name if display_name else '', # Placeholder: overwritten in runner
-            base_score=opt_data.get("base_score", 0.0),
-            metadata={"original_id": original_id}  # Save original ID for the final trace!
-        ))
-        
-        # 3. Automatically expand the dictionary into a flat list of CueSpecs
-        for attr_id, val in opt_cues.items():
-            cues.append(CueSpec(
-                id=f"{original_id}_{attr_id}",
-                option_id=original_id,
-                attribute_id=attr_id,
-                value=str(val)
+        for opt_data in experiment['options']:
+
+            opt_cues = opt_data.pop("cues", {})
+            original_id = opt_data.get("id")
+            display_name = opt_data.get("display_name")
+
+            # 2. Build the OptionSpec
+            options.append(OptionSpec(
+                id=original_id,
+                display_name=display_name if display_name else '', # Placeholder: overwritten in runner
+                base_score=opt_data.get("base_score", 0.0),
+                metadata={"original_id": original_id}  # Save original ID for the final trace!
             ))
             
+            # 3. Automatically expand the dictionary into a flat list of CueSpecs
+            for attr_id, val in opt_cues.items():
+                cues.append(CueSpec(
+                    id=f"{original_id}_{attr_id}",
+                    option_id=original_id,
+                    attribute_id=attr_id,
+                    value=str(val)
+                ))
+
+        # print(options)
+        # print(cues)
+        # exit()
+        # pass
+
+    elif inspect_mode=='cell':
+        attributes = [AttributeSpec(**item) for item in experiment["attributes"]]
+
+        options = []
+        cues = []
+        
+        # Loop through the simplified options list from the YAML
+        for opt_data in experiment["options"]:
+            # 1. Pop out the nested 'cues' dictionary
+            opt_cues = opt_data.pop("cues", {})
+            original_id = opt_data.get("id")
+            display_name = opt_data.get("display_name")
+
+            # 2. Build the OptionSpec
+            options.append(OptionSpec(
+                id=original_id,
+                display_name=display_name if display_name else '', # Placeholder: overwritten in runner
+                base_score=opt_data.get("base_score", 0.0),
+                metadata={"original_id": original_id}  # Save original ID for the final trace!
+            ))
+            
+            # 3. Automatically expand the dictionary into a flat list of CueSpecs
+            for attr_id, val in opt_cues.items():
+                cues.append(CueSpec(
+                    id=f"{original_id}_{attr_id}",
+                    option_id=original_id,
+                    attribute_id=attr_id,
+                    value=str(val)
+                ))
+    else:
+        print(f'inspect_mode: {inspect_mode} invalid.')
+        exit()            
 
     return ExperimentSpec(
         name=experiment["name"],
+        inspect_mode=inspect_mode,
         participant=participant,
         randomization=experiment.get('randomization'),
         options=options,
@@ -229,7 +273,7 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         budget_tools=experiment.get("budget_tools", 0),
         budget_tokens=experiment.get("budget_tokens", 0),
         budget_points=experiment.get("budget_points", 0),
-        inspect_cell_tool_cost=experiment.get("inspect_cell_tool_cost", 0),
+        inspect_tool_cost=experiment.get("inspect_tool_cost", 0),
         max_turns=experiment.get("max_turns", 20),
         metadata=experiment.get("metadata", {}),
     )

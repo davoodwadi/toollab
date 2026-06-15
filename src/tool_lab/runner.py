@@ -12,6 +12,9 @@ from tool_lab.models.base import _to_serializable, AssistantResponse, ToolInvoca
 
 import time
 
+import random
+from copy import deepcopy
+
 class ExperimentRunner:
     def __init__(self, spec: ExperimentSpec, output_root: str = "results", verbose: bool = False) -> None:
         self.spec = spec
@@ -40,14 +43,12 @@ class ExperimentRunner:
         }
 
     def _run_single(self, replicate_index: int, session_name: str) -> dict[str, Any]:
-        import random
-        from copy import deepcopy
-
         run_spec = deepcopy(self.spec)
 
         # 2. Apply Randomization if configured
         if run_spec.randomization and run_spec.randomization.get("randomize_attributes_options"):
             base_seed = run_spec.randomization.get("seed")
+            # print(base_seed)
             if base_seed is not None:
                 rng = random.Random(base_seed + replicate_index)
                 print(f'randomizing with seed: {base_seed + replicate_index}')
@@ -56,7 +57,8 @@ class ExperimentRunner:
                 print('randomizing without seed')
             
             rng.shuffle(run_spec.options)
-            rng.shuffle(run_spec.attributes)
+            if run_spec.attributes:
+                rng.shuffle(run_spec.attributes)
             
         # 3. Rewrite option IDs to positional names (e.g. option_1)
         for i, option in enumerate(run_spec.options):
@@ -76,18 +78,26 @@ class ExperimentRunner:
             for cue in run_spec.cues:
                 if cue.option_id == original_id:
                     cue.option_id = new_id
-                    
-        environment = build_environment(run_spec)
-
+        # print(run_spec.options[0])
+        # exit()
+        # print(run_spec.inspect_mode)
+        # exit()    
+        environment = build_environment(run_spec) 
+        # print(environment)
+        # exit()
+        # if environment.attributes:
+        #     print('environment.attributes', list(environment.attributes.keys()))
         # Based on the config, get the correct provider `session` with system_prompt, initial_user_message, and tools
         model_session = create_model_session(
-            self.spec.model,
+            self.spec.model, 
             environment.build_system_prompt(), 
             environment.build_user_prompt(),
+            environment=environment
         )
-
+        
         # print('model_session.system_prompt', model_session.system_prompt)
         # print('model_session.initial_user_message', model_session.initial_user_message)
+        # exit()
         started_at = datetime.now(timezone.utc).isoformat()
         forced_choice = False
         
@@ -97,7 +107,7 @@ class ExperimentRunner:
 
         if self.verbose and replicate_index==1:
             num_options = len(run_spec.options)
-            num_attributes = len(run_spec.attributes)
+            num_attributes = len(run_spec.attributes) if run_spec.attributes else 0
             total_cells = num_options * num_attributes
             print("\n" + "="*50)
             print("INITIALIZING EXPERIMENT")
@@ -109,7 +119,7 @@ class ExperimentRunner:
             elif environment.spec.budget_type=='tools':
                 print(f"Budget: {environment.spec.budget_tools} Tools")
             elif environment.spec.budget_type=='tool_usd':
-                print(f"Tool cost: ${environment.spec.inspect_cell_tool_cost}")
+                print(f"Tool cost: ${environment.spec.inspect_tool_cost}")
             elif environment.spec.budget_type=='tokens':
                 print(f"Budget: {environment.spec.budget_tokens} Tokens")
             elif environment.spec.budget_type=='points':
@@ -123,38 +133,36 @@ class ExperimentRunner:
             print(f"Num Attributes: {num_attributes}")
             print(f"Total cells: {total_cells}")
 
+            # exit()
+            # print("="*50)
+            # print("EXPERIMENT MATRIX:")
+            # opt_ids = [opt.id for opt in run_spec.options]
+            # header = f"{'Attribute':<25} | " + " | ".join([f"{opt:<20}" for opt in opt_ids])
+            # print(header)
+            # print("-" * len(header))
             
-            print("="*50)
-            print("EXPERIMENT MATRIX:")
-            opt_ids = [opt.id for opt in run_spec.options]
-            header = f"{'Attribute':<25} | " + " | ".join([f"{opt:<20}" for opt in opt_ids])
-            print(header)
-            print("-" * len(header))
-            
-            for attr in run_spec.attributes:
-                row_str = f"{attr.id:<25} | "
-                vals = []
-                for opt in opt_ids:
-                    val = "N/A"
-                    for c in run_spec.cues:
-                        if c.option_id == opt and c.attribute_id == attr.id:
-                            val = str(c.value)
-                            break
-                    vals.append(f"{val:<20}")
-                row_str += " | ".join(vals)
-                print(row_str)
-            print("="*50 + "\n")
+            # attributes = set([c.attribute_id for c in run_spec.cues])
 
+            # for attr in attributes:
+            #     row_str = f"{attr:<25} | "
+            #     vals = []
+            #     for opt in opt_ids:
+            #         val = "N/A"
+            #         for c in run_spec.cues:
+            #             if c.option_id == opt and c.attribute_id == attr:
+            #                 val = str(c.value)
+            #                 break
+            #         vals.append(f"{val:<20}")
+            #     row_str += " | ".join(vals)
+            #     print(row_str)
+            # print("="*50 + "\n")
         # exit()
 
         for iteration in range(self.spec.max_turns):
-            # if self.spec.model.provider!='llamacpp':
-                # print(self.spec.model.provider, self.spec.model.model_name)
-                # time.sleep()
             # calls the LLM -> gets response (tool_call, content, reasoning) -> adds it to session.transcript
-            # gets: LLM's response             
+            # gets: LLM's response              
             assistant_response = model_session._call_model()
-            environment.charge_model_turn(assistant_response)
+            environment.charge_model_turn(assistant_response) 
             # START: record assistant_response
             assistant_data = _to_serializable(assistant_response)
 
@@ -217,14 +225,15 @@ class ExperimentRunner:
             for index, tc in enumerate(assistant_response.tool_calls):
                 if index==0:
                     # execute first tool
+                    print(f"Tool Name: {tc.name}")
+                    print(f"Tool Arguments: {tc.arguments}")
                     tool_response = environment.execute_tool(
                         tool_name=tc.name,
                         arguments=tc.arguments,
                         tool_call_id=tc.tool_call_id,
                     )
                     tool_results_and_name.append((tool_response, tc.name))
-                    print(f"Tool Name: {tc.name}")
-                    print(f"Tool Arguments: {tc.arguments}")
+
                     print(f"Tool Response: {tool_response.get('content')}")
                 else:
                     # error the remaining tools, if any
@@ -247,6 +256,7 @@ class ExperimentRunner:
         run_record = {
             "session_name": session_name,
             "experiment_name": self.spec.name,
+            "inspect_model":self.spec.inspect_mode,
             "provider": self.spec.model.provider,
             "model_name": self.spec.model.model_name,
             'forced_choice': forced_choice,
@@ -277,7 +287,7 @@ class ExperimentRunner:
             'user_message' : model_session.initial_user_message,
         }
         if environment.spec.budget_type=='tool_usd':
-            run_record['inspect_cell_tool_cost'] = environment.spec.inspect_cell_tool_cost
+            run_record['inspect_tool_cost'] = environment.spec.inspect_tool_cost
         return run_record
 
 

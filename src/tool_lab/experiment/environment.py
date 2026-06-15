@@ -19,15 +19,18 @@ import random
 def build_environment(spec: ExperimentSpec) -> "ToolLabEnvironment":
     return FixedMatrixEnvironment(spec)
 
-
-
 class ToolLabEnvironment(ABC):
     def __init__(self, spec: ExperimentSpec) -> None:
         self.spec = spec
         self.options: dict[str, OptionSpec] = {option.id: option for option in spec.options}
-        self.attributes: dict[str, AttributeSpec] = {
-            attribute.id: attribute for attribute in spec.attributes
-        }
+        if spec.attributes:
+            self.attributes: dict[str, AttributeSpec] = {
+                attribute.id: attribute for attribute in spec.attributes
+            }
+        else:
+            self.attributes = None
+        # print(spec.inspect_mode)
+        # exit()
         self.cumulative_cost_usd = 0.0
         self.budget_remaining_usd = spec.budget_usd
         self.last_turn_cost_usd: float = 0.0
@@ -71,7 +74,7 @@ class ToolLabEnvironment(ABC):
         return (
             "You are a subject in a Tool-Lab decision experiment. "
             "You can use the available tools to gather information or make a decision. "
-            "At any point you can record your final decision by calling submit_choice. "
+            "At any point you can record your final decision by calling the submit_choice tool. "
             "You cannot call tools concurrently. Each time you can call ONLY one tool maximum. "
             f"{mode_rules} "
         )
@@ -87,20 +90,22 @@ class ToolLabEnvironment(ABC):
             option_lines.append(s.strip())            
 
         attribute_lines = []
-        for attribute in self.spec.attributes:
-            attr_str = f"- {attribute.id}: "
-            if attribute.display_name:
-                attr_str+=f'{attribute.display_name}.'
-            if attribute.description:
-                attr_str+=f' {attribute.description}'
-            if attribute.cost_multiplier and self.spec.budget_type=='points':
-                cost = self.spec.inspect_cell_tool_cost * attribute.cost_multiplier
-                attr_str+=f'(tool cost: {cost})'
-            
-            attribute_lines.append(attr_str)
+        if self.spec.attributes:
+            for attribute in self.spec.attributes:
+                attr_str = f"- {attribute.id}: "
+                if attribute.display_name:
+                    attr_str+=f'{attribute.display_name}.'
+                if attribute.description:
+                    attr_str+=f' {attribute.description}'
+                if attribute.cost_multiplier and self.spec.budget_type=='points':
+                    cost = self.spec.inspect_tool_cost * attribute.cost_multiplier
+                    attr_str+=f'(tool cost: {cost})'
+                
+                attribute_lines.append(attr_str)
         
         attribute_lines_str = '\n'.join(attribute_lines)
 
+        budget_str = ''
         if self.spec.budget_type == 'usd':
             budget_str = f"Budget: ${self.spec.budget_usd:.4f}"
         elif self.spec.budget_type == 'tokens':
@@ -110,30 +115,32 @@ class ToolLabEnvironment(ABC):
         elif self.spec.budget_type == 'tools' and self.spec.budget_tools<=0:
             # budget_str = f"REMEMBER: You have to make a decision and submit a choice with minimal number of tool calls."
             budget_str = ''
-        elif self.spec.budget_type == 'tool_usd':
-            budget_str = f"Each `inspect_cell` tool call you make costs the user ${self.spec.inspect_cell_tool_cost}"
+        elif self.spec.budget_type == 'tool_usd' and self.spec.inspect_tool_cost>0:
+            budget_str = f"Each `inspect` tool call you make costs the user ${self.spec.inspect_tool_cost}"
         elif self.spec.budget_type == 'points':
             budget_str = f"Your starting points: {self.spec.budget_points}"
         
-        if "{inspect_cell_tool_cost}" in self.spec.participant.profile:
-            formatted_profile = self.spec.participant.profile.format(inspect_cell_tool_cost=f"${self.spec.inspect_cell_tool_cost}")
+        if "{inspect_tool_cost}" in self.spec.participant.profile:
+            formatted_profile = self.spec.participant.profile.format(inspect_tool_cost=f"${self.spec.inspect_tool_cost}")
         else:
             formatted_profile = self.spec.participant.profile
 
-        user_prompt = [
-            formatted_profile,
-            'REMEMBER:',
-            budget_str,
-            '',
-            "Options:",
-            *option_lines,
+        user_prompt = [formatted_profile, ]
+        if budget_str: user_prompt.extend(['','REMEMBER:', budget_str, ''])
+        user_prompt.extend(['', "Options:", *option_lines,])            
+            
+        if attribute_lines_str:
+            user_prompt.extend([
             "",
-            "Attributes available in this task:",
+            "Attributes available:",
             attribute_lines_str,
-            "",
-            "Critical Note:",
-            budget_str,
-        ]
+            ])
+        if budget_str:
+            user_prompt.extend([
+                "",
+                "Critical Note:",
+                budget_str,
+            ])
         return "\n".join(user_prompt)
 
     def reminder_message(self) -> str:
@@ -160,18 +167,19 @@ class ToolLabEnvironment(ABC):
             # print('+'*40)
             # print(message.tool_calls[0])
             tool_name = message.tool_calls[0].name
-            if tool_name=='inspect_cell':
-                attribute = message.tool_calls[0].arguments['attribute_id']
+            if tool_name=='inspect':
+                if self.spec.inspect_mode=='cell':
+                    attribute = message.tool_calls[0].arguments['attribute_id']
+                    cost_multiplier_list = [att.cost_multiplier for att in self.spec.attributes if att.id==attribute]
+                    cost_multiplier = cost_multiplier_list[0] if cost_multiplier_list else 1
                 
-                cost_multiplier_list = [att.cost_multiplier for att in self.spec.attributes if att.id==attribute]
-                if cost_multiplier_list:
-                    cost_multiplier = cost_multiplier_list[0]
-                else:
-                    cost_multiplier = 1.
+                if self.spec.inspect_mode=='full':
+                    cost_multiplier = 1
 
                 cost_tools += (1 * cost_multiplier)
-                cost_tool_usd += self.spec.inspect_cell_tool_cost
-                cost_points += self.spec.inspect_cell_tool_cost * cost_multiplier
+                # print('self.spec.inspect_tool_cost', self.spec.inspect_tool_cost)
+                cost_tool_usd += self.spec.inspect_tool_cost
+                cost_points += self.spec.inspect_tool_cost * cost_multiplier
 
         return cost_usd, cost_tools, cost_tokens, cost_points, cost_tool_usd
     
@@ -191,6 +199,7 @@ class ToolLabEnvironment(ABC):
         self.budget_remaining_tokens = self.spec.budget_tokens - self.cumulative_cost_tokens
 
     def charge_model_turn(self, message: AssistantResponse) -> None:
+        # print('charge_model_turn', message)
         cost_usd, cost_tools, cost_tokens, cost_points, cost_tool_usd = self.get_model_cost(message)
         self.apply_model_cost(cost_usd, cost_tools, cost_tokens, cost_points, cost_tool_usd)
         message.input_cost = cost_usd['input_cost']
@@ -211,11 +220,12 @@ class ToolLabEnvironment(ABC):
         try:
             if tool_name == "submit_choice":
                 payload = self._submit_choice(arguments, tool_call_id)
-            elif tool_name == "inspect_cell":
-                payload = self._inspect_cell(arguments, tool_call_id)
+            elif tool_name == "inspect":
+                payload = self._inspect(arguments, tool_call_id)
             else:
                 raise ValueError(f"Unsupported tool: {tool_name}")
         except Exception as exc:
+            print(f'Error execute_tool: {exc}')
             payload = {
                 "role": "tool",
                 "tool_call_id": tool_call_id,
@@ -223,7 +233,7 @@ class ToolLabEnvironment(ABC):
             }
 
         extra = {}
-        if tool_name == "inspect_cell":
+        if tool_name == "inspect":
             extra["is_revisit"] = self._last_is_revisit
             extra["transition"] = self._last_transition
 
@@ -264,9 +274,16 @@ class ToolLabEnvironment(ABC):
         return payload
 
     def _mode_rules(self) -> str:
-        return (
-            "You may reveal any cell with inspect_cell."
-        )
+        if self.spec.inspect_mode=='cell':
+            return (
+                "You may reveal any cell with the `inspect` tool."
+            )
+        elif self.spec.inspect_mode=='full':
+            return (
+                "You may obtain full details of each option with the `inspect` tool."
+            )
+        else:
+            raise ValueError(f'mode {self.spec.inspect_mode} Invalid.')
 
     def _record_event(
         self,
@@ -298,25 +315,32 @@ class ToolLabEnvironment(ABC):
         return event
 
 class FixedMatrixEnvironment(ToolLabEnvironment):
-    def _inspect_cell(self, arguments: dict[str, Any], tool_call_id: str) -> dict[str, Any]:
+    def _inspect(self, arguments: dict[str, Any], tool_call_id: str) -> dict[str, Any]:
         option_id = str(arguments["option_id"])
-        attribute_id = str(arguments["attribute_id"])
-        cue = self._cue_for(option_id, attribute_id)
+        if self.spec.inspect_mode=='cell':
+            attribute_id = str(arguments["attribute_id"])
+            cue = self._cue_for(option_id, attribute_id)
+            self._last_is_revisit = cue.id in self.opened_cues
+            self._last_transition = classify_transition(
+                self._last_inspect, cue.option_id, cue.attribute_id
+            )
+            self.opened_cues.add(cue.id)
+            self._last_inspect = {"option_id": cue.option_id, "attribute_id": cue.attribute_id}
+            content_dict = {
+                    "option_id": cue.option_id,
+                    "attribute_id": cue.attribute_id,
+                    "result": cue.value,
+            }
+        elif self.spec.inspect_mode=='full':
+            cue = self._cue_for(option_id)
+            self._last_is_revisit = option_id in self.opened_cues
+            self.opened_cues.add(option_id)
+            self._last_inspect = {"option_id": cue['option_id']}
+            content_dict = cue
+        # print('self._last_inspect', self._last_inspect)
+        # print('content_dict', content_dict)
 
-        self._last_is_revisit = cue.id in self.opened_cues
-        self._last_transition = classify_transition(
-            self._last_inspect, cue.option_id, cue.attribute_id
-        )
-        # print('self._last_transition'.upper(), self._last_transition)
-        self.opened_cues.add(cue.id)
-        self._last_inspect = {"option_id": cue.option_id, "attribute_id": cue.attribute_id}
-
-        content_dict = {
-                "option_id": cue.option_id,
-                "attribute_id": cue.attribute_id,
-                "result": cue.value,
-        }
-        if self.spec.budget_type=='usd':
+        if self.spec.budget_type=='usd' and self.spec.budget_usd>0:
             content_dict['turn_cost_usd'] = round(self.last_turn_cost_usd, 4)
             content_dict['budget_remaining_usd'] = round(self.budget_remaining_usd, 4)
         elif self.spec.budget_type=='tools' and self.spec.budget_tools>=0:
@@ -325,19 +349,19 @@ class FixedMatrixEnvironment(ToolLabEnvironment):
         elif self.spec.budget_type=='tools' and self.spec.budget_tools<0:
             content_dict['cost_for_this_tool_call'] = self.last_turn_cost_tool
             content_dict['cumulative_cost_tools'] = self.cumulative_cost_tools
-        elif self.spec.budget_type=='tool_usd':
+        elif self.spec.budget_type=='tool_usd' and self.spec.inspect_tool_cost>0:
             content_dict['turn_cost_usd'] = self.last_turn_cost_tool_usd
             content_dict['cumulative_cost_tool_usd'] = self.cumulative_cost_tool_usd
 
-        elif self.spec.budget_type=='tokens':
+        elif self.spec.budget_type=='tokens' and self.spec.budget_tokens>0:
             content_dict['turn_cost_tokens'] = self.last_turn_cost_tokens
             content_dict['budget_remaining_tokens'] = self.budget_remaining_tokens
-        elif self.spec.budget_type=='points':
+        elif self.spec.budget_type=='points' and self.spec.budget_points>0:
             content_dict['total_points_lost'] = self.cumulative_cost_points
             content_dict['points_lost_for_this_tool'] = self.last_turn_cost_points
             content_dict['points_remaining'] = self.budget_remaining_points
-        else: 
-            raise ValueError(f'budget_type not recognized: {self.spec.budget_type}')
+        # else: 
+            # raise ValueError(f'budget_type not recognized: {self.spec.budget_type}')
         payload = {
             'role': 'tool',
             "tool_call_id": tool_call_id,
@@ -345,10 +369,19 @@ class FixedMatrixEnvironment(ToolLabEnvironment):
         }
         return payload
 
-    def _cue_for(self, option_id: str, attribute_id: str) -> CueSpec:
-        for cue in self.spec.cues:
-            if cue.option_id == option_id and cue.attribute_id == attribute_id:
-                return cue
+    def _cue_for(self, option_id: str, attribute_id: str | None = None):
+        if attribute_id:
+            for cue in self.spec.cues:
+                if cue.option_id == option_id and cue.attribute_id == attribute_id:
+                    return cue
+        else:
+            cues = [cue for cue in self.spec.cues if cue.option_id==option_id]
+            new_cues = dict()
+            new_cues['option_id'] = cues[0].option_id
+            for cue in cues:
+                new_cues[cue.attribute_id] = cue.value
+            return new_cues
+        
         raise ValueError(f"No cue exists for option {option_id} and attribute {attribute_id}")
 
 

@@ -4,6 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 import numpy as np
 import pandas as pd
+from scipy.stats import beta
 
 # -----------------------------
 # Problem definition
@@ -26,9 +27,8 @@ class ToolPlanner:
         attributes,
         num_bags=5,
         algorithm="expectimax",   
-        mcts_iterations=2500,     
+        mcts_iterations=50_000,     
         max_depth=None,
-        seed=0,
         chance_enumeration_limit=500,
         tie_epsilon=1e-12,
         tie_break_reveal_penalty=0.0,
@@ -44,8 +44,7 @@ class ToolPlanner:
         self.mcts_iterations = mcts_iterations
 
         self.max_depth = max_depth
-        self.rng = random.Random(seed)
-        # np.random.seed(seed)
+        self.rng = random.Random()
 
         self.chance_enumeration_limit = chance_enumeration_limit
 
@@ -207,6 +206,10 @@ class ToolPlanner:
                 limit = self.chance_enumeration_limit
                 indices = np.linspace(0, len(domain) - 1, limit, dtype=int)
                 self._outcomes_cache[attr.name] = domain[indices]
+            # if attr.name=='dollars':
+            #     print(attr)
+            #     print('self._outcomes_cache[attr.name]', self._outcomes_cache[attr.name])
+            #     print('attr.domain', attr.domain)
 
         return self._outcomes_cache[attr.name]
 
@@ -217,6 +220,8 @@ class ToolPlanner:
             return self._expectimax_plan(state, depth)
         elif self.algorithm == "mcts":
             return self._mcts_plan(state)
+        elif self.algorithm == "myopic":
+            return self._myopic_plan(state)
         else:
             raise ValueError(f"Unknown algorithm: {self.algorithm}")
 
@@ -246,16 +251,18 @@ class ToolPlanner:
                 return cache[key]
 
             best_value = float("-inf")
-            best_action = None
+            best_actions = []
 
             # Option 1: choose one product: q is the value of choosing the best product NOW
             for product_i in range(self.n_products):
                 q = self.choose_value(s, product_i)
                 action = ("choose", product_i)
 
-                if q > best_value:
+                if q > best_value + self.tie_epsilon:
                     best_value = q
-                    best_action = action
+                    best_actions = [action]
+                elif abs(q - best_value) <= self.tie_epsilon:
+                    best_actions.append(action)
 
             # Option 2: reveal one unknown attribute -> compute value for the resulting state
             if d > 0:
@@ -269,11 +276,13 @@ class ToolPlanner:
                         q = Q_reveal(s, product_i, attr_i, d)
                         # print(f'revealing {s}, {product_i}, {attr_i}: {q}')
 
-                        if q > best_value:
+                        if q > best_value + self.tie_epsilon:
                             best_value = q
-                            best_action = ("reveal", product_i, attr_i)
+                            best_actions = [("reveal", product_i, attr_i)]
+                        elif abs(q - best_value) <= self.tie_epsilon:
+                            best_actions.append(("reveal", product_i, attr_i))
 
-            cache[key] = best_value, best_action
+            cache[key] = best_value, best_actions
             return cache[key]
 
         def Q_reveal(s, product_i, attr_i, d):
@@ -293,19 +302,19 @@ class ToolPlanner:
             return -self.tie_break_reveal_penalty + average_value
 
 
-        value, best_action = V(state, depth)
+        value, best_actions = V(state, depth)
         # Root action stats
         stats = []
 
         for action in self.legal_actions(state):
             if action[0] == "choose":
-                q = self.choose_value(state, product_i)
+                q = self.choose_value(state, action[1])
             else:
                 if depth <= 0:
                     q = None
                 else:
-                    _, product_i, attr_i = action
-                    q = Q_reveal(state, product_i, attr_i, depth)
+                    _, p_idx, a_idx = action
+                    q = Q_reveal(state, p_idx, a_idx, depth)
 
             stats.append({
                 "action": self.format_action(action),
@@ -319,7 +328,7 @@ class ToolPlanner:
         )
 
         return {
-            "best_action": best_action,
+            "best_actions": best_actions,
             "estimated_value": value,
             "stats": stats,
         }
@@ -435,9 +444,9 @@ class ToolPlanner:
 
         # Compile results matching the dictionary format
         legal = self.legal_actions(state)
-        # Pick the action with the highest Expected Q-value
-        best_action = max(legal, key=lambda a: Q[(state, a)]) 
-        best_value = Q[(state, best_action)]
+        # Pick the actions with the highest Expected Q-value
+        best_value = max([Q[(state, a)] for a in legal])
+        best_actions = [a for a in legal if abs(Q[(state, a)] - best_value) <= self.tie_epsilon]
         
         stats = []
         for a in legal:
@@ -450,7 +459,88 @@ class ToolPlanner:
             
         stats.sort(key=lambda st: float("-inf") if st["mean_q"] is None else st["mean_q"], reverse=True)
         
-        return {"best_action": best_action, "estimated_value": best_value, "stats": stats}
+        return {"best_actions": best_actions, "estimated_value": best_value, "stats": stats}
+
+    def _myopic_plan(self, state):
+        """
+        Calculates the Myopic Value of Information (EVSI).
+        Assumes that after making ONE reveal, the agent MUST choose a product.
+        """
+        self.validate_state(state)
+        
+        q_values = {}
+        best_value = float("-inf")
+        best_actions = []
+
+        # 1. Option A: Stop and Choose NOW (Current Value)
+        for product_i in range(self.n_products):
+            action = ("choose", product_i)
+            q = self.choose_value(state, product_i)
+            q_values[action] = q
+            
+            if q > best_value + self.tie_epsilon:
+                best_value = q
+                best_actions = [action]
+            elif abs(q - best_value) <= self.tie_epsilon:
+                best_actions.append(action)
+
+        # 2. Option B: Reveal ONE attribute, then force a choice
+        for product_i in range(self.n_products):
+            for attr_i, attr in enumerate(self.attributes):
+                idx = self.index(product_i, attr_i)
+
+                # Skip if already revealed
+                if state[idx] is not None:
+                    continue
+                    
+                action = ("reveal", product_i, attr_i)
+                outcomes = self.outcome_values(attr)
+                total_expected_next_value = 0.0
+
+                # Simulate every possible outcome of this tool call
+                for x in outcomes:
+                    next_state = state[:idx] + (x,) + state[idx+1:]
+                    
+                    # Since it's Myopic, we assume we MUST choose a product in the next state.
+                    # We find the max value of choosing in that future state.
+                    best_next_choose = max([
+                        self.choose_value(next_state, next_p_i) 
+                        for next_p_i in range(self.n_products)
+                    ])
+                    
+                    total_expected_next_value += best_next_choose
+
+                # Average the future values and apply the tie breaker
+                avg_next_value = total_expected_next_value / len(outcomes)
+                q = avg_next_value - self.tie_break_reveal_penalty
+                
+                q_values[action] = q
+                
+                if q > best_value + self.tie_epsilon:
+                    best_value = q
+                    best_actions = [action]
+                elif abs(q - best_value) <= self.tie_epsilon:
+                    best_actions.append(action)
+
+        # 3. Format the stats exactly like expectimax/mcts for display
+        stats = []
+        for action, q in q_values.items():
+            stats.append({
+                "action": self.format_action(action),
+                "raw_action": action,
+                "mean_q": q,
+            })
+
+        stats.sort(
+            key=lambda s: float("-inf") if s["mean_q"] is None else s["mean_q"],
+            reverse=True,
+        )
+
+        return {
+            "best_actions": best_actions,
+            "estimated_value": best_value,
+            "stats": stats,
+        }
 
     # -----------------------------
     # Rollout and Display
@@ -492,7 +582,15 @@ class ToolPlanner:
             self.display_plan_evaluations(state, current_plan)
             print('+'*50)
             before = current_plan
-            action = before["best_action"]
+            best_actions = before["best_actions"]
+            
+            if len(best_actions) > 1:
+                formatted_actions = [self.format_action(a) for a in best_actions]
+                print(f"Found {len(best_actions)} optimal actions with equal values: {formatted_actions}")
+                action = self.rng.choice(best_actions)
+                print(f"Randomly selecting {self.format_action(action)} for this rollout step.")
+            else:
+                action = best_actions[0]
 
             step = {
                 "t": t,
@@ -524,7 +622,7 @@ class ToolPlanner:
             }
             step["posterior_state"] = self.pretty_state(new_state)
             step["estimated_V_posterior"] = after["estimated_value"]
-            step["next_action"] = self.format_action(after["best_action"])
+            step["next_actions"] = [self.format_action(a) for a in after["best_actions"]]
 
             logs.append(step)
 
@@ -585,8 +683,9 @@ class ToolPlanner:
                 
                 t_cost_per_bag = current_tc / self.num_bags
                 
-                breakdown = f"(Price: ${e_price:.2f} + Tool: ${t_cost_per_bag:.2f}) * E[1/W]: {e_inv_w:.4f}"
+                breakdown = f"(Price: ${e_price:.2f} + Tool: ${t_cost_per_bag:.4f}) * E[1/W]: {e_inv_w:.4f}"
             else:
+                # print(action[2], self.outcome_values(self.attributes[action[2]]))
                 outcomes = len(self.outcome_values(self.attributes[action[2]]))
                 breakdown = f"Expectimax average of {outcomes} possible future states"
                 
@@ -652,23 +751,103 @@ def evaluate_human_trajectory(planner, realization, human_actions, trial_id, too
 # Example
 # -----------------------------
 
+def get_skewed_domain_int(lower, upper):
+
+    # 1. Define the parameters for the right-skewed Beta distribution
+    # a=2, b=8 creates a strong right-skew (peak on the left, long tail to the right)
+    a_param, b_param = 2, 8
+
+    # 2. Generate 50 equally spaced percentiles (from 1% to 99%)
+    percentiles = np.linspace(0.01, 0.99, 50)
+
+    # 3. Generate the right-skewed domain bounded between 0 and 1
+    skewed_base = beta.ppf(percentiles, a_param, b_param)
+
+    # 4. Scale the domain to your specific range [2, 35]
+    range_val = upper - lower
+
+    skewed_domain_continuous = lower + (skewed_base * range_val)
+
+    # If this is for "dollars" and needs to be integers:
+    skewed_domain_integers = np.round(skewed_domain_continuous).astype(int)
+
+    return skewed_domain_integers
+
+def get_price_dollars_instant_coffee_distribution_int(lower=2, upper=40):
+    # 2. Simulate the continuous prices using a Log-Normal distribution
+    # A mean of 2.0 and sigma of 0.5 in log-space creates a peak around $6-$8 
+    # and a long tail stretching toward the $30s.
+    mu = 2.0
+    sigma = 0.5
+    num_products = 100
+
+    continuous_prices = np.random.lognormal(mean=mu, sigma=sigma, size=num_products)
+
+    # 3. Apply realistic market bounds (minimum $2, hard cap at $40 for standard retail)
+    continuous_prices = np.clip(continuous_prices, a_min=lower, a_max=upper)
+
+    # 4. Extract the `price_dollars` (Whole dollar amount / integer floor)
+    price_dollars = np.floor(continuous_prices).astype(int)
+    return price_dollars
+
+def get_price_dollars_instant_coffee_distribution_float(lower=2, upper=40):
+    # 2. Simulate the continuous prices using a Log-Normal distribution
+    # A mean of 2.0 and sigma of 0.5 in log-space creates a peak around $6-$8 
+    # and a long tail stretching toward the $30s.
+    mu = 2.0
+    sigma = 0.5
+    num_products = 100
+
+    continuous_prices = np.random.lognormal(mean=mu, sigma=sigma, size=num_products)
+
+    # 3. Apply realistic market bounds (minimum $2, hard cap at $40 for standard retail)
+    continuous_prices = np.clip(continuous_prices, a_min=lower, a_max=upper)
+
+    # 4. Extract the `price_dollars` (Whole dollar amount / integer floor)
+    price_dollars = np.floor(continuous_prices).astype(float)
+    return price_dollars
+
+
+class InstantCoffeeWeightDistribution:
+    def __init__(self):
+        # Standard sizes in ounces
+        self.weights_oz = [3.5, 7.0, 8.0, 12.0, 16.0]
+        
+        # Estimated probability mass for each size
+        self.probabilities = [0.15, 0.35, 0.35, 0.10, 0.05]
+        
+        # Validate that probabilities sum to 1
+        assert np.isclose(sum(self.probabilities), 1.0), "Probabilities must sum to 1"
+
+    def sample_weights(self, num_samples=100):
+        """
+        Generates 'num_samples' of instant coffee weights based on the distribution.
+        """
+        return np.random.choice(
+            self.weights_oz, 
+            size=num_samples, 
+            p=self.probabilities
+        )
+
+
 if __name__ == "__main__":
     products_leftdigit = ["coffee_a", "coffee_b"]
     products_discount = ["coffee_c", "coffee_d", "coffee_e"]
-
-    TOOL_COST_LEFTDIGIT = 1.
-    TOOL_COST_DISCOUNT = 0.0
+    products_discount2 = ["coffee_a", "coffee_b"]
+    # random.shuffle(products_discount)
+    TOOL_COST_LEFTDIGIT = 0.
+    TOOL_COST_DISCOUNT = 0.001
     # TOOL_COST = 10
 
     attributes_leftdigit = [
         Attribute(
             name="dollars",
-            domain=np.arange(1, 100, 1),
+            domain=get_price_dollars_instant_coffee_distribution_int(2, 40),
             cost=TOOL_COST_LEFTDIGIT,
         ),
         Attribute(
             name="weight",
-            domain=np.linspace(1, 100, 50),
+            domain=InstantCoffeeWeightDistribution().sample_weights(),
             cost=TOOL_COST_LEFTDIGIT,
         ),
         Attribute(
@@ -676,42 +855,67 @@ if __name__ == "__main__":
             domain=np.linspace(0, 99, 50).round(),
             cost=TOOL_COST_LEFTDIGIT,
         ),
+
+        Attribute(name="origin", domain=np.array([0,1]), cost=TOOL_COST_LEFTDIGIT),
+        Attribute(name="roast_date", domain=np.array([0,1]), cost=TOOL_COST_LEFTDIGIT),
+        Attribute(name="packaging", domain=np.array([0,1]), cost=TOOL_COST_LEFTDIGIT),
+        Attribute(name="calories", domain=np.arange(50), cost=TOOL_COST_LEFTDIGIT),
     ]
-    dollars = np.linspace(1, 100, 50)
-    weights = np.linspace(10, 50, 50)
-    d_e = dollars.mean()
-    w_i_e = (1/weights).mean()
-    value_e = d_e * w_i_e
-    # print(value_e)
-    # print((dollars).std())
-    # print((1/weights).std())
+
     attributes_discount = [
         Attribute(
             name="dollars",
-            domain=np.arange(1, 100),
+            domain=np.linspace(8, 15, 50),
             cost=TOOL_COST_DISCOUNT,
         ),
         Attribute(
             name="weight",
-            domain=np.arange(1, 100),
+            domain=np.linspace(8, 12, 50),
             cost=TOOL_COST_DISCOUNT,
         ),
         Attribute(
             name="discount_percentage",
-            domain=np.arange(0, 70, 5),
+            domain=np.array([0,20]),
             cost=TOOL_COST_DISCOUNT,
         ),
     ]
+
+    attributes_discount2 = [
+        Attribute(
+            name="dollars",
+            domain=np.linspace(12, 15, 50),
+            cost=TOOL_COST_DISCOUNT,
+        ),
+        Attribute(
+            name="weight",
+            domain=np.linspace(10, 10.1, 50),
+            cost=TOOL_COST_DISCOUNT,
+        ),
+        Attribute(
+            name="discount_percentage",
+            domain=np.array([0,20]),
+            cost=TOOL_COST_DISCOUNT,
+        ),
+    ]
+
     # print(attributes[1].domain)
 
     realization_leftdigit = {
         ("coffee_a", "dollars"): 4,
-        ("coffee_a", "weight"): 10,
         ("coffee_a", "cents"): 99,
+        ("coffee_a", "weight"): 10,
+        ("coffee_a", "roast_date"): 0,
+        ("coffee_a", "origin"): 0,
+        ("coffee_a", "packaging"): 0,
+        ("coffee_a", "calories"): 3,
 
         ("coffee_b", "dollars"): 5,
-        ("coffee_b", "weight"): 11,
         ("coffee_b", "cents"): 0,
+        ("coffee_b", "weight"): 11,
+        ("coffee_b", "roast_date"): 0,
+        ("coffee_b", "origin"): 0,
+        ("coffee_b", "packaging"): 0,
+        ("coffee_b", "calories"): 3,
     }
 
 
@@ -731,26 +935,41 @@ if __name__ == "__main__":
         # ("B", "cents"): 90,
     }
 
-    # realization = realization_leftdigit
-    # products = products_leftdigit
-    # attributes = attributes_leftdigit
 
-    realization = realization_discount
-    products = products_discount
-    attributes = attributes_discount
+    realization_discount2 = {
+        ("coffee_a", "dollars"): 15,
+        ("coffee_a", "weight"): 10.,
+        ("coffee_a", "discount_percentage"): 20,
+
+        ("coffee_b", "dollars"): 12,
+        ("coffee_b", "weight"): 10.1,
+        ("coffee_b", "discount_percentage"): 0,
+    }
+
+    realization = realization_leftdigit
+    products = products_leftdigit
+    attributes = attributes_leftdigit
+
+    # realization = realization_discount
+    # products = products_discount
+    # attributes = attributes_discount
 
     planner = ToolPlanner(
         products=products,
         attributes=attributes,
         num_bags=5,
 
-        algorithm="mcts",            
-        mcts_iterations=70_000,        # How many simulations to run per step
+        algorithm="expectimax",       # <--- SWITCH TO EXPECTIMAX
+        max_depth=3,                  # <--- SET DEPTH TO 2 (or 3)
+        chance_enumeration_limit=10,   # <--- BUCKETS THE 99 OUTCOMES INTO 5
 
-        max_depth=None,
+        # algorithm="myopic",       
+        # chance_enumeration_limit=5,   # <--- BUCKETS THE 99 OUTCOMES INTO 5
+
+
+        # max_depth=None,
         # Exact enumeration for dollars and cents domains.
-        chance_enumeration_limit=5,
-        seed=123,
+        # chance_enumeration_limit=5,
 
         # Keep 0.0 if tool cost is truly zero.
         # Set e.g. 1e-6 if you want to break ties against unnecessary reveals.
@@ -778,6 +997,17 @@ if __name__ == "__main__":
             # print("Observation:", step["observation"])
             # print("Posterior state:", step["posterior_state"])
             # print("Estimated V(posterior):", step["estimated_V_posterior"])
-            # print("Next action:", step["next_action"])
+            # print("Next actions:", step["next_actions"])
         else:
+            print('+'*50)
             print("Chosen product:", step["chosen_product"])
+            print('+'*50)
+
+    # print(products)
+
+# for att in attributes:
+#     expected = att.domain.mean()
+#     print(f'expected {att.name}: {expected}')
+
+# print(np.sort(get_price_dollars_instant_coffee_distribution(2, 40)))
+# print(np.sort(InstantCoffeeWeightDistribution().sample_weights()))

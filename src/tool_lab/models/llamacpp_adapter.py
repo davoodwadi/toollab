@@ -18,6 +18,13 @@ import requests
 import subprocess
 from pathlib import Path
 
+class LikertResponse(BaseModel):
+    value: int = Field(
+                description="Rating from 1 (Strongly disagree) to 7 (Strongly agree)."
+    )
+
+class BooleanResponse(BaseModel):
+    value: bool
 
 class LlamaCppClient:
     BASE_URL = "http://127.0.0.1:8080/v1"
@@ -257,6 +264,7 @@ class LlamaCPPModelSession:
 
         submit_choice_tool = dict(
             type= "function",
+
             name="submit_choice",
             description="Record the final decision.",
             # strict= True,
@@ -354,7 +362,93 @@ class LlamaCPPModelSession:
 
             self.messages.append(function_call_output) 
 
+    def administer_survey(self, ):
+        survey_data = {}
+        
+        likert_questions = {
+            'ulterior_motive': "At least one reviewer has an ulterior motive.",
+            'suspicious_statements': "At least one of the reviews contains suspicious statements.",
+            'exaggerate_performance': "At least one reviewer is motivated to exaggerate the performance of their review."
+        }
 
+        # 1. Ask Likert Questions
+        for key, statement in likert_questions.items():
+            prompt = f'''Based on the reviews you read answer the following question on a 7-point Likert scale: 
+"{statement}"
+1 (Strongly disagree) to 7 (Strongly agree).
+Output a JSON object based on this schema:
+{LikertResponse.model_json_schema()}
+'''
+            self.messages.append({'role': 'user', 'content': prompt})
+            
+            response = self._client.responses.create(
+                model=self.config.model_name,
+                input=self.messages,
+                instructions=self.system_prompt,
+                text={"format": {"type": "json_object"}}
+            )
+            
+            text_parts = []
+            for item in response.output:
+                if item.type == 'message' or item.type == 'output_text':
+                    text_parts.append(item.content[0].text)
+                    
+            q_text = "\n".join(text_parts).strip()
+            
+            if q_text.startswith("```"):
+                match = re.search(r'```(?:json)?(.*?)```', q_text, re.DOTALL)
+                if match:
+                    q_text = match.group(1).strip()
+            
+            self.messages.extend(response.output)
+            
+            try:
+                survey_data[key] = json.loads(q_text).get('value')
+            except Exception:
+                survey_data[key] = None
+
+        # 2. Ask True/False Manipulation Checks
+        manipulation_checks = {
+            'manipulation_sponsored': "At least 1 review was sponsored.",
+            'manipulation_positive': "At least 1 review was positive.",
+            'manipulation_negative': "At least 1 review was negative."
+        }
+
+        for key, statement in manipulation_checks.items():
+            prompt = f'''Based on the reviews you read, answer the following True or False question: 
+"{statement}"
+Output a JSON object based on this schema:
+{BooleanResponse.model_json_schema()}
+'''
+            self.messages.append({'role': 'user', 'content': prompt})
+            
+            response = self._client.responses.create(
+                model=self.config.model_name,
+                input=self.messages,
+                instructions=self.system_prompt,
+                text={"format": {"type": "json_object"}}
+            )
+            
+            text_parts = []
+            for item in response.output:
+                if item.type == 'message' or item.type == 'output_text':
+                    text_parts.append(item.content[0].text)
+                    
+            q_text = "\n".join(text_parts).strip()
+            
+            if q_text.startswith("```"):
+                match = re.search(r'```(?:json)?(.*?)```', q_text, re.DOTALL)
+                if match:
+                    q_text = match.group(1).strip()
+            
+            self.messages.extend(response.output)
+            
+            try:
+                survey_data[key] = json.loads(q_text).get('value')
+            except Exception:
+                survey_data[key] = None
+
+        return survey_data
 
     def _get_tool_error_one_tool_only(self, tool_call: ToolInvocation) -> dict[str, str]:
         return {

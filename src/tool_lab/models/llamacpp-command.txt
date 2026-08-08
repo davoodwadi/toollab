@@ -1,3 +1,9 @@
+# Qwen 3.6
+~/llama.cpp/build/bin/llama-server \
+    -m $LLAMA_CACHE/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf \
+    -ngl 999 \
+    --parallel 4
+
 # Qwen3.5
 ~/llama.cpp/build/bin/llama-server \
     -m $LLAMA_CACHE/Qwen3.5-27B-GGUF/Qwen3.5-27B-UD-Q4_K_XL.gguf \
@@ -8,6 +14,7 @@
     -m $LLAMA_CACHE/Qwen3.5-9B-GGUF/Qwen3.5-9B-UD-Q4_K_XL.gguf \
     -ngl 999 \
     --parallel 4
+
 
 # Gemma 4
 ## 26B-A4B

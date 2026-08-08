@@ -95,6 +95,7 @@ class ExperimentSpec:
     attributes: list[AttributeSpec] | None
     cues: list[CueSpec]
     model: ModelConfig
+    cue_value_pools: dict[str, list[str]] = field(default_factory=dict)
     inspect_mode: Literal['full', 'cell'] = 'cell'
     replications: int = 5
     budget_type: Literal["usd", "tools", "tool_usd", 'tokens', 'points'] = "tool_usd"
@@ -192,6 +193,8 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
     inspect_mode = experiment.get('inspect_mode')
     # print('inspect_mode', inspect_mode)
 
+    cue_value_pools = {}
+
     if inspect_mode=='full':
         attributes = None
         options = []
@@ -213,11 +216,21 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
             
             # 3. Automatically expand the dictionary into a flat list of CueSpecs
             for attr_id, val in opt_cues.items():
+                val_str = str(val)
+                if val_str.startswith('{') and val_str.endswith('}'):
+                    filename = val_str[1:-1]
+                    if val_str not in cue_value_pools:
+                        list_path = file_path.parent / filename
+                        if list_path.exists():
+                            cue_value_pools[val_str] = [line.strip() for line in list_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+                        else:
+                            cue_value_pools[val_str] = []
+
                 cues.append(CueSpec(
                     id=f"{original_id}_{attr_id}",
                     option_id=original_id,
                     attribute_id=attr_id,
-                    value=str(val)
+                    value=val_str
                 ))
 
         # print(options)
@@ -248,11 +261,21 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
             
             # 3. Automatically expand the dictionary into a flat list of CueSpecs
             for attr_id, val in opt_cues.items():
+                val_str = str(val)
+                if val_str.startswith('{') and val_str.endswith('}'):
+                    filename = val_str[1:-1]
+                    if val_str not in cue_value_pools:
+                        list_path = file_path.parent / filename
+                        if list_path.exists():
+                            cue_value_pools[val_str] = [line.strip() for line in list_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+                        else:
+                            cue_value_pools[val_str] = []
+
                 cues.append(CueSpec(
                     id=f"{original_id}_{attr_id}",
                     option_id=original_id,
                     attribute_id=attr_id,
-                    value=str(val)
+                    value=val_str
                 ))
     else:
         print(f'inspect_mode: {inspect_mode} invalid.')
@@ -267,6 +290,7 @@ def load_experiment_spec(path: str | Path) -> ExperimentSpec:
         attributes=attributes,
         cues=cues,
         model=model,
+        cue_value_pools=cue_value_pools,
         replications=experiment.get("replications", 5),
         budget_type=experiment.get("budget_type"),
         budget_usd=experiment.get("budget_usd", 0.0),

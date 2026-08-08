@@ -46,7 +46,7 @@ class ExperimentRunner:
         run_spec = deepcopy(self.spec)
 
         # 2. Apply Randomization if configured
-        if run_spec.randomization and run_spec.randomization.get("randomize_attributes_options"):
+        if run_spec.randomization:
             base_seed = run_spec.randomization.get("seed")
             # print(base_seed)
             if base_seed is not None:
@@ -56,10 +56,29 @@ class ExperimentRunner:
                 rng = random.Random()
                 print('randomizing without seed')
             
-            rng.shuffle(run_spec.options)
-            if run_spec.attributes:
-                rng.shuffle(run_spec.attributes)
-            
+            if run_spec.randomization.get("randomize_attributes_options"):
+                rng.shuffle(run_spec.options)
+                if run_spec.attributes:
+                    rng.shuffle(run_spec.attributes)
+
+            # 2b. Sample from placeholder pools
+            for placeholder, pool in run_spec.cue_value_pools.items():
+                if not pool:
+                    continue
+                
+                matching_cues = [cue for cue in run_spec.cues if cue.value == placeholder]
+                if not matching_cues:
+                    continue
+                
+                if len(pool) >= len(matching_cues):
+                    values = rng.sample(pool, len(matching_cues))
+                else:
+                    values = rng.choices(pool, k=len(matching_cues))
+                
+                for cue, new_val in zip(matching_cues, values):
+                    cue.value = new_val
+
+        # print('run_spec.cues', [c for c in run_spec.cues if c.attribute_id=='brand'])
         # 3. Rewrite option IDs to positional names (e.g. option_1)
         for i, option in enumerate(run_spec.options):
             original_id = option.metadata.get('original_id', option.id)
@@ -79,6 +98,7 @@ class ExperimentRunner:
                 if cue.option_id == original_id:
                     cue.option_id = new_id
         # print(run_spec.options[0])
+        # print(run_spec.cues[0])
         # exit()
         # print(run_spec.inspect_mode)
         # exit()    
@@ -158,6 +178,7 @@ class ExperimentRunner:
             # print("="*50 + "\n")
         # exit()
 
+        survey_data = {}
         for iteration in range(self.spec.max_turns):
             # calls the LLM -> gets response (tool_call, content, reasoning) -> adds it to session.transcript
             # gets: LLM's response              
@@ -245,6 +266,9 @@ class ExperimentRunner:
 
             if assistant_response.tool_calls[0].name == "submit_choice":
                 print(f"Choice: {environment.choice}")
+                if hasattr(model_session, 'administer_survey'):
+                    survey_data = model_session.administer_survey()
+                    print(survey_data)
                 break
             print('*'*50)
             # END: execute tools
@@ -286,8 +310,15 @@ class ExperimentRunner:
             'system_prompt' : model_session.system_prompt,
             'user_message' : model_session.initial_user_message,
         }
+
         if environment.spec.budget_type=='tool_usd':
             run_record['inspect_tool_cost'] = environment.spec.inspect_tool_cost
+
+        if survey_data:
+            for k,v in survey_data.items():
+                run_record[k] = v
+
+
         return run_record
 
 
